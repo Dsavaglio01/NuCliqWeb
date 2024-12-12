@@ -1,6 +1,7 @@
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import React from 'react'
 import NextButton from './NextButton'
+import { styles } from '@/styles/styles'
 function NewPostHeader({button, group, pfp}) {
     const pfpStyle = {
         height: window.innerHeight / 18.7,
@@ -15,14 +16,13 @@ function NewPostHeader({button, group, pfp}) {
     }
   return (
     <>
-            <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', marginVertical: '2.5%', marginHorizontal: '5%'}}>
+            <div style={styles.repostButtonContainer}>
                 {pfp ? 
                 <img src={pfp} style={pfpStyle}/>
                 : <UserCircleIcon className='userBtn' style={pfpStyle}/>}
                     <p style={newPostText}>You can post up to 5 images or a single video or a single text post</p>
-                {button ?  <div style={
-                 { zIndex: 3, height: 70, alignSelf: 'center', alignItems: 'center'}}>
-                  <div style={{alignSelf: 'center', alignItems: 'center', marginTop: '20%'}}>
+                {button ?  <div style={{zIndex: 3, height: 70, alignSelf: 'center', alignItems: 'center'}}>
+                  <div style={styles.postDoneContainer}>
 
                     <NextButton text={"DONE"} textStyle={{fontSize: 12.29}}/>
                     </div>

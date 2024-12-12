@@ -45,12 +45,12 @@ span {
 
 .side-footer {
   width: 300px; /* Adjust width as needed */
- /* Example background */
   padding: 20px;
   position: sticky; /* Keep the footer visible on scroll */
-  top: 0;
+  top: 0px;
   border-right: 0.5px solid #fafafa;         
   height: 100vh;  /* Match viewport height for full-length footer */
+  padding-top: 0px;
 }
 .side-theme-footer {
   width: 300px; /* Adjust width as needed */
@@ -184,11 +184,11 @@ span {
   border-top: 1px dashed #fff; /* Adjust color and width */
 }
 .chat-bubble {
-  background-color: #fff;
+  background-color: #fafafa;
   border-radius: 15px;
   height: 90%;
   width: 90%;
-  margin-left: 5%;
+  overflow: hidden;
 }
 .tail {
   /* absolute w-3 h-3 rotate-45*/
@@ -225,7 +225,6 @@ textarea:focus {
   min-height: 100vh;   /* Ensure container takes up full viewport height */
   max-width: 100vw;   /* Prevent content from exceeding viewport width */
   overflow-x: hidden;  /* Hide horizontal scrollbar */
-  padding: 20px; 
 }
 textarea {
   resize: none

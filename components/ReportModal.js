@@ -55,7 +55,7 @@ comment: reportComment.comment == undefined ? reportComment.reply : reportCommen
   return (
     <ReactModal isOpen={reportModal} style={{content: styles.modalContainer}}>
        <div>
-                {loading ? <div style={{flex: 1, alignItems: 'center', justifyContent:'center', marginBottom: '20%'}}>
+                {loading ? <div style={styles.reportLoadingContainer}>
         <BeatLoader color={ "#9EDAFF"}/> 
         </div> : !finishedReporting ? 
         <>
@@ -109,7 +109,7 @@ comment: reportComment.comment == undefined ? reportComment.reply : reportCommen
                 </>
              : 
             <div style={{flex: 1}}>
-            <div style={{flex: 1, justifyContent: 'center', marginBottom: '50%'}}>
+            <div style={styles.thanksContainer}>
             <p style={styles.reportThanksContentText}>Thanks for submitting your anonymous response!</p>
             <p style={styles.reportThanksContentText}>User has been notified about the report.</p>
             <p style={styles.reportThanksContentText}>Thanks for keeping NuCliq safe!</p>

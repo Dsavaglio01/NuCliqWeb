@@ -1,4 +1,4 @@
-import Reac, {useCallback} from 'react'
+import React, {useCallback} from 'react'
 import { BookmarkIcon as SolidBookmark } from '@heroicons/react/24/solid'
 import { BookmarkIcon } from '@heroicons/react/24/outline'
 function SaveButton({item, user, updateTempPostsAddSave, updateTempPostsRemoveSave}) {

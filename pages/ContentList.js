@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
-import { collection, getDoc, getDocs, getFirestore, onSnapshot, query, where, doc, deleteDoc, updateDoc, arrayRemove, limit, startAfter, orderBy } from 'firebase/firestore';
+import React, { useEffect, useState, useMemo } from 'react'
+import { collection, getDoc, getDocs, onSnapshot, query, where, doc, updateDoc, arrayRemove, limit, startAfter, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { FaceFrownIcon } from '@heroicons/react/24/outline';
 import NextButton from '@/components/NextButton';
 import ThemeHeader from '@/components/ThemeHeader';
 import { db } from '@/firebase';
-//import _ from 'lodash'
 import { useRouter } from 'next/router';
 import { BeatLoader } from 'react-spinners';
+import { fetchMoreSettings, fetchSettings, getProfileDetails, getRequests } from '@/firebaseUtils';
 function ContentList() {
     const {user} = useAuth()
     const [posts, setPosts] = useState([]);
@@ -22,21 +22,23 @@ function ContentList() {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const {likes, comments, saves, archived, cards, username, blocked, mentions} = router.query;
-    useEffect(()=> {
-      let unsub;
-      const fetchCards = async () => {
-        //const passes = await getDocs(collection(db, 'users', user.uid, 'passes')).then((snapshot) => snapshot.docs.map((doc) => doc.id));
-        unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'requests'), where('actualRequest', '==', true)), (snapshot) => {
-          setRequests(snapshot.docs.map((doc)=> ( {
-            id: doc.id,
-            ...doc.data()
-            //info: doc.data().info
-          })))
-        })
-      } 
-      fetchCards();
-      return unsub;
-    }, []);
+    useMemo(() => {
+       let unsubscribe;
+
+    if (user.uid) {
+      // Call the utility function with the userId and a callback
+      unsubscribe = getRequests(user.uid, (data) => {
+        setRequests(data); // Update the state with the fetched data
+      });
+    }
+
+    // Clean up the listener on component unmount
+    return () => {
+      if (unsubscribe) {
+        return unsubscribe
+      }
+    };
+    }, [user?.uid])
     useMemo(() => {
       if (comments) {
         const getData = async() => {
@@ -46,103 +48,38 @@ function ContentList() {
         getData()
       }
     }, [comments])
-    useEffect(() => {
+    useMemo(() => {
+      setPosts([])
+      const getData = async() => {
         if (mentions) {
-          setPosts([]);
-      const getLikes = async() => {
-        const first = query(collection(db, "profiles", user.uid, 'mentions'), orderBy('timestamp', 'desc'), limit(10));
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        console.log(querySnapshot.docs.length)
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-        });
-      }
-      getLikes()
-        } 
-        else if (comments) {
-          setPosts([]);
-          const getLikes = async() => {
-            const first = query(collection(db, "profiles", user.uid, 'comments'), orderBy('timestamp', 'desc'), limit(10));
-            const querySnapshot = await getDocs(first);
-            setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-            querySnapshot.forEach(async(document) => setPosts(prevState => [...prevState, {id: document.id, ...document.data()}]));
-          }
-          getLikes()
-          setTimeout(() => {
-              setPostDone(true)
-          }, 1500);
-          
-        } else if (saves) {
-                setPosts([]);
-      const getLikes = async() => {
-        const first = query(collection(db, "profiles", user.uid, 'saves'), orderBy('timestamp', 'desc'), limit(10));
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        console.log(querySnapshot.docs.length)
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-        });
-      }
-      getLikes()
+          const {data} = await fetchSettings(user.uid, 'mentions')
+          setPosts(data)
         }
-        else if (archived) {
-          let unsub;
-          const getArchivedPosts = async() => {
-            unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'posts'), where('archived', '==', true), orderBy('timestamp', 'desc'), limit(10)), (snapshot) => {
-              setPosts(snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-              })))
-              setLastVisible(snapshot.docs[snapshot.docs.length - 1])
-            })
-          }
-          getArchivedPosts();
-          setTimeout(() => {
-              setLoading(false)
-            }, 1000);
-            return unsub;
+        else if (comments) {
+          const {data} = await fetchSettings(user.uid, 'comments')
+          setPosts(data)
+        }
+        else if (saves) {
+          const {data} = await fetchSettings(user.uid, 'saves')
+          setPosts(data)
         }
         else if (cards) {
-          const getCards = async() => {
-            const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-            if (docSnap.exists()) {
-              //console.log(docSnap.data().paymentMethodLast4)
-              setEditedCards(docSnap.data().paymentMethodLast4)
-            }
-            /* if (docSnap.exists()) {
-              setEditedCards(docSnap)
-            } */
-            
+          const profileData = await getProfileDetails(user.uid)
+          if (profileData) {
+            setEditedCards(profileData.paymentMethodLast4)
           }
-          getCards()
         }
         else if (blocked) {
-          const getUsers = async() => {
-            let blockedUsers = (await getDoc(doc(db, 'profiles', user.uid))).data().blockedUsers
-            blockedUsers.forEach(async(item) => {
-              let user = await getDoc(doc(db, 'profiles', item))
-              setPosts(prevState => [...prevState, {id: user.id, ...user.data()}])
-            })
-            
-            //setPosts(blockedUsers)
-          } 
-          getUsers()
-          //await getDoc(doc(db, ))
-          //etPosts(await getDoc(doc(db, profiles)))
+          const profileData = await getProfileDetails(user.uid)
+          if (profileData) {
+            setEditedCards(profileData.blockedUsers)
+          }
         }
         
-    }, [])
+    }
+      
+      getData();
+  }, [])
     useEffect(() => {
       if (postDone) {
           setCompletePosts([]);
@@ -169,102 +106,23 @@ function ContentList() {
     }, [done]) */
     //console.log(posts.length)
     
-    function fetchMoreData() {
+   async function fetchMoreData() {
       if (lastVisible != undefined) {
         if (mentions) {
-          setLoading(true)
-        const getLikes = async() => {
-            const first = query(collection(db, "profiles", user.uid, 'mentions'), orderBy('timestamp', 'desc'), startAfter(lastVisible), limit(10))
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-        });
-      }
-          //console.log(tempPosts)
-          getLikes();
-          setTimeout(() => {
-                    setLoading(false)
-                  }, 1000);
+          const {data} = await fetchMoreSettings(user.uid, 'mentions', lastVisible)
+          setPosts([...posts, data])
         }
         else if (comments) {
-          setLoading(true)
-          setPostDone(false)
-          let newData = [];
-        const getLikes = async() => {
-            const first = query(collection(db, "profiles", user.uid, 'comments'), orderBy('timestamp', 'desc'), startAfter(lastVisible), limit(10))
-        const querySnapshot = await getDocs(first);
-        
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          newData.push({
-            id: document.id,
-            ...document.data()
-          })
-        });
-        if (newData.length > 0) {
-          setLoading(true)
-          setPosts([...posts, ...newData])
-          setCompletePosts([]);
-          setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        }
-      }
-          getLikes();
+          const {data} = await fetchMoreSettings(user.uid, 'comments', lastVisible)
+          setData([...posts, data])
           setTimeout(() => {
-                    setLoading(false)
                     setPostDone(true)
-                  }, 1500);
+                  }, 500);
         }
         else if (saves) {
-          setLoading(true)
-        const getLikes = async() => {
-            const first = query(collection(db, "profiles", user.uid, 'saves'), orderBy('timestamp', 'desc'), startAfter(lastVisible), limit(10))
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-        });
-      }
-          //console.log(tempPosts)
-          getLikes();
-          setTimeout(() => {
-                    setLoading(false)
-                  }, 1000);
-
+          const {data} = await fetchMoreSettings(user.uid, 'saves', lastVisible)
+          setPosts([...posts, data])
         }
-        else if (archived) {
-          let unsub;
-          const fetchCards = async () => {
-            unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'posts'), where('archived', '==', true), orderBy('timestamp', 'desc'), startAfter(lastVisible), limit(10)), (snapshot) => {
-              const newData = [];
-              setPosts(snapshot.docs.map((doc)=> {
-                newData.push({
-                  id: doc.id,
-                ...doc.data(),
-                })
-                
-              }))
-              setPosts([...posts, ...newData])
-              setLastVisible(snapshot.docs[snapshot.docs.length-1])
-              
-            })
-          } 
-          fetchCards();
-          return unsub;
-        }
-        setTimeout(() => {
-          setLoading(false)
-        }, 1000);
       }
     }
     const friendsContainer = {
@@ -306,12 +164,6 @@ function ContentList() {
       maxWidth: '75%'
     }
     async function unBlock(item) {
-      //console.log(item)
-      /* await updateDoc(doc(db, 'profiles', user.uid), {
-        blockedUsers: arrayRemove(item.id)
-      }).then(async() => await updateDoc(doc(db, 'profiles', item.id), {
-        
-      })) */
       await updateDoc(doc(db, 'profiles', user.uid), {
       blockedUsers: arrayRemove(item.id)
     }).then(async() => await updateDoc(doc(db, 'profiles', item.id), {

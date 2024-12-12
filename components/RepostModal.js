@@ -65,8 +65,8 @@ async function schedulePushRepostNotification(id, username, notificationToken) {
               <p style={styles.repostCommentText}>{repostComment.length}/200</p>
               <div style={styles.repostContainer}>
                 <div style={styles.postRepostHeader}>
-            {repostItem.pfp ? <img src={repostItem.pfp} style={{height: 33, width: 33, borderRadius: 8}}/> : 
-          <UserCircleIcon style={{height: 33, width: 33, borderRadius: 8}}/>
+            {repostItem.pfp ? <img src={repostItem.pfp} style={styles.commentPfp}/> : 
+          <UserCircleIcon style={styles.commentPfp}/>
           }
             <div className='cursor-pointer' onClick={repostItem.userId != user.uid ? () => router.push('ViewingProfile', {name: repostItem.userId, viewing: true}) : () => router.push('Profile', {screen: 'ProfileScreen', params: {name: user.uid, preview: false, viewing: false, previewImage: null, previewMade: false, applying: false}})}>
               <p style={styles.addRepostText}>@{repostItem.username}</p>
@@ -78,7 +78,7 @@ async function schedulePushRepostNotification(id, username, notificationToken) {
               : <p>Sorry, something went wrong, please try again.</p>}
               
 
-              <div style={{flex: 1, alignItems: 'flex-end', marginRight: '5%', marginTop: '5%'}}>
+              <div style={styles.repostLoadingContainer}>
                 {repostLoading ? <BeatLoader color={"9edaff"}/> : 
                 <div className='flex justify-end mt-5'>
                 <NextButton text={"Re-vibe"} onClick={rePostFunction}/> 

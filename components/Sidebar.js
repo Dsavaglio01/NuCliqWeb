@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useContext, createContext, Suspense} from 'react'
+import React, { useState, useEffect, useRef, Suspense} from 'react'
 import { useRouter } from 'next/router'
 import ReactModal from 'react-modal';
-import { ChatBubbleBottomCenterIcon, ChevronLeftIcon, EllipsisVerticalIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { EllipsisVerticalIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { HomeIcon, PlusCircleIcon, UserIcon, EnvelopeIcon, BellIcon, VideoCameraIcon, ChatBubbleBottomCenterTextIcon, } from '@heroicons/react/24/outline';
 import { BeatLoader } from 'react-spinners';
 import {PhotoIcon} from '@heroicons/react/24/solid';
@@ -13,62 +13,35 @@ import NewPostHeader from './NewPostHeader';
 import MainButton from './MainButton';
 import Image from 'next/image';
 import useStore from './store';
+import { styles } from '@/styles/styles';
 const Chat = React.lazy(() => import ('../pages/Chat'))
 const Notifications = React.lazy(() => import ('../pages/Notifications'))
+const grid = 5;
 export default function Sidebar({ style, onStateChange}) {
     const router = useRouter();
     const {user} = useAuth();
     const [initialText, setInitialText] = useState(null);
-    const [themes, setThemes] = useState(false);
     const [text, setText] = useState('');
-    const [actualTextSize, setActualTextSize] = useState(15.36)
     const {postArray} = router.query;
     const [newPostModal, setNewPostModal] = useState(false);
     const [data, setData] = useState([])
     const [textOpen, setTextOpen] = useState(false);
     const [pfp, setPfp] = useState(null);
     const sidebarValue = useStore((state) => state.sidebarValue);
-  const setSidebarValue = useStore((state) => state.setSidebarValue);
+    const setSidebarValue = useStore((state) => state.setSidebarValue);
     const [expanded, setExpanded] = useState(false);
     const [notificationsExpanded, setNotificationsExpanded] = useState(false);
     const [loading, setLoading] = useState(false)
-     const openMenu = (obj) => {
-      //console.log(obj)
-      const newArray = data.map((obj) => ({ ...obj }));
-      //console.log(newArray)
-    // Find the index of the item you want to modify (e.g., item with id 2)
-    const index = newArray.findIndex(item => item.id === obj.id);
-    //console.log(index)
-    if (index !== -1) {
-      // Update the value of the specific object
-      newArray[index].visible = true;
-      //console.log(newArray)
-      // Update the state with the modified array
-      setData(newArray);
+  
+    useEffect(() => {
+      if(newPostModal) {
+      const getData = async() => {
+        const docSnap = await getDoc(doc(db, 'profiles', user.uid))
+        setPfp(docSnap.data().pfp)
+      }
+      getData()
     }
-  }
-  const closeMenu = (obj) => {
-    const newArray = [...data];
-    
-    // Find the index of the item you want to modify (e.g., item with id 2)
-    const index = newArray.findIndex(item => item === obj);
-    if (index !== -1) {
-      // Update the value of the specific object
-      newArray[index].visible = false;
-
-      // Update the state with the modified array
-      setData(newArray);
-    }
-  }
-  useEffect(() => {
-    if(newPostModal) {
-    const getData = async() => {
-      const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-      setPfp(docSnap.data().pfp)
-    }
-    getData()
-  }
-  }, [newPostModal]) 
+    }, [newPostModal]) 
     async function addVideoToArray(item) {
         try {
       const { uri } = await VideoThumbnails.getThumbnailAsync(
@@ -81,92 +54,6 @@ export default function Sidebar({ style, onStateChange}) {
     } catch (e) {
       console.warn(e);
     }
-    }
-     const replaceImage = async(e) => {
-    
-    if (!mStatus != false) {
-    await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsMultipleSelection: false,
-          aspect: [4, 3],
-          allowsEditing: true,
-          quality: 0.8,
-        }).then(async(image) => {
-          if (!image.canceled) {
-              image.assets.map(async(ite, index) => {
-              const result = await Image.compress(
-                ite.uri,
-                {},
-              );
-              //console.log(result)
-             const updatedItems = data.map(item => (item.post === e.post ? {id: item.id, image: true, post: result, visible: item.visible} : item));
-            //image.assets[0].uri
-            setData(updatedItems)
-                      
-            })
-            }
-        }) 
-      }
-  }
-  const deleteData = (obj) => {
-    const updatedItems = data.filter(item => item != obj)
-    updatedItems.map((item) => {
-      item.id = item.id - 1
-    })
-    setData(updatedItems)
-  }
-    const toggleView = {
-      borderWidth: 2,
-      width: '90%',
-      marginLeft: '5%',
-      marginRight: '5%',
-      borderRadius: 10,
-      height: window.innerHeight / 7,
-      marginTop: '5%',
-      borderColor: '#005278',
-      backgroundColor: "#f5f5f5"
-    }
-    const editText = {
-       fontSize: window.innerHeight / 68.7,
-    padding: 10,
-    paddingTop: 0,
-    marginTop: '5%',
-    color: "#fafafa",
-    textAlign: 'center'
-    }
-    const input = {
-      minHeight: 150,
-    borderRadius: 5,
-    borderWidth: 0.25,
-    padding: 5,
-    width: '95%',
-    marginLeft: '2.5%',
-    fontSize: actualTextSize, 
-    textAlign: 'left', 
-    color: "#121212", 
-    borderColor: "#fafafa",
-    }
-    const editBottomText = {
-      fontSize: window.innerHeight / 68.7,
-    padding: 10,
-    paddingTop: 0,
-    marginTop: 0,
-    color: "#fafafa",
-    textAlign: 'center'
-    }
-    const editPostText = {
-       fontSize: window.innerHeight / 54.9,
-    padding: 10,
-    paddingBottom: 0,
-    color: "#005278"
-    }
-    const postLength = {
-      fontSize: 12.29,
-    paddingBottom: 10,
-    paddingTop: 5,
-    color: "#fafafa",
-    textAlign: 'right',
-    marginRight: '5%'
     }
     const postPostText = {
       fontSize: window.innerHeight / 68.7,
@@ -189,8 +76,6 @@ export default function Sidebar({ style, onStateChange}) {
 
   return result;
 };
-
-const grid = 5;
     const getItemStyle = (isDragging, draggableStyle) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: "none",
@@ -232,11 +117,9 @@ const getListStyle = isDraggingOver => ({
    const handleText = (event) => {
     setText(event.target.value)
 }
-console.log(notificationsExpanded)
-const handleClickTwo = () => {
-
-  onStateChange(notificationsExpanded)
-}
+    const handleClickTwo = () => {
+      onStateChange(notificationsExpanded)
+    }
 
     const handleFileChange = (event) => {
         const selectedFiles = event.target.files;
@@ -249,24 +132,17 @@ const handleClickTwo = () => {
       );
     }
       }
-      useEffect(() => {
-  const drawerButtons = document.querySelectorAll('.drawer-button');
-
-  console.log("Drawer buttons found:", drawerButtons); // Check if buttons are found
-
-  drawerButtons.forEach(button => {
-    let isOpen = false; // Add a variable to track the state
-
-  button.addEventListener('click', () => {
-    const drawerContent = button.nextElementSibling; 
-    drawerContent.classList.toggle('open'); 
-
-    isOpen = !isOpen; // Toggle the state
-
-    console.log("Drawer content open:", isOpen); 
-});
-  });
-}, []);
+  useEffect(() => {
+    const drawerButtons = document.querySelectorAll('.drawer-button');
+      drawerButtons.forEach(button => {
+        let isOpen = false; // Add a variable to track the state
+        button.addEventListener('click', () => {
+          const drawerContent = button.nextElementSibling; 
+          drawerContent.classList.toggle('open'); 
+          isOpen = !isOpen; // Toggle the state
+      });
+    });
+  }, []);
      
     const handleVideoFileChange = (event) => {
       const selectedFile = event.target.file;
@@ -278,27 +154,21 @@ const handleClickTwo = () => {
     }
     return (
       <>
-      <ReactModal isOpen={newPostModal} style={{content: {width: '40%',
-      left: '50%',
-      right: 'auto',
-      borderRadius: 10,
-      transform: 'translate(-50%, 0)',
-      backgroundColor: "#121212",
-      marginRight: '-50%',}}}>
+      <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
         <div>
           <p className='text-white'>New Post</p>
         <div className='divider'/>
       <div>
 
         <NewPostHeader group={false} data={data} pfp={pfp}/>
-        <div style={toggleView}>
-          <div style={{flexDirection: 'row', display: 'flex'}}>
-         <div style={{ flexDirection: 'row', display: 'flex', justifyContent: 'space-evenly', flex: 1}}>
+        <div style={styles.toggleView}>
+          <div style={{display: 'flex'}}>
+         <div style={styles.newPostContainer}>
           <>
-          <button style={{borderRadius: 10, flexDirection: 'row', display: 'flex', backgroundColor: "#fafafa"}} onClick={handleClick}>
+          <button style={styles.selectImageContainer} onClick={handleClick}>
               <PhotoIcon className='postBtn' color='#005278' style={{alignSelf: 'center'}}/>
                 <div>
-                  <p style={editPostText}>Select Images</p>
+                  <p style={styles.editPostText}>Select Images</p>
                   <p style={postPostText}>up to {5 - (data.filter((item) => item.image == true)).length} images</p>
                 </div>
           </button>
@@ -306,10 +176,10 @@ const handleClickTwo = () => {
           </>
         <div style={{height: 35, borderWidth: 0.5, alignSelf: 'center', borderColor: "grey"}}/>
         <>
-          <button style={{borderRadius: 10, flexDirection: 'row', display: 'flex', backgroundColor: "#fafafa"}} onClick={handleVideoClick}>
+          <button style={styles.selectImageContainer} onClick={handleVideoClick}>
               <VideoCameraIcon className='postBtn' color='#005278' style={{alignSelf: 'center'}}/>
                 <div>
-                  <p style={editPostText}>Select Vid</p>
+                  <p style={styles.editPostText}>Select Vid</p>
                   <p style={postPostText}>up to 60 seconds</p>
                 </div>
           </button>
@@ -317,11 +187,11 @@ const handleClickTwo = () => {
           </>
          </div>
       </div>
-      <div className='cursor-pointer' style={{alignItems: 'center', display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: '-2.5%'}} 
+      <div className='cursor-pointer' style={styles.textContainer} 
       onClick={() => setTextOpen(true)}>
        <ChatBubbleBottomCenterTextIcon className='postBtn' color='#005278'/>
         <div>
-         <p style={editPostText}>What's vibing?</p>
+         <p style={styles.editPostText}>What's vibing?</p>
           <p style={postPostText}>Post Text</p>
         </div>
         
@@ -329,10 +199,10 @@ const handleClickTwo = () => {
       
       </div>
        
-        <p style={editText}>Hold, drag and drop to change order of your posts</p>
-        <p style={editBottomText}>To edit/adjust your post, press the three dots</p>
+        <p style={styles.editText}>Hold, drag and drop to change order of your posts</p>
+        <p style={styles.editBottomText}>To edit/adjust your post, press the three dots</p>
         {loading ? 
-        <div style={{flex: 1, justifyContent: 'center', alignItems: 'center' }}> 
+        <div style={styles.loadContainer}> 
           <BeatLoader color='#9edaff'/>
           </div> : (postArray != undefined || data.length != 0) && !loading && !textOpen ? 
         <DragDropContext onDragEnd={onDragEnd}>
@@ -357,9 +227,9 @@ const handleClickTwo = () => {
                         provided.draggableProps.style
                       )}
                     >
-                      <img src={item.post} style={{height: 50, width: 50}}/>
+                      <img src={item.post} style={styles.postImage}/>
                       <p className='text-black self-center pl-6'>Post #{index + 1}</p>
-                      <EllipsisVerticalIcon className='postBtn' style={{alignSelf: 'center', marginLeft: 'auto'}} color='#121212'/>
+                      <EllipsisVerticalIcon className='postBtn' style={styles.threeDotIcon} color='#121212'/>
                     </div>
                   )}
                 </Draggable>
@@ -372,11 +242,11 @@ const handleClickTwo = () => {
          : textOpen ? 
         <div>
             <div>
-      <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '5%', marginRight: '5%', paddingBottom: 5}}>
+      <div style={styles.typeMessageContainer}>
          <>
-         <div style={{flexDirection: 'row',display: 'flex', }}>
+         <div style={{display: 'flex'}}>
           <ChatBubbleBottomCenterTextIcon className='postBtn' color='#9edaff' style={{alignSelf: 'center'}}/>
-          <p style={editText}>Type your message below</p>
+          <p style={styles.editText}>Type your message below</p>
         </div>
           
          </>
@@ -384,13 +254,10 @@ const handleClickTwo = () => {
       <div className='divider'/>
       <>
       <div style={{marginTop: '5%'}}>
-        <textarea placeholder={initialText ? initialText.value : "What's Vibing?"} value={text} style={input} onChange={handleText} maxLength={300} />
-       {/*  <TextInput placeholder={initialText ? initialText.value : "What's Vibing?"} placeholderTextColor={'grey'} value={text} style={[styles.input, 
-        {fontSize: actualTextSize, textAlign: 'left', color: theme.color, backgroundColor: theme.backgroundColor, borderColor: theme.color, fontFamily: 'Montserrat_500Medium'}]} 
-              onChangeText={setText} multiline maxLength={300} blurOnSubmit onFocus={handleFocus} onBlur={handleBlur}/> */}
-              <p style={postLength}>{text.length}/300</p>
+        <textarea placeholder={initialText ? initialText.value : "What's Vibing?"} value={text} style={styles.input} onChange={handleText} maxLength={300} />
+        <p style={styles.postLength}>{text.length}/300</p>
       </div>
-      <div style={{flexDirection: 'row', display: 'flex', justifyContent: 'flex-end', marginHorizontal: '10%'}}>
+      <div style={styles.postContainerButton}>
       <div style={{alignSelf: 'center'}}>
         {text.length > 0 ? <div className='mr-3 mt-3'>
         <MainButton text={initialText ? "FINISH EDIT" : "FINISH"} onPress={text.length > 0 ? initialText ? () => putKeys() : () => addToArray() : null} />
@@ -413,19 +280,20 @@ const handleClickTwo = () => {
       
     </div>
         <button className="close-button" onClick={() => {setNewPostModal(false); setData([])}}>
-        <XMarkIcon className='btn'/>
-            </button>
+          <XMarkIcon className='btn'/>
+        </button>
       </ReactModal>
-      <aside style={style} className={`${expanded || notificationsExpanded ? 'small-side-footer' : !themes ? 'side-footer' : 'side-theme-footer'}`}>
+      <aside className={`${expanded || notificationsExpanded ? 'small-side-footer' : 'side-footer'}`}>
         {!expanded && !notificationsExpanded ?
-          <div style={{marginLeft: '25%'}} className='relative hidden lg:inline-grid items-center justify-center h-24 w-24 cursor-pointer'>
+          <div style={{marginLeft: '25%'}} className='relative hidden lg:inline-grid items-center mt-5 justify-center h-24 w-24 cursor-pointer'>
                 <Image
                   src={require('../assets/DarkMode5.png')} // Make sure this path is correct
                   alt="Your logo description"
                   height={50}
                   width={150}
                 />
-            </div> : <div className='relative hidden lg:inline-grid h-24 w-24 cursor-pointer'>
+            </div> : 
+            <div className='relative hidden lg:inline-grid h-24 w-24 mt-5 cursor-pointer'>
                 <Image
                   src={require('../assets/logo.png')} // Make sure this path is correct
                   alt="Your logo description"

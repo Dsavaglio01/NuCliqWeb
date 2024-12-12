@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-
+import { styles } from '@/styles/styles';
 function PickTheme({text, onFileSelected}) {
     const fileInputRef = useRef(null);
     const handleClick = () => {
@@ -14,12 +14,8 @@ function PickTheme({text, onFileSelected}) {
     }
   return (
     <>
-    <button style={{borderRadius: 10, borderWidth: 1, borderColor: "#9EDAFF", backgroundColor: "#9EDAFF"}} onClick={handleClick}>
-        <p style={{fontSize: 15.36,
-        padding: 12,
-        paddingLeft: 25,
-        paddingRight: 25,
-        textAlign: 'center'}}>{text}</p>
+    <button style={styles.nextButton} onClick={handleClick}>
+        <p style={styles.nextButtonText}>{text}</p>
     </button>
     <input type='file' accept="image/*" ref={fileInputRef} style={{display: 'none'}} onChange={handleFileChange}/>
     </>

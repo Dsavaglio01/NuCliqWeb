@@ -3,13 +3,13 @@ import SearchInput from './SearchInput';
 import { UserCircleIcon} from '@heroicons/react/24/outline';
 import { styles } from '@/styles/styles';
 import { ArrowUpLeftIcon } from '@heroicons/react/24/solid';
-import { fetchUserSearchesLarge, fetchUserSearchesSmall } from '@/firebaseUtils';
+import { fetchActualRecentSearches, fetchRecentSearches, fetchUserSearchesLarge, fetchUserSearchesSmall } from '@/firebaseUtils';
 import RecentSearches from './RecentSearches';
 import { useRouter } from 'next/router';
-import { onSnapshot,query, collection, where, limit, orderBy, getDoc, doc } from 'firebase/firestore';
+import { onSnapshot, collection, doc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuth } from '@/context/AuthContext';
-function UserSearchBar({searching, openSearching, closeSearching}) {
+function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}) {
   const router = useRouter();
   const [specificSearch, setSpecificSearch] = useState('');
   const [filtered, setFiltered] = useState([]);
@@ -20,7 +20,6 @@ function UserSearchBar({searching, openSearching, closeSearching}) {
   const [tempSearches, setTempSearches] = useState([]);
   const [recentSearches, setRecentSearches] = useState(false);
   const [filteredGroup, setFilteredGroup] = useState([]);
-  const [moreResultButton, setMoreResultButton] = useState(false);
   const handleOpen = () => {
     openSearching()
   }
@@ -30,15 +29,18 @@ function UserSearchBar({searching, openSearching, closeSearching}) {
   const handleClose = () => {
     closeSearching()
   }
+  const handleNoSearchInput = () => {
+    noSearchInput();
+  }
   const SearchItem = ({item, index}) => (
     <div key={index}>
-        <div className='cursor-pointer w-full' style={styles.categoriesContainer} onClick={() => {setFilteredGroup([item]); handleClose()}}>
-          {item.pfp ? <img src={item.pfp} style={{height: 40, width: 40, borderRadius: 8}}/> :
-          <UserCircleIcon className='btn' style={{height: 40, width: 40, borderRadius: 8}}/>}
-            
-            <p numberOfLines={1} style={styles.categories}>@{item.username != undefined ? item.username : item.userName}</p>
-            <ArrowUpLeftIcon className='btn'/>
-        </div>
+      <div className='cursor-pointer w-full' style={styles.categoriesContainer} onClick={() => {setFilteredGroup([item]); handleClose()}}>
+        {item.pfp ? 
+          <img src={item.pfp} style={styles.searchPfp}/> :
+          <UserCircleIcon className='btn' style={styles.searchPfp}/>}
+        <p numberOfLines={1} style={styles.categories}>@{item.username != undefined ? item.username : item.userName}</p>
+        <ArrowUpLeftIcon className='btn'/>
+      </div>
     </div>
   )
   useMemo(() => {
@@ -48,44 +50,41 @@ function UserSearchBar({searching, openSearching, closeSearching}) {
         if (specificSearch.length < 4) {
           const {userSearches} = await fetchUserSearchesSmall(specificSearch);
           setSearches(userSearches)
+        }
+        else {
+          const {userSearches} = await fetchUserSearchesLarge(specificSearch);
+          setSearches(userSearches)
+        }
       }
-      else {
-        const {userSearches} = await fetchUserSearchesLarge(specificSearch);
-        setSearches(userSearches)
-      }
-    }
-      
       getData();
+    }
+    else {
+      handleNoSearchInput();
     }
   }, [specificSearch])
   useEffect(() => {
     if (actualRecentSearches.length > 0) {
-      actualRecentSearches.map(async(item) => {
-        //console.log(item.id)
-        const docSnap = await getDoc(doc(db, 'profiles', item.id))
-        if(docSnap.exists()) {
-        setTempSearches(prevState => [...prevState, {id: docSnap.id, searchId: item.searchId, ...docSnap.data()}])
-        }
-      })
+      const { tempSearches } = fetchRecentSearches(actualRecentSearches);
+      setTempPosts(tempSearches);
     }
   }, [actualRecentSearches])
   useEffect(() => {
+    let unsubscribe;
 
-      let unsub;
-      const fetchSearches = async() => {
-        unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'recentSearches'), where('user', '==', true), orderBy('timestamp', 'desc'), limit(3)), (snapshot) => {
-          setActualRecentSearches(snapshot.docs.map((doc) => ({
-            id: doc.data().element.id,
-            searchId: doc.id
-          })))
-        })
+    if (user.uid) {
+      unsubscribe = fetchActualRecentSearches(user.uid, (data) => {
+        setActualRecentSearches(data);
+      });
+    }
+
+    return () => {
+      if (unsubscribe) {
+        return unsubscribe; 
       }
-      fetchSearches();
-      return unsub;
-  }, [onSnapshot])
+    };
+  }, [user?.uid, onSnapshot]);
   useMemo(() => {
-        if (specificSearch.length > 0) {
-      setMoreResultButton(false)
+      if (specificSearch.length > 0) {
       setMoreResults(false)
       setRecentSearches(true)
       const temp = specificSearch.toLowerCase()
@@ -95,7 +94,7 @@ function UserSearchBar({searching, openSearching, closeSearching}) {
         } 
       })
       if (tempList.length > 3) {
-        setMoreResultButton(true)
+        //setMoreResultButton(true)
       }
       setFiltered(tempList)
     }
@@ -108,13 +107,13 @@ function UserSearchBar({searching, openSearching, closeSearching}) {
     return (
       <div style={styles.categoriesContainer}>
         <div className='flex cursor-pointer'onClick={() => recentSearchFunction(item)}>
-        {item.pfp ? <img src={item.pfp} style={{height: 40, width: 40, borderRadius: 8}}/> :
-              <UserCircleIcon style={{height: 40, width: 40, borderRadius: 8}}/>
-              }
-            <p className='numberofLines1' style={styles.categories}>@{item.username ? item.username : item.userName}</p>
-            </div>
-                <XMarkIcon className='btn' onClick={() => removeSearch(item)} style={{alignSelf: 'center', marginLeft: "auto"}}/>
+          {item.pfp ? <img src={item.pfp} style={styles.searchPfp}/> :
+            <UserCircleIcon style={styles.searchPfp}/>
+          }
+          <p className='numberofLines1' style={styles.categories}>@{item.username ? item.username : item.userName}</p>
         </div>
+        <XMarkIcon className='btn' onClick={() => removeSearch(item)} style={styles.threeDotIcon}/>
+      </div>
     )
   }
   function recentSearchFunction(item) {
@@ -125,60 +124,82 @@ function UserSearchBar({searching, openSearching, closeSearching}) {
       navigation.navigate('Profile', {screen: 'ProfileScreen', params: {name: user.uid, preview: false, viewing: false, previewImage: null, previewMade: false, applying: false}})
      }
   }
+  function addToRecentSearches(item) {
+    var element = item
+    if (tempSearches.filter(e => e.id == item.id).length > 0) {
+      tempSearches.map(async(e) => {
+        if (e.id == e.id) {
+          await setDoc(doc(db, 'profiles', user.uid, 'recentSearches', e.id), {
+            group: false,
+            event: false,
+            element,
+            user: true,
+            ai: false,
+            theme: false,
+            friend: false,
+            timestamp: serverTimestamp()
+          })
+        }
+      })
+    } 
+    else {
+      addDoc(collection(db, 'profiles', user.uid, 'recentSearches'), {
+        group: false,
+        event: false,
+        element,
+        user: true,
+        ai: false,
+        friend: false,
+        theme: false,
+        timestamp: serverTimestamp()
+      })
+    }
+  }
   return (
     <div className='flex flex-col w-72'>    
-    <div className='mt-10 mb-3' style={{flexDirection: 'row', display: 'flex'}}>
-                  <SearchInput width={window.innerWidth < 1500 ? '80%' : '100%'} value={specificSearch} icon={'magnify'} placeholder={'Search'} onFocus={() => handleOpen()} iconStyle={styles.homeIcon}
-                  containerStyle={!searching ? {borderWidth: 1, borderColor: '#fff', width: '100%'} : {borderWidth: 1, borderColor: '#fff', width: '150%'}} text={searching ? true : false} onChangeText={specificSearchFunction} 
-                  onClick={() => {setSpecificSearch(''); openSearching()}}/>
-        
-                  </div>
-                  <div>
-                  {searching && filtered.length == 0 && specificSearch.length > 0 ?
-                  <div>
-                    <p style={{color: '#fff', fontSize: 15.36, paddingHorizontal: 10, textAlign: 'center', marginRight: '5%', marginTop: '5%'}}>No Search Results</p>
-                  </div> :  
-                  searching && moreResults
-                  ?
-                  <ul
-                  > 
-                  {!moreResults ? filtered.slice(0, 3).map((item, index) => {
-                    return (
-                        <SearchItem item={item} index={index}/>
-                    )
-                  }) : filtered.slice(0, 10).map((item, index) => {
-                    return (
-                        <SearchItem item={item} index={index}/>
-                    )
-                  })}
-                  {
-                    recentSearches && searching ?
-                    <RecentSearches data={tempSearches.filter((obj, index, self) => index === self.findIndex((o) => o.userName === obj.userName)).reverse()} 
-                    theme={false} group={false} home={true} friend={false} ai={false} extraStyling={{width: '90%'}}
-                    renderSearches={renderSearches} recentSearches={handleRecentSearches}/> : null
-                  }
-                  </ul>
-                  : searching && (moreResults || specificSearch.length > 0) ? 
-                  <div>
-                  <ul
-                  > 
-                  {!moreResults ? filtered.slice(0, 3).map((item, index) => {
-                    return (
-                        <SearchItem item={item} index={index}/>
-                    )
-                  }) : filtered.slice(0, 10).map((item, index) => {
-                    return (
-                        <SearchItem item={item} index={index}/>
-                    )
-                  })}
-                  </ul>
-                  <div className='cursor-pointer' style={{alignItems: 'center', marginRight: '5%'}} onClick={() => {setRecentSearches(false); setMoreResults(true); setMoreResultButton(false);}}>
-                    <p style={{paddingTop: 5, fontWeight: '400', color:"#9EDAFF", fontSize: 12.29, marginLeft: '35%'}}>See more results</p>
-                    </div>
-                  </div> : <></>}
-                  </div>
-
+      <div className='mt-10 mb-3' style={{display: 'flex'}}>
+        <SearchInput width={'100%'} value={specificSearch} icon={'magnify'} placeholder={'Search'} onFocus={() => handleOpen()} iconStyle={styles.homeIcon}
+        containerStyle={!searching ? {borderWidth: 1, borderColor: '#fff', width: '100%'} : {borderWidth: 1, borderColor: '#fff', width: '150%'}} text={searching ? true : false} onChangeText={specificSearchFunction} 
+        onClick={() => {setSpecificSearch(''); openSearching()}}/>
       </div>
+      <div>
+        {searching && filtered.length == 0 && specificSearch.length > 0 ?
+        <div>
+          <p style={styles.noSearchResultsText}>No Search Results</p>
+        </div> :  
+        searching && moreResults
+        ?
+        <ul> 
+          {!moreResults ? filtered.slice(0, 3).map((item, index) => (
+              <SearchItem item={item} index={index}/>
+            )
+          ) : filtered.slice(0, 10).map((item, index) => (
+              <SearchItem item={item} index={index}/>
+            )
+          )}
+          {recentSearches && searching ?
+            <RecentSearches data={tempSearches.filter((obj, index, self) => index === self.findIndex((o) => o.userName === obj.userName)).reverse()} 
+            theme={false} group={false} home={true} friend={false} ai={false} extraStyling={{width: '90%'}}
+            renderSearches={renderSearches} recentSearches={handleRecentSearches}/> : null}
+        </ul>
+        : searching && (moreResults || specificSearch.length > 0) ? 
+        <div>
+          <ul> 
+            {!moreResults ? filtered.slice(0, 3).map((item, index) => (
+                  <SearchItem item={item} index={index}/>
+              )
+            ) : filtered.slice(0, 10).map((item, index) => (
+                  <SearchItem item={item} index={index}/>
+              )
+            )}
+          </ul>
+          <div className='cursor-pointer' style={styles.seeMoreResultsContainer} onClick={() => {setRecentSearches(false); setMoreResults(true)}}>
+            <p style={styles.seeMoreResultsText}>See more results</p>
+          </div>
+        </div> : <></>}
+      </div>
+
+    </div>
   )
 }
 

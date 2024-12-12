@@ -1,9 +1,12 @@
 export const styles = {
     name: {
-        fontSize: 15.36,
-        paddingTop: 5,
-        color: "#fafafa"
-        //width: '95%'
+      fontSize: 15.36,
+      paddingTop: 5,
+      color: "#fafafa"
+    },
+    themeChatName: {
+      alignSelf: 'center', 
+      paddingTop: 5
     },
     message: {
         fontSize: 15.36,
@@ -16,22 +19,33 @@ export const styles = {
         padding: 5,
         paddingBottom: 0
     },
+    text: {
+      fontSize: 15.36, 
+      color: "#fafafa",
+      alignSelf: 'flex-start',
+      textAlign: 'left'
+    },
     header: {
-        fontSize: 19.20,
-        color: "#fafafa",
-        marginLeft: '42.5%'
-        //marginLeft: 'auto'
+      fontSize: 19.20,
+      color: "#fafafa",
+      marginLeft: '42.5%'
     },
     profileFriendsContainer: {
       flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    display: 'flex',
-    width: '90%',
+      justifyContent: 'space-evenly',
+      display: 'flex',
+      marginTop: '2%',
+      width: '90%',
+    },
+    replyContainer: {
+      marginLeft: '7.5%', 
+      paddingLeft: 0, 
+      padding: 10,
     },
     friendsHeader: {
-       borderRadius: 5,
-    backgroundColor: "lightblue",
-    marginTop: '2.5%'
+      borderRadius: 5,
+      backgroundColor: "lightblue",
+      marginTop: '2.5%'
     },
     friendsText: {
       fontSize: 15.36,
@@ -40,15 +54,11 @@ export const styles = {
     },
     friendsContainer: {
       borderRadius: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#d3d3d3",
-        padding: 10,
-        flexDirection: 'row',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '95%',
-        marginLeft: '2.5%'
+      borderBottomColor: "#d3d3d3",
+      padding: 10,
+      flexDirection: 'row',
+      display: 'flex',
+      alignItems: 'center',
     },
     repost: {
         fontSize: 15.36,
@@ -65,19 +75,19 @@ export const styles = {
     padding: 5
     },
     postText: {
-        fontSize: 12.29,
-    padding: 5,
-    color: "#fafafa",
-    paddingBottom: 10
+      fontSize: 12.29,
+      padding: 5,
+      color: "#fafafa",
+      paddingBottom: 10
     },
-     rePostText: {
-fontSize: 15.36,
-    padding: 5,
-    paddingTop: 0,
-    paddingLeft: '5%',
-    color: "#fafafa",
-    paddingBottom: 10
-  },
+    rePostText: {
+      fontSize: 15.36,
+      padding: 5,
+      paddingTop: 0,
+      paddingLeft: '5%',
+      color: "#fafafa",
+      paddingBottom: 10
+    },
   actualrepostText: {
     fontSize: 12.29,
     padding: 5,
@@ -108,19 +118,60 @@ postHeader: {
     alignSelf: 'center',
     color: "#fafafa"
   },
+  searchIcon: {
+    alignSelf: 'center', 
+    paddingLeft: 10
+  },
+  searchInput: {
+    fontSize: 15.36, 
+    color: "#fff", 
+    backgroundColor: "#121212",
+    fontWeight: '600', 
+    borderWidth: 0, 
+    paddingLeft: 10
+  },
+  sendText: {
+    fontSize: 12.29,
+    color: "#121212",
+    padding: 6,
+    paddingLeft: 12.5,
+    paddingRight: 12.5,
+    textAlign: 'center'
+  },
   addVideoText: {
-    fontSize: window.innerHeight / 70,
-      padding: 7.5,
-      color: "#fafafa",
-      marginRight: 'auto',
-      //width: '98%',
-      alignSelf: 'center'
+    fontSize: typeof window !== 'undefined' ? window.innerHeight / 70: 0,
+    padding: 7.5,
+    color: "#fafafa",
+    marginRight: 'auto',
+    alignSelf: 'center'
+  },
+  timestamp: {
+    fontSize: 12.29,
+    color: '#fafafa',
+    marginRight: 'auto',
+    marginTop: 5,
+  },
+  userTimestamp: {
+    fontSize: 12.29,
+    color: '#121212',
+    marginTop: 5,
+  },
+  commentHeart: {
+    alignSelf: 'center',
+    paddingRight: 3
   },
   numberCommentText: {
     fontSize: 12.29, 
     color: "#fafafa", 
     alignSelf: 'center', 
     paddingLeft: 5
+  },
+  postUsername: {
+    fontSize: 15.36,
+    alignSelf: 'center',
+    paddingLeft: 5,
+    color: "#fafafa",
+    display: 'flex'
   },
   repostButtonContainer: {
     flexDirection: 'row', 
@@ -142,22 +193,42 @@ postHeader: {
     color: "#fafafa"
   },
   image: {
-     height: window.outerHeight / 4,
-    width: (window.outerHeight / 4) * 1.01625
+     height: typeof window !== 'undefined' ? window.outerHeight / 4 : 0,
+    width: typeof window !== 'undefined' ? (window.outerHeight / 4) * 1.01625 : 0
+  },
+  postDoneContainer: {
+    alignSelf: 'center', 
+    alignItems: 'center', 
+    marginTop: '20%'
   },
   homeContainer: {
     display: 'flex', 
     flexDirection: 'column', 
     maxWidth: '80vw'
   },
+  commentModalContainer: {
+    width: '80%',
+    left: '50%',
+    right: 'auto',
+    borderRadius: 10,
+    transform: 'translate(-50%, 0)',
+    backgroundColor: "#121212",
+    marginRight: '-50%'
+  },
   modalContainer: {
     width: '40%',
-      left: '50%',
-      right: 'auto',
-      borderRadius: 10,
-      transform: 'translate(-50%, 0)',
-      backgroundColor: "#121212",
-      marginRight: '-50%'
+    left: '50%',
+    right: 'auto',
+    borderRadius: 10,
+    transform: 'translate(-50%, 0)',
+    backgroundColor: "#121212",
+    marginRight: '-50%'
+  },
+  addComment: {
+    fontSize: 15.36, 
+    paddingLeft: 5, 
+    paddingTop: 20, 
+    width: '45%'
   },
   reportSupplementText: {
       fontSize: 15.36,
@@ -199,12 +270,47 @@ postHeader: {
         fontSize: 12.29, 
         color: "#fafafa"
     },
+    thanksContainer: {
+      flex: 1, 
+      justifyContent: 'center', 
+      marginBottom: '50%'
+    },
+    reportLoadingContainer: {
+      flex: 1, 
+      alignItems: 'center', 
+      justifyContent:'center', 
+      marginBottom: '20%'
+    },
     repostContainer: {
-        borderWidth: 1,
+      borderWidth: 1,
       borderRadius: 10,
       borderColor: "#fafafa",
       width: '90%',
       marginLeft: '5%'
+    },
+    commentInput: {
+      display: 'flex', 
+      alignItems: 'center', 
+      borderTopWidth: 1, 
+      borderColor: "#fafafa"
+    },
+    sendingInput: {
+      borderTopWidth: 0.25,
+      width: '95%',
+      padding: 15,
+      backgroundColor: "#121212",
+      margin: '2.5%',
+      marginTop: 0,
+      paddingBottom: 0,
+      marginBottom: 0,
+      borderColor: "#fafafa",
+      color: "#fafafa"
+    },
+    inputPfp: {
+      height: 35, 
+      width: 35, 
+      borderRadius: 25, 
+      marginLeft: 5
     },
     postRepostHeader: {
       flexDirection: 'row',
@@ -231,13 +337,12 @@ postHeader: {
     },
     categoriesContainer: {
       borderRadius: 5,
-    flexDirection: 'row',
-    display: 'flex',
-    width: '200%',
-    //marginRight: '5%',
-    marginBottom: 5,
-    padding: 5,
-    alignItems: 'center',
+      flexDirection: 'row',
+      display: 'flex',
+      width: '200%',
+      marginBottom: 5,
+      padding: 5,
+      alignItems: 'center',
     },
     categories: {
     fontSize: 15.36,
@@ -245,16 +350,39 @@ postHeader: {
     color: "#fff",
     width: '35%',
   },
+  sendingFriendsContainer: {
+    width: '30%', 
+    margin: 5, 
+    alignItems: 'center', 
+    justifyContent: 'center'
+  },
+  photoIcon: {
+    alignSelf: 'center', 
+    margin: 5
+  },
   themeContainer: {
-     margin: 15,
+    margin: 15,
     borderWidth: 1,
-     //marginHorizontal: 10,
-     height: 290,
-      padding: 5,
-      marginBottom: 20,
-      width: 200, 
-      justifyContent: 'center',
-      borderColor: "#fafafa"
+    height: 290,
+    padding: 5,
+    marginBottom: 20,
+    width: 200, 
+    justifyContent: 'center',
+    borderColor: "#fafafa"
+  },
+  postContainer: {
+    margin: '2.5%',
+    padding: 5,
+    height: 60,
+    width: 245,
+    borderRadius: 20,
+    backgroundColor: "#005278"
+  },
+  regImage: {
+    height: 200,
+    width: 200,
+    borderRadius: 10,
+    resizeMode: 'contain'
   },
   postIcon: {
     position: 'absolute', 
@@ -327,6 +455,7 @@ postHeader: {
     padding: 7.5,
     paddingBottom: 0,
   },
+
   noThemesText: {
     fontSize: 24,
       padding: 10,
@@ -351,17 +480,473 @@ postHeader: {
       flexWrap: 'wrap',
       marginLeft: '5%'
   },
+  closeSend: {
+    display: 'flex', 
+    justifyContent: 'space-between'
+  },
   sections: {
     justifyContent: 'space-between',
-        flexDirection: 'row',
-        display: 'flex',
-        marginTop: '5%',
-        alignItems: 'center',
-        paddingBottom: 10,
+    flexDirection: 'row',
+    display: 'flex',
+    marginTop: '5%',
+    alignItems: 'center',
+    paddingBottom: 10,
+  },
+  copyTextContainer:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    display: 'flex'
+  },
+  inputBoxContainer: {
+    marginTop: '5%',
+    display: 'flex'
   },
   applyText: {
     fontSize: 15.36,
       padding: 7.5,
       textAlign: 'center'
+  },
+  toggleView: {
+    borderWidth: 2,
+    width: '90%',
+    marginLeft: '5%',
+    marginRight: '5%',
+    borderRadius: 10,
+    height: typeof window !== 'undefined' ? window.innerHeight / 7 : 0,
+    marginTop: '5%',
+    borderColor: '#005278',
+    backgroundColor: "#f5f5f5"
+  },
+  editText: {
+    fontSize: typeof window !== 'undefined' ? window.innerHeight / 68.7 : 0,
+    padding: 10,
+    paddingTop: 0,
+    marginTop: '5%',
+    color: "#fafafa",
+    textAlign: 'center'
+  },
+  input: {
+    minHeight: 150,
+    borderRadius: 5,
+    borderWidth: 0.25,
+    padding: 5,
+    width: '95%',
+    marginLeft: '2.5%',
+    fontSize: 15.36, 
+    textAlign: 'left', 
+    color: "#121212", 
+    borderColor: "#fafafa",
+  },
+  moreRepliesText: {
+    textAlign: 'left', 
+    color: "#fafafa"
+  },
+  userText: {
+    textAlign: 'left', 
+    color: "#121212",
+    fontSize: 15.36
+  },
+  commentInputContainer: {
+    position: 'absolute', 
+    bottom: 30, 
+    width: '87.5%'
+  },
+  personalChatInput: {
+    height: 40,
+    width: '87.5%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginLeft: '2.5%',
+    marginRight: '2.5%',
+    flexDirection: 'row',
+    display: 'flex'
+  },
+  personalChatImage: {
+    height: 220, 
+    width: 223.4375, 
+    borderRadius: 8, 
+    marginLeft: 5
+  },
+  commentHeaderContainer: {
+    flexDirection: 'row', 
+    display: 'flex', 
+    width: '95%', 
+    marginLeft: '2.5%', 
+    margin: '2.5%'
+  },
+  personalChatSendInput: {
+    width: '95%', 
+    marginLeft: '1%', 
+    backgroundColor: "#121212", 
+    color: "#fafafa", 
+    padding: 5, 
+    alignSelf: 'center'
+  },
+  editBottomText: {
+    fontSize: typeof window !== 'undefined' ? window.innerHeight / 68.7: 0,
+    padding: 10,
+    paddingTop: 0,
+    marginTop: 0,
+    color: "#fafafa",
+    textAlign: 'center'
+  },
+  editPostText: {
+    fontSize: typeof window !== 'undefined' ? window.innerHeight / 54.9 : 0,
+    padding: 10,
+    paddingBottom: 0,
+    color: "#005278"
+  },
+  postLength: {
+    fontSize: 12.29,
+    paddingBottom: 10,
+    paddingTop: 5,
+    color: "#fafafa",
+    textAlign: 'right',
+    marginRight: '5%'
+  },
+  newPostContainer: {
+    flexDirection: 'row', 
+    display: 'flex', 
+    justifyContent: 'space-evenly', 
+    flex: 1
+  },
+  selectImageContainer: {
+    borderRadius: 10, 
+    flexDirection: 'row', 
+    display: 'flex', 
+    backgroundColor: "#fafafa"
+  },
+  textContainer: {
+    alignItems: 'center', 
+    display: 'flex', 
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    marginTop: '-2.5%'
+  },
+  loadContainer: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
+  postImage: {
+    height: 50, 
+    width: 50
+  },
+  sendingFriendPfp: {
+    height: 55, 
+    width: 55, 
+    borderRadius: 55, 
+    alignSelf: 'center'
+  },
+  postContainerButton: {
+    flexDirection: 'row', 
+    display: 'flex', 
+    justifyContent: 'flex-end', 
+    marginHorizontal: '10%'
+  },
+  userTextMessage: {
+    display: 'flex', 
+    justifyContent: 'flex-end'
+  },
+  typeMessageContainer: {
+    flexDirection: 'row', 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginLeft: '5%', 
+    marginRight: '5%', 
+    paddingBottom: 5
+  },
+  repostLoadingContainer: {
+    flex: 1, 
+    alignItems: 'flex-end', 
+    marginRight: '5%', 
+    marginTop: '5%'
+  },
+  seeMoreResultsContainer: {
+    alignItems: 'center',
+    marginRight: '5%'
+  },  
+  threeDotIcon: {
+    alignSelf: 'center', 
+    marginLeft: 'auto'
+  },
+  userNewMessage: {
+    alignSelf: 'flex-end', 
+    marginLeft: 'auto'
+  },
+  newMessage: {
+    alignSelf: 'flex-start', 
+    display: 'flex', 
+    flexDirection: 'row'
+  },
+  userTitle: {
+    fontSize: 15.36,
+    color: "#fff",
+    fontWeight: '700'
+  },
+  seeMoreResultsText: {
+    paddingTop: 5, 
+    fontWeight: '400', 
+    color:"#9EDAFF", 
+    fontSize: 12.29, 
+    marginLeft: '35%'
+  },
+  usernameTextSending: {
+    fontSize: 12.29,
+    color: "#fafafa",
+    alignSelf: 'center',
+    padding: 5
+  },
+  addCommentSecondContainer: {
+    marginBottom: '10%',
+    marginLeft: '-5%',
+    backgroundColor: "#121212",
+    width: '105%',
+    borderColor: "#fafafa"
+  },
+  personalChatInputContainer: {
+    display: 'flex', 
+    marginLeft: '-2%', 
+    position: 'sticky', 
+    bottom: 0, 
+    marginTop: '5%'
+  },
+  personalChatInputMessageContainer: {
+    marginBottom: '5%', 
+    marginLeft: '-2%', 
+    bottom: 50, 
+    position: 'sticky', 
+    display: 'flex'
+  },
+  usernameTextSendingChecked: {
+    fontSize: 12.29,
+    color: "#fafafa",
+    marginTop: -27.5,
+    alignSelf: 'center',
+    padding: 5
+  },
+  pageContainer: {
+    height: '100vh', 
+    display: 'flex', 
+    flexDirection: 'column', 
+    position: 'sticky'
+  },
+  sendingCheck: {
+    position: 'relative', 
+    bottom: 20, 
+    left: 80
+  },
+  swipeContainer: {
+    flex: 1, 
+    display: 'flex', 
+    flexDirection: 'row', 
+    height: '100%'
+  },
+  commentsContainer: {
+    display: 'flex', 
+    height: '100%'
+  },
+  inputComment: {
+    fontSize: 15.36, 
+    padding: 5, 
+    display: 'flex'
+  },
+  commentCarousel: {
+    width: '100%', 
+    maxWidth: '800px', 
+    height: '100%', 
+    overflow: 'hidden'
+  },
+  commentScrollable: {
+    flex: 1, 
+    width: '100%', 
+    overflow: 'hidden'
+  },
+  searchPfp: {
+    height: 45, 
+    width: 45, 
+    borderRadius: 8, 
+    borderWidth: 1.5,
+    color: "#fafafa"
+  },
+  sendButton: {
+    borderRadius: 10, 
+    borderWidth: 1, 
+    height: 40, 
+    borderColor: "#9EDAFF", 
+    marginTop: 10, 
+    backgroundColor: "#9EDAFF"
+  },
+  nextButton: {
+    borderRadius: 10, 
+    borderWidth: 1, 
+    borderColor: "#9EDAFF", 
+    backgroundColor: "#9EDAFF"
+  },
+  commentContainerPfp: {
+    width: 40, 
+    height: 40, 
+    borderRadius: 8, 
+    marginRight: 5
+  },
+  searchPfp: {
+    width: 40, 
+    height: 40, 
+    borderRadius: 8, 
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#fafafa",
+    borderRadius: 20,
+    marginRight: 10, // Add spacing between image and text
+  },
+  userBubbleStyle: {
+    backgroundColor: '#9edaff',
+    padding: 10,
+    margin: 5,
+    borderRadius: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 5,
+    maxWidth: '100%',
+    alignSelf: 'flex-end',
+  },
+  timestampContainer: { 
+    width: '100%',  // Adjust the width as needed
+    alignItems: 'flex-end', // Align timestamp to the right
+  },
+  userTimestampContainer: {
+    width: '100%',
+    alignItems: 'flex-start',
+  },
+  flexColumn: {
+    flexDirection: 'column', 
+    display: 'flex'
+  },
+  likeButton: {
+    top: 5,
+    right: 10, // Default: right side
+  },
+  userLikeButton: {
+    left: 'auto',
+    right: 10
+  },
+  bubbleStyle: {
+    backgroundColor: '#005278',
+    padding: 10,
+    margin: 5,
+    borderRadius: 20,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 20,
+    maxWidth: '100%',
+    alignSelf: 'flex-start',
+  },
+  sendingButton: {  
+    borderRadius: 10, 
+    borderWidth: 1, 
+    height: 40, 
+    borderColor: "#9EDAFF",
+    marginTop: 10, 
+    marginRight: 5, 
+    backgroundColor: "#9EDAFF"
+  },
+  nextButtonText: {
+    fontSize: 15.36,
+    padding: 12,
+    paddingLeft: 25,
+    color: "#121212",
+    paddingRight: 25,
+    textAlign: 'center'
+  },
+  inputBox: {
+    width: 300,
+    padding: 10,
+    border: '1px solid #ccc',
+    borderRadius: 5,
+    color: "#fafafa",
+    backgroundColor: "#121212"
+  },
+  commentsPfp: {
+    height: 35, 
+    width: 35, 
+    borderRadius: 17.5
+  },
+  searchInfo: {
+    paddingLeft: 20, 
+    width: '75%'
+  },
+  chatSendButton: {
+    width: 70,
+    height: 40,
+    alignItems: 'center',
+    backgroundColor: '#005278',
+    borderRadius: 10,
+  },
+  copyText: {
+    fontSize: 15.36,
+    paddingRight: 10,
+    color: "#fafafa",
+  },
+  miniPostContainer: {
+    borderWidth: 1, 
+    borderColor: "#fafafa",
+    height: typeof window !== 'undefined' ? (window.outerHeight / 4) : 0,
+    width: typeof window !== 'undefined' ? ((window.innerHeight / 4) * 1.01625) : 0,
+  },
+  miniPostText: {
+    fontSize: 15.36, 
+    width: '100%', 
+    paddingLeft: 5, 
+    paddingTop: 2.5, 
+    paddingBottom: 2.5
+  },
+  commentPfp: {
+    height: 33,
+    width: 33,
+    borderRadius: 8
+  },
+  imagepfp: {
+    height: 33, 
+    width: 33, 
+    borderRadius: 8, 
+    margin: '5%'
+  },
+  copyModal: {
+    borderRadius: 10,
+    backgroundColor: "gray",
+    marginRight: '5%',
+    marginLeft: '5%',
+    marginBottom: '2.5%'
+  },
+  noSearchResultsText: {
+    color: '#fafafa', 
+    fontSize: 15.36, 
+    textAlign: 'center', 
+    marginRight: '5%',
+    marginTop: '5%'
+  },
+  captionText: {
+    fontSize: 12.29,
+    padding: 10,
+    color: "#fafafa",
+    paddingBottom: 0,
+    paddingRight: 0,
+  },
+  chatName: {
+    fontSize: 15.36, 
+    alignSelf: 'center', 
+    color: "#fafafa", 
+    marginLeft: 15
+  },
+  readReceipt: {
+    fontSize: 12.29,
+    color: '#fafafa',
+    marginLeft: 'auto', 
+    marginRight: 10
   }
+  
 }

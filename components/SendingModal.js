@@ -4,46 +4,7 @@ import { XMarkIcon, CheckIcon } from '@heroicons/react/24/solid'
 import { onSnapshot, query, collection, orderBy, where, limit, getDoc, doc } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
-const styles = { 
-    header: {
-        fontSize: 19.20,
-        color: "#fafafa",
-        marginLeft: '42.5%'
-    },
-    usernameTextSending: {
-        fontSize: 12.29,
-        color: "#fafafa",
-        alignSelf: 'center',
-        padding: 5
-    },
-    usernameTextSendingChecked: {
-        fontSize: 12.29,
-        color: "#fafafa",
-        marginTop: -27.5,
-        alignSelf: 'center',
-        padding: 5
-    },
-     addCommentSecondContainer: {
-        marginBottom: '10%',
-        marginLeft: '-5%',
-        backgroundColor: "#121212",
-        width: '105%',
-        borderColor: "#fafafa"
-    },
-    input: {
-        borderTopWidth: 0.25,
-      width: '95%',
-     // marginLeft: 0,
-      padding: 15,
-      backgroundColor: "#121212",
-      margin: '2.5%',
-      marginTop: 0,
-      paddingBottom: 0,
-      marginBottom: 0,
-      borderColor: "#fafafa",
-      color: "#fafafa"
-    }
-}
+import { styles } from '@/styles/styles'
 function SendingModal({sendingModal, closeSendingModal, followers, following, user, post, video, theme}) {
     const handleClose = () => {
         closeSendingModal()
@@ -110,27 +71,21 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
     setCaption(event.target.value)
 }
   return (
-    <ReactModal isOpen={sendingModal} style={{content: {width: '40%',
-      left: '50%',
-      right: 'auto',
-      borderRadius: 10,
-      transform: 'translate(-50%, 0)',
-      backgroundColor: "#121212",
-      marginRight: '-50%',}}}>
+    <ReactModal isOpen={sendingModal} style={{content: styles.modalContainer}}>
          <div className='flex flex-col'>
-        <div style={{flexDirection: 'row', display: 'flex', justifyContent: 'space-between', marginHorizontal: '5%'}}>
+        <div style={styles.closeSend}>
             <p style={styles.header}>Send To: </p>
             <XMarkIcon className='btn' onClick={() => handleClose()}/>
         </div>
         <div className='flex flex-row flex-wrap'>
         {friendsInfo.map((item, index) => {
             return (
-                <div key={index} style={{width: '30%', margin: 5, alignItems: 'center', justifyContent: 'center'}}>
+                <div key={index} style={styles.sendingFriendsContainer}>
             <div className='cursor-pointer items-center flex flex-col'  onClick={() => renderChecked(item)}>
-              {item.pfp ? <img src={item.pfp} style={{height: 55, width: 55, borderRadius: 55, alignSelf: 'center'}}/> : 
-              <UserCircleIcon className='userBtn' style={{height: 55, width: 55, borderRadius: 55, alignSelf: 'center'}}/>}
+              {item.pfp ? <img src={item.pfp} style={styles.sendingFriendPfp}/> : 
+              <UserCircleIcon className='userBtn' style={styles.sendingFriendPfp}/>}
                 
-                {item.checked ? <CheckIcon color='#9edaff' className='btn' style={{position: 'relative', bottom: 20, left: 80}}/> : null}
+                {item.checked ? <CheckIcon color='#9edaff' className='btn' style={styles.sendingCheck}/> : null}
                 {!item.checked ? <p style={styles.usernameTextSending} className='numberOfLines1'>{item.userName}</p> 
                 : <p style={styles.usernameTextSendingChecked} className='numberOfLines1'>{item.userName}</p>}
                 
@@ -142,16 +97,9 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
         </div>
       {actuallySending ?
       <div style={styles.addCommentSecondContainer} className='bg-black flex flex-col items-center absolute bottom-0 w-full'>
-            <textarea style={styles.input} placeholder='Add Message...' className='text-white' maxLength={200} value={caption} onChange={handleCaption}/>
-          <button style={{borderRadius: 10, borderWidth: 1, height: 40, borderColor: "#9EDAFF", marginTop: 10, marginRight: 5, backgroundColor: "#9EDAFF"}}>
-              
-              <p style={{fontSize: 12.29,
-              
-              padding: 6,
-              paddingLeft: 12.5,
-              paddingRight: 12.5,
-              textAlign: 'center',
-              alignSelf: 'center'}}>Send</p>
+            <textarea style={styles.sendingInput} placeholder='Add Message...' className='text-white' maxLength={200} value={caption} onChange={handleCaption}/>
+          <button style={styles.sendingButton}>
+              <p style={styles.sendText}>Send</p>
           </button>
           </div> : null}
     </div>

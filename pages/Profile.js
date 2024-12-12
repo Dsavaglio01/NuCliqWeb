@@ -1,19 +1,16 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
-import { onSnapshot, query, doc, collection, getCountFromServer, where, orderBy, limit } from 'firebase/firestore';
+import { onSnapshot, query, collection, where, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/firebase';
 import { BeatLoader } from 'react-spinners';
-import { ChevronDownIcon, ChevronUpIcon, PauseIcon, PlayIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import NextButton from '@/components/NextButton';
 import { useRouter } from 'next/router';
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Head from 'next/head';
-import Image from 'next/image';
 import Sidebar from '@/components/Sidebar';
 import Edit from './Edit';
 import Settings from './Settings';
-import { fetchPosts, fetchReposts, getProfileDetails} from '@/firebaseUtils';
+import { fetchPosts, fetchReposts, getProfileDetails, fetchCount} from '@/firebaseUtils';
 import { styles } from '@/styles/styles';
 import MiniPost from '@/components/MiniPost';
 function Profile() {
@@ -28,6 +25,7 @@ function Profile() {
   const [edit, setEdit] = useState(false);
   const [numberOfPosts, setNumberOfPosts] = useState(0);
   const [reposts, setReposts] = useState(0);
+  const [blockedUsers, setBlockedUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [firstName, setFirstName] = useState('');
   const [postSetting, setPostSetting] = useState(true);
@@ -139,8 +137,8 @@ function Profile() {
         setLastName(profileData.lastName);
         setBio(profileData.bio);
         setPfp(profileData.pfp);
-        setFollowers(profileData.followers);
-        setFollowing(profileData.following);
+        setFollowers(profileData.followers.length);
+        setFollowing(profileData.following.length);
         setForSale(profileData.forSale);
         setBackground(profileData.postBackground);
         setBlockedUsers(profileData.blockedUsers);
@@ -153,23 +151,15 @@ function Profile() {
   }, []);
   useEffect(() => {
     if (user?.uid) {
-      // Fetch count of all posts
       fetchCount(user.uid, 'posts', [where('repost', '==', false)], setNumberOfPosts);
-
-      // Fetch count of reposts
       fetchCount(user.uid, 'posts', [where('repost', '==', true)], setNumberOfReposts);
     }
   }, [user?.uid]);
 const Posts = ({index, item}) => (
-    <MiniPost item={item}/>
+    <MiniPost item={item} index={index} repost={false}/>
 )
 const Reposts = ({index, item}) => (
-    <div style={{borderWidth: 1, borderColor: "#121212"}} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})} className='cursor-pointer justify-center flex items-center'>
-        <div style={{padding: 0}} className='chat-bubble'>
-            <p style={{fontSize: 15.36, height: window.innerHeight / 4, width: (window.innerHeight / 4) * 1.01625, paddingLeft: 5, paddingTop: 2.5}}>{item.post[0].value}</p>
-            
-        </div>
-    </div>
+    <MiniPost item={item} index={index} repost={true}/>
 )
   return (
     <ProtectedRoute>
@@ -185,7 +175,7 @@ const Reposts = ({index, item}) => (
                <Sidebar />
 
           {!settingsShown && !edit ? 
-          <div style={{width: (window.innerHeight * 0.7) * 1.01625, marginLeft: '20%'}}>
+          <div style={{width: (window.innerHeight * 0.75) * 1.01625, marginLeft: '20%'}}>
     <div className=''>
         <img src={!loading ? previewImage ? previewImage : background ? background : require('../assets/Default_theme.jpg') : null} 
         style={{width: '100%', height: window.innerHeight * 0.25, objectFit: 'cover'}}/>
@@ -220,8 +210,8 @@ const Reposts = ({index, item}) => (
           </div>
         </div>
         </div>
-        <div className='justify-between items-center self-center flex'>
-        <div style={{display: 'flex', marginTop: '2%', flexDirection: 'row', justifyContent: 'space-between', flex: 1, marginRight: '2%'}}>
+        <div className='justify-between items-center self-center'>
+        <div style={styles.profileFriendsContainer}>
             <div style={styles.noOfPosts} className='cursor-pointer' onClick={postSetting ? null : () => {setPostSetting(true); setRepostSetting(false)}}>
                 <p style={styles.profileHeaderText}>{numberOfPosts > 999 && numberOfPosts < 1000000 ? `${numberOfPosts / 1000}k` : numberOfPosts > 999999 ? `${numberOfPosts / 1000000}m` : numberOfPosts}</p>
                 <p style={styles.headerSupplementText}>{numberOfPosts == 1 ? 'Post' : 'Posts'}</p>
@@ -243,7 +233,7 @@ const Reposts = ({index, item}) => (
         </div>
         <div className='flex flex-row mt-5'>  
           {posts.length > 0 && postSetting ? 
-                posts.slice( 0, 2).map((e, index) => (
+                posts.slice( 0, 3).map((e, index) => (
             <Posts index={index} item={e}/>
             
         )) : reposts.length > 0 && repostSetting ? 

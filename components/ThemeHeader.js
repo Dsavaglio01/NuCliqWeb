@@ -22,12 +22,6 @@ function ThemeHeader({backButton, viewingProfile, video, name, text, post, cance
       <ChevronLeftIcon style={{alignSelf: 'center'}} className='btn' onClick={viewingProfile ? () => router.push('ViewingProfile', {name: name, viewing: true}) : () => router.back() }/>
       : null}
       <div style={backButton ? {flexDirection: 'row', marginLeft: '2%', display: 'flex'} : {flexDirection: 'row', display: 'flex'}}>
-      {/* <div style={{marginTop: '3%', marginLeft: '5%'}}>
-        <img src={require('../assets/DarkMode5.png')} style={{height: 27.5, width: 68.75}}/>
-      </div> */}
-              
-             {/*  <p style={backButton ? {fontSize: 37.5, fontWeight: '200', color: "#9EDAFF"} :
-               {fontSize: 37.5, fontWeight: '200', color: "#9EDAFF"}}>|</p> */}
                 <p className='numberofLines1' style={header}>{text}</p>
                 </div>
                 {cancelButton ? <div style={{flexDirection: 'column', marginTop: '5%'}} onClick={() => router.push('All', {name: null})}>

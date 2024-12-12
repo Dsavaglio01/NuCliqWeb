@@ -10,7 +10,7 @@ import UserSearchBar from '@/components/UserSearchBar';
 import { getMessageNotifications, fetchFriends, getProfileDetails } from '@/firebaseUtils';
 import getDateAndTime from '@/lib/getDateAndTime';
 function Chat () {
-    const BACKEND_URL = process.env.BACKEND_URL
+    //const BACKEND_URL = process.env.BACKEND_URL
     const [searches, setSearches] = useState([]);
     const [friends, setFriends] = useState([]);
     const [specificSearch, setSpecificSearch] = useState('');
@@ -145,13 +145,6 @@ function Chat () {
     async function deleteMessageNotifications (item) {
       
     }
-    const image= {height: 40, width: 40, borderRadius: 8, alignSelf: 'center', borderWidth: 1}
-    const addCommentSecondContainer= {
-        //flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'flex-end',
-        width: '100%',
-    }
     useEffect(() => {
         if (specificSearch.length > 0) {
       setSearching(true)
@@ -271,7 +264,7 @@ const SendingMessageItem = ({item, index}) => (
       {friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ? 
           <div style={{marginVertical: '5%', marginLeft: '11%', width: '100%'}}>
             <div className='cursor-pointer' style={{width: '100%', marginTop: '2.5%', zIndex: 0}}>
-            <UserSearchBar searching={searching} openSearching={() => setSearching(true)} closeSearching={() => setSearching(false)}/>     
+            <UserSearchBar searching={searching} noSearchInput={() => setSearching(false)} openSearching={() => setSearching(true)} closeSearching={() => setSearching(false)}/>     
             </div>
               
           </div>

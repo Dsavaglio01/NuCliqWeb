@@ -1,42 +1,66 @@
-import React, {useEffect, useMemo, useState} from 'react'
-import FollowIcon from './FollowIcon'
-import FollowingIcon from './FollowingIcon'
-import RequestedIcon from './RequestedIcon'
-import { db } from '@/firebase'
-import { onSnapshot, query, collection, where, getDoc, doc } from 'firebase/firestore'
-function FollowButtons({user, item}) {
-    const [following, setFollowing] = useState([]);
-    const [requests, setRequests] = useState([]);
-    useMemo(() => {
-        const getData = async() => {
-            const profileSnap = await getDoc(doc(db, 'profiles', user.uid))
-            setFollowing(profileSnap.data().following)
+import React, { useEffect, useCallback, useState } from 'react';
+import FollowIcon from './FollowIcon';
+import FollowingIcon from './FollowingIcon';
+import RequestedIcon from './RequestedIcon';
+import { getProfileDetails, getRequests } from '@/firebaseUtils';
+
+function FollowButtons({ user, item }) {
+  const [following, setFollowing] = useState([]);
+  const [requests, setRequests] = useState([]);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (user.uid) {
+        const profileData = await getProfileDetails(user.uid);
+        if (profileData) {
+          setFollowing(profileData.following);
         }
-        getData()
-    }, [])
-    useMemo(()=> {
-      let unsub;
-      const fetchCards = async () => {
-        //const passes = await getDocs(collection(db, 'users', user.uid, 'passes')).then((snapshot) => snapshot.docs.map((doc) => doc.id));
-        unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'requests'), where('actualRequest', '==', true)), (snapshot) => {
-          setRequests(snapshot.docs.map((doc)=> ( {
-            id: doc.id,
-            ...doc.data()
-            //info: doc.data().info
-          })))
-        })
-      } 
-      fetchCards();
-      return unsub;
-    }, []);
+      }
+    };
+
+    fetchProfileData();
+  }, [user.uid]); // Dependency on user.uid
+
+  useEffect(() => {
+    let unsubscribe;
+
+    if (user.uid) {
+      unsubscribe = getRequests(user.uid, (data) => {
+        setRequests(data);
+      });
+    }
+
+    return () => {
+      if (unsubscribe) {
+        return unsubscribe; 
+      }
+    };
+  }, [user?.uid]); // Dependency on user.uid
+
+  const handleClick = useCallback(() => {
+    if (!user.uid) return;
+
+    const isFollowing = following.includes(item.userId);
+    const isRequested = requests.some(e => e.id === item.userId);
+
+    if (isFollowing) {
+      removeFriend(item.userId);
+    } else if (item.userId !== user.uid && !isRequested) {
+      addFriend(item);
+    }
+  }, [user.uid, following, item.userId, requests]); // Dependencies for useCallback
+
   return (
-    <button onClick={user.uid != null ? following.filter(e => e === item.userId).length > 0 ? () => removeFriend(item.userId) : item.userId == user.uid || requests.filter(e => e.id === item.userId).length > 0 ? null : () => addFriend(item): null}>
-              {requests.filter(e => e.id === item.userId).length > 0 ? <RequestedIcon color={"#9EDAFF"} width={65} height={32} /> : 
-              following.filter(e => e === item.userId).length > 0 ? <FollowingIcon color={"#9EDAFF"} width={70} height={32} />
-              : item.userId == user.uid ? null : <FollowIcon color={"#9EDAFF"}  width={50} height={32}/>}
-              
-            </button>
-  )
+    <button onClick={handleClick} disabled={!user.uid || item.userId === user.uid || requests.some(e => e.id === item.userId)}> 
+      {requests.some(e => e.id === item.userId) ? (
+        <RequestedIcon color="#9EDAFF" width={65} height={32} />
+      ) : following.includes(item.userId) ? (
+        <FollowingIcon color="#9EDAFF" width={70} height={32} />
+      ) : item.userId === user.uid ? null : (
+        <FollowIcon color="#9EDAFF" width={50} height={32} />
+      )}
+    </button>
+  );
 }
 
-export default FollowButtons
+export default FollowButtons;
