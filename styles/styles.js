@@ -30,6 +30,9 @@ export const styles = {
       color: "#fafafa",
       marginLeft: '42.5%'
     },
+    notificationHeader: {
+
+    },
     profileFriendsContainer: {
       flexDirection: 'row',
       justifyContent: 'space-evenly',
@@ -117,6 +120,19 @@ postHeader: {
     paddingLeft: 15,
     alignSelf: 'center',
     color: "#fafafa"
+  },
+  notificationText: {
+    fontSize: 15.36,
+    color: "#fafafa",
+    padding: 7.5,
+    paddingLeft: 15,
+    maxWidth: '90%'
+  },
+  acceptText: {
+    padding: 7.5, 
+    paddingLeft: 7.5, 
+    paddingRight: 7.5, 
+    fontSize: 12.29
   },
   searchIcon: {
     alignSelf: 'center', 
@@ -237,10 +253,18 @@ postHeader: {
     alignSelf: 'center'
     },
     reportContentText: {
-       fontSize: 19.20,
-    color: "#fafafa",
-    textAlign: 'center',
-    padding: 10
+      fontSize: 19.20,
+      color: "#fafafa",
+      textAlign: 'center',
+      padding: 10
+    },
+    addTextReport: {
+      fontSize: 15.36,
+      color: "#fafafa",
+      padding: 7.5,
+      paddingLeft: 0,
+      maxWidth: '90%',
+      marginLeft: 0
     },
     reportThanksContentText: {
       fontSize: 24, 
@@ -288,6 +312,14 @@ postHeader: {
       width: '90%',
       marginLeft: '5%'
     },
+    notificationImageText: {
+      height: 45, 
+      width: 100, 
+      borderRadius: 8, 
+      alignSelf: 'center', 
+      fontSize: 15.36,
+      color: "#fafafa"
+    },
     commentInput: {
       display: 'flex', 
       alignItems: 'center', 
@@ -305,6 +337,10 @@ postHeader: {
       marginBottom: 0,
       borderColor: "#fafafa",
       color: "#fafafa"
+    },
+    notificationContainer: {
+      flex: 1, 
+      margin: '2.5%'
     },
     inputPfp: {
       height: 35, 
@@ -377,6 +413,12 @@ postHeader: {
     width: 245,
     borderRadius: 20,
     backgroundColor: "#005278"
+  },
+  postPostText: {
+    fontSize: typeof window !== 'undefined' ? window.innerHeight / 68.7 : 0,
+    padding: 10,
+    paddingTop: 0,
+    color: "#005278"
   },
   regImage: {
     height: 200,
@@ -491,6 +533,22 @@ postHeader: {
     marginTop: '5%',
     alignItems: 'center',
     paddingBottom: 10,
+  },
+  notificationItemContainer: {
+    margin: '2.5%', 
+    width: '100%', 
+    justifyContent: 'space-between', 
+    display: 'flex',
+    marginTop: 0, 
+    borderBottomWidth: 1, 
+    borderBottomColor: "#d3d3d3", 
+    paddingBottom: 15, 
+    marginTop: 0
+  },
+  notificationItemHeader: {
+    display: 'flex', 
+    alignItems: 'center', 
+    width: '91%'
   },
   copyTextContainer:{
     flexDirection: 'row',
@@ -674,6 +732,11 @@ postHeader: {
     alignSelf: 'center', 
     marginLeft: 'auto'
   },
+  notificationButton: {
+    borderRadius: 10,
+    marginLeft: 'auto', 
+    alignSelf: 'center'
+  },
   userNewMessage: {
     alignSelf: 'flex-end', 
     marginLeft: 'auto'
@@ -700,6 +763,28 @@ postHeader: {
     color: "#fafafa",
     alignSelf: 'center',
     padding: 5
+  },
+  commentHeader: {
+    display: 'flex',
+    marginTop: '5%',
+    marginLeft: '5%',
+    marginRight: '5%'
+  },
+  commentSection: {
+    marginLeft: '1.5%',
+    width: '90%',
+    alignSelf: 'center'
+  },
+  commentFooterContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%'
+  },
+  replyFooterContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginLeft: 2.5
   },
   addCommentSecondContainer: {
     marginBottom: '10%',
@@ -773,6 +858,23 @@ postHeader: {
     borderWidth: 1.5,
     color: "#fafafa"
   },
+  noCommentsText: {
+    fontSize: 24,
+    padding: 10,
+    color: "#fafafa"
+  },
+  noCommentsTextSupp: {
+    fontSize: 19.20,
+    padding: 10,
+    color: "#fafafa"
+  },
+  usernameText: {
+    fontSize: 15.36,
+    paddingTop: 0,
+    padding: 5,
+    paddingBottom: 0,
+    color: "#fafafa"
+  },
   sendButton: {
     borderRadius: 10, 
     borderWidth: 1, 
@@ -780,6 +882,20 @@ postHeader: {
     borderColor: "#9EDAFF", 
     marginTop: 10, 
     backgroundColor: "#9EDAFF"
+  },
+  notificationImage: {
+    height: 40, 
+    width: 40, 
+    borderRadius: 8, 
+    alignSelf: 'center', 
+    borderWidth: 1
+  },
+  notificationImageBorder: {
+    height: 40, 
+    width: 40, 
+    borderRadius: 1, 
+    alignSelf: 'center', 
+    borderWidth: 1
   },
   nextButton: {
     borderRadius: 10, 
@@ -844,6 +960,11 @@ postHeader: {
     borderTopRightRadius: 20,
     maxWidth: '100%',
     alignSelf: 'flex-start',
+  },
+  notificationCommentContainer: {
+    display: 'flex', 
+    alignItems: 'center', 
+    width: '100%'
   },
   sendingButton: {  
     borderRadius: 10, 
@@ -947,6 +1068,19 @@ postHeader: {
     color: '#fafafa',
     marginLeft: 'auto', 
     marginRight: 10
+  },
+  acceptContainer: {
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginLeft: 'auto'
+  },
+  chatContainer: {
+    backgroundColor: '#121212', 
+    borderTopWidth: 1,
+    borderTopColor: "#d3d3d3",
+    padding: 10,
+    display: 'flex',
+    alignItems: 'center'
   }
   
 }

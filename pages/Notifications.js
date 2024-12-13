@@ -1,15 +1,16 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { useState, useEffect, useMemo } from 'react';
-import { query, collection, onSnapshot, getDoc, getDocs, deleteDoc, doc, orderBy, where, limit } from 'firebase/firestore';
+import { query, collection, onSnapshot, getDoc, getDocs, deleteDoc, doc, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '@/context/AuthContext';
 import NextButton from '@/components/NextButton';
-import themeContext from '../lib/themeContext';
 import generateId from '../lib/generateId';
 import { BeatLoader } from 'react-spinners';
 import { TrashIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/router';
 import { useSwipeable } from 'react-swipeable';
+import { styles } from '@/styles/styles';
+import { getRequests } from '@/firebaseUtils';
 const Notifications = () => {
     const [completeNotificationsDone, setCompleteNotificationsDone] = useState(false);
     const [notificationDone, setNotificationDone] = useState(false);
@@ -19,13 +20,11 @@ const Notifications = () => {
     const [requests, setRequests] = useState([]);
     const [nonMessageNotifications, setNonMessageNotifications] = useState([]);
     const [username, setUsername] = useState('');
-    const [searchKeywords, setSearchKeywords] = useState([]);
     const [smallKeywords, setSmallKeywords] = useState([]);
     const [largeKeywords, setLargeKeywords] = useState([]);
     const [completeNotifications, setCompleteNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const {user} = useAuth();
-    const modeTheme = useContext(themeContext)
     const [menuVisible, setMenuVisible] = useState(false);
     const openMenu = () => setMenuVisible(true)
     const closeMenu = () => setMenuVisible(false)
@@ -47,27 +46,26 @@ const Notifications = () => {
         deleteCheckedNotifications()
     }, [])
     async function deleteCheckedNotifications() {
-      //console.log('first')
       const querySnapshot = await getDocs(collection(db, "profiles", user.uid, 'checkNotifications'));
       querySnapshot.forEach(async(docu) => {
         await deleteDoc(doc(db, 'profiles', user.uid, 'checkNotifications', docu.id))
       });
     }
-    useEffect(()=> {
-      let unsub;
-      const fetchCards = async () => {
-        //const passes = await getDocs(collection(db, 'users', user.uid, 'passes')).then((snapshot) => snapshot.docs.map((doc) => doc.id));
-        unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'requests'), where('actualRequest', '==', true)), (snapshot) => {
-          setRequests(snapshot.docs.map((doc)=> ( {
-            id: doc.id,
-            ...doc.data()
-            //info: doc.data().info
-          })))
-        })
-      } 
-      fetchCards();
-      return unsub;
-    }, [onSnapshot]);
+    useEffect(() => {
+    let unsubscribe;
+
+    if (user.uid) {
+      unsubscribe = getRequests(user.uid, (data) => {
+        setRequests(data);
+      });
+    }
+
+    return () => {
+      if (unsubscribe) {
+        return unsubscribe; 
+      }
+    };
+  }, [user?.uid, onSnapshot]); // Dependency on user.uid and snapshot in case requests are accepted
     useEffect(()=> {
       const getRequest = async() => {
         const unsub = onSnapshot(doc(db, 'profiles', user.uid), (docSnap) => {
@@ -459,49 +457,6 @@ const Notifications = () => {
     console.error('Error:', error);
   }
   }
-  const image = {height: 40, width: 40, borderRadius: 8, alignSelf: 'center', borderWidth: 1}
-  const imageBorder = {height: 40, width: 40, borderRadius: 8, alignSelf: 'center', borderWidth: 1, borderRadius: 1}
-  const imageText = {height: 45, width: 100, borderRadius: 8, alignSelf: 'center', fontSize: 15.36, color: "#fafafa"}
-  const noFriendsText = {
-    fontSize: 19.20,
-    color: "#fafafa",
-    padding: 10,
-    textAlign: 'center'
-  }
-  const addTextReport = {
-    fontSize: 15.36,
-    color: "#fafafa",
-      padding: 7.5,
-      paddingLeft: 0,
-      maxWidth: '90%',
-      marginLeft: 0
-  }
-  const addText = {
-    fontSize: 15.36,
-    color: "#fafafa",
-      padding: 7.5,
-      paddingLeft: 15,
-      maxWidth: '90%'
-  }
-  const header = {
-    flexDirection: 'row',
-        alignItems: 'center',
-        //justifyContent: 'space-between',
-        marginTop: '5%',
-        marginLeft: '5%',
-        marginRight: '5%',
-        display: 'flex'
-  }
-  const headerText = {
-    fontSize: 19.20,
-        flex: 1,
-        color: "#fafafa",
-        textAlign: 'center',
-        paddingLeft: 0,
-        alignSelf: 'center',
-        padding: 10,
-        marginRight: '5%'
-  }
   
 async function deleteNotification(item)  {
   if (item.item.request) {
@@ -602,294 +557,288 @@ async function schedulePushRequestFriendNotification(id, username, notificationT
     console.error('Error:', error);
   }
 }
-//console.log(loading, completeNotifications.length, completeNotificationsDone)
   return (
-    <div className=''>
-    <div style={header}>
-            {
-         <>
-          <span style={headerText}>Notifications</span>
+    <div>
+      <div style={styles.commentHeader}>
+        <span style={{...styles.headerText, ...{textAlign: 'center'}}}>Notifications</span>
+      </div>
+      <div className='divider'/>
+      <div>
+        {<>
+        {loading ?  
+          <div style={styles.repostLoadingContainer}>
+            <BeatLoader color='#9edaff'/> 
+          </div> : actualNotifications.length > 0 ? 
+          <>
+            {!loading && completeNotificationsDone ? <div style={styles.notificationContainer}>
+              {completeNotifications.slice().sort((a, b) => b.item.timestamp - a.item.timestamp).map((item, index) => {
+                  return (
+                    <div className='swipe-container'>
+                      <div className='swipe-content' style={{ transform: `translateX(${translateX}px)` }}>
+                      {item.item.like && !item.item.repost ? 
+                        <div style={styles.notificationItemContainer}>
+                        <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+                          {item.info.pfp ? <img src={item.info.pfp} style={styles.notificationImage}/> :
+                              <UserCircleIcon className='userBtn' style={styles.notificationImage}/>
+                              }
+                          <span className='numberOfLines2' style={styles.notificationText}><span style={{fontWeight: '700'}} >@{item.info.userName}</span> liked your {!item.postInfo.repost ? item.postInfo.post[0].image ? 'post' : 
+                          item.postInfo.post[0].video ? 'vid' : 'vibe' : 're-vibe'}: </span>
+                        </div>
+                        {!item.postInfo.repost ? item.postInfo.post[0].image ? 
+                      <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                        <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+                      </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                        <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+                      </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                        <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+                      </button> : item.postInfo.post.post[0].image ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                        <img src={item.postInfo.post.post[0].post} style={styles.notificationImageBorder}/>
+                      </button> : item.postInfo.post.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                        <img src={item.postInfo.post.post[0].thumbnail} style={styles.notificationImageBorder}/>
+                      </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                        <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post.post[0].value}</span>
+                      </button>}
+                        
+                        </div> : item.item.request ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? <img src={item.info.pfp} style={styles.notificationImage}/> :
+                <UserCircleIcon className='userBtn' style={styles.notificationImage}/>
+                }
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> requested to add you as a friend.</span>
+          </div>
+          <div style={styles.acceptContainer}>
+            <NextButton text={"Accept"} textStyle={styles.acceptText} onClick={() => acceptRequest(item)}/>
+          </div>
+          
+          </div>
+          : item.item.repost ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? <img src={item.info.pfp} style={styles.notificationImage}/> :
+                <UserCircleIcon className='userBtn' style={styles.notificationImage}/>
+                }
+            <span className='numberOfLInes2' style={styles.notificationText}><span style={{fontWeight: '700'}} 
+            >@{item.info.userName}</span> re-vibed your vibe: </span>
+          </div>
+          <button style={styles.notificationButton} onClick={() => router.push({pathname: 'Post',  query: {post: item.postInfo.id}})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button>
+          
+          </div> :
+          item.item.acceptRequest ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? <img src={item.info.pfp} style={styles.notificationImage}/> :
+                <UserCircleIcon className='userBtn' style={styles.notificationImage}/>
+                }
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> accepted your friend request!</span>
+          </div>
+          </div> :
+          item.item.friend ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? <img src={item.info.pfp} style={styles.notificationImage}/> :
+                <UserCircleIcon className='userBtn' style={styles.notificationImage}/>
+                }
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> added you as a friend!</span>
+          </div>
+          </div> :
+          item.item.report ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationCommentContainer}>
+            {item.item.comments ? <div>
+              <span className='numberOfLInes2' style={styles.addTextReport}>You have been reported for this comment: {item.item.postId.comment} for {item.item.item}</span>
+            </div> : item.item.post ? 
+            <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
+              <span className='numberOfLInes2' style={styles.addTextReport}>This post has been reported for {item.item.item}:</span>
+              {!item.postInfo.repost ? item.postInfo.post[0].image ? 
+              <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+              </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button> : item.postInfo.post.post[0].image ? 
+              <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+                <img src={item.postInfo.post.post[0].post} style={styles.notificationImageBorder}/>
+              </button> : item.postInfo.post.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post.post[0].value}</span>
+        </button>}
+            </div> : item.item.message ? 
+            <div style={{marginLeft: '-3%', width: '110%'}}> 
+              <span className='numberOfLInes2' style={styles.notificationText}>You have been reported for a chat message for {item.item.item}</span>
+            </div> : item.item.theme ? 
+            <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
+              <span className='numberOfLInes2' style={styles.addTextReport}>This theme has been reported:</span>
+              <button style={styles.notificationButton} onClick={() => router.push('SpecificTheme', {productId: item.postInfo.id, free: true, purchased: false})}>
+                <img src={item.postInfo.images[0]} style={styles.notificationImage}/>
+              </button>
+            </div>  : null}
+          </div>
+          
+          </div> 
+          :
+          item.item.comment ? item.item.likedComment ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? 
+            <img src={{uri: item.info.pfp}} style={styles.notificationImage}/> : <UserCircleIcon className='userBtn' style={styles.notificationImage}/>}
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> liked your comment:  {item.item.item} </span>
+          </div>
+          {!item.postInfo.repost ? item.postInfo.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button> : item.postInfo.post.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post.post[0].value}</span>
+        </button>}
+          </div> : 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? 
+            <img src={{uri: item.info.pfp}} style={styles.notificationImage}/> : <UserCircleIcon className='userBtn' style={styles.notificationImage}/>}
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> commented:  {item.item.item} </span>
+          </div>
+          {!item.postInfo.repost ? item.postInfo.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button> : item.postInfo.post.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post.post[0].value}</span>
+        </button>}
+          </div>
+          : item.item.reply ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? 
+            <img src={{uri: item.info.pfp}} style={styles.notificationImage}/> : <UserCircleIcon className='userBtn' style={styles.notificationImage}/>}
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> replied to you:  {item.item.item} </span>
+          </div>
+          {!item.postInfo.repost ? item.postInfo.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button> :item.postInfo.post.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post.post[0].value}</span>
+        </button>}
+          </div> :
+          item.item.theme ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? 
+            <img src={{uri: item.info.pfp}} style={styles.notificationImage}/> : <UserCircleIcon className='userBtn' style={styles.notificationImage}/>}
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> bought your theme: </span>
+          </div>
+        <button style={styles.notificationButton} onClick={() => router.push('SpecificTheme', {productId: item.postInfo.id, free: true, purchased: false})}>
+                <img src={item.postInfo.images[0]} style={styles.notificationImage}/>
+              </button>
+          
+          </div> :
+          item.item.mention ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? 
+            <img src={{uri: item.info.pfp}} style={styles.notificationImage}/> : <UserCircleIcon className='userBtn' style={styles.notificationImage}/>}
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> mentioned you in a comment.</span>
+          </div>
+          {!item.postInfo.repost ? item.postInfo.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button> : item.postInfo.post.post[0].image ? 
+        <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post.post[0].video ? <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <img src={item.postInfo.post.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post.post[0].value}</span>
+        </button>}
+          </div> : item.item.remove ? 
+          <div style={styles.notificationItemContainer}>
+            <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
+              <span className='numberOfLInes2' style={styles.addTextReport}>You have been removed from this Cliq: {item.postInfo.name}</span>
+              {<div style={styles.notificationButton}>
+                <img src={item.postInfo.banner ? {uri: item.postInfo.banner, priority: 'normal'} : null} style={styles.notificationImage}/>
+              </div>}
+            </div>
+          </div> 
+          : item.item.postMention ? 
+          <div style={styles.notificationItemContainer}>
+          <div style={styles.notificationItemHeader} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
+            {item.info.pfp ? 
+            <img src={{uri: item.info.pfp}} style={styles.notificationImage}/> : <UserCircleIcon className='userBtn' style={styles.notificationImage}/>}
+            <span className='numberOfLInes2' style={styles.notificationText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> mentioned you in a post.</span>
+          </div>
+          {item.postInfo.post[0].image ? 
+        <button style={styles.notificationButton} onClick={() => router.push({pathname: 'Post',  query: {post: item.postInfo.id}})}>
+          <img src={item.postInfo.post[0].post} style={styles.notificationImageBorder}/>
+        </button> : item.postInfo.post[0].video ? <button style={styles.notificationButton} onClick={() => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true})}>
+          <img src={item.postInfo.post[0].thumbnail} style={styles.notificationImageBorder}/>
+        </button> : <button style={styles.notificationButton} onClick={() => router.push({pathname: 'Post',  query: {post: item.postInfo.id}})}>
+          <span className='numberofLines2' style={styles.notificationImageText}>{item.postInfo.post[0].value}</span>
+        </button>}
+          </div>
+          : item.item.ban ? 
+          <div style={styles.notificationItemContainer}>
+            <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
+              <span className='numberOfLInes2' style={styles.addTextReport}>You have been banned from this Cliq: {item.postInfo.name}</span>
+              {<div style={styles.notificationButton}>
+                <img src={item.postInfo.banner} style={styles.notificationImage}/>
+              </div>}
+            </div>
+          </div > :
+          null
+          }
+          {revealed ? <TrashIcon className='trashBtn' /> : null}
+          </div>
+          </div>
+                  )
+              })}
+              
+          </div> : null}
+          {loading ? 
+              <div style={{alignItems: 'center', flex: 1, justifyContent: 'flex-end', marginVertical: '5%'}}>
+          <BeatLoader color="#9edaff"/>
+          </div> : null
+              }
+        {/* </div> */}
+        </> 
+        :
+        <div style={{justifyContent: 'center', flex: 1, marginBottom: '40%'}}>
+          <span style={styles.reportContentText}>Sorry no Notifications</span>
+        </div>}
         </>
         }
-        </div>
-        <div className='divider'/>
-        <div>
-      {<>
-      {loading ?  <div style={{justifyContent: 'flex-end', flex: 1}}>
-          <BeatLoader color='#9edaff'/> 
-        </div> : actualNotifications.length > 0 ? 
-      <>
-      
-        {!loading && completeNotificationsDone ? <div style={{flex: 1, margin: '2.5%'}}>
-            {completeNotifications.slice().sort((a, b) => b.item.timestamp - a.item.timestamp).map((item, index) => {
-                return (
-                  
-                  <div className='swipe-container'>
-                    <div className='swipe-content' style={{ transform: `translateX(${translateX}px)` }}>
-                    {item.item.like && !item.item.repost ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', width: '100%', justifyContent: 'space-between', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15, marginTop: 0}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '91%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? <img src={item.info.pfp} style={image}/> :
-              <UserCircleIcon className='userBtn' style={image}/>
-              }
-          <span className='numberOfLines2' style={addText}><span style={{fontWeight: '700'}} >@{item.info.userName}</span> liked your {!item.postInfo.repost ? item.postInfo.post[0].image ? 'post' : 
-          item.postInfo.post[0].video ? 'vid' : 'vibe' : 're-vibe'}: </span>
-        </div>
-        {!item.postInfo.repost ? item.postInfo.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button> : item.postInfo.post.post[0].image ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post.post[0].value}</span>
-      </button>}
-        
-        </div> : item.item.request ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex',  marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15, marginTop: 0}}>
-        <div style={{flexDirection: 'row', display: 'flex',  alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? <img src={item.info.pfp} style={image}/> :
-              <UserCircleIcon className='userBtn' style={image}/>
-              }
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> requested to add you as a friend.</span>
-        </div>
-        <div style={{alignItems: 'center', justifyContent: 'center', marginLeft: 'auto'}}>
-          <NextButton text={"Accept"} textStyle={{padding: 7.5, paddingLeft: 7.5, paddingRight: 7.5, fontSize: 12.29}} onClick={() => acceptRequest(item)}/>
-        </div>
-        
-        </div>
-        : item.item.repost ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15, marginTop: 0}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '91%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? <img src={item.info.pfp} style={image}/> :
-              <UserCircleIcon className='userBtn' style={image}/>
-              }
-          <span className='numberOfLInes2' style={addText}><span style={{fontWeight: '700'}} 
-          >@{item.info.userName}</span> re-vibed your vibe: </span>
-        </div>
-        <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={() => router.push({pathname: 'Post',  query: {post: item.postInfo.id}})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button>
-        
-        </div> :
-        item.item.acceptRequest ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15, marginTop: 0}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '91%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? <img src={item.info.pfp} style={image}/> :
-              <UserCircleIcon className='userBtn' style={image}/>
-              }
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> accepted your friend request!</span>
-        </div>
-        </div> :
-        item.item.friend ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15, marginTop: 0}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? <img src={item.info.pfp} style={image}/> :
-              <UserCircleIcon className='userBtn' style={image}/>
-              }
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> added you as a friend!</span>
-        </div>
-        </div> :
-        item.item.report ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15, marginTop: 0}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '100%'}}>
-          {item.item.comments ? <div>
-            <span className='numberOfLInes2' style={addTextReport}>You have been reported for this comment: {item.item.postId.comment} for {item.item.item}</span>
-          </div> : item.item.post ? 
-          <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
-            <span className='numberOfLInes2' style={addTextReport}>This post has been reported for {item.item.item}:</span>
-            {!item.postInfo.repost ? item.postInfo.post[0].image ? 
-            <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-              <img src={item.postInfo.post[0].post} style={imageBorder}/>
-            </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button> : item.postInfo.post.post[0].image ? 
-            <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-              <img src={item.postInfo.post.post[0].post} style={imageBorder}/>
-            </button> : item.postInfo.post.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post.post[0].value}</span>
-      </button>}
-          </div> : item.item.message ? 
-          <div style={{marginLeft: '-3%', width: '110%'}}> 
-             <span className='numberOfLInes2' style={addText}>You have been reported for a chat message for {item.item.item}</span>
-          </div> : item.item.theme ? 
-          <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
-            <span className='numberOfLInes2' style={addTextReport}>This theme has been reported:</span>
-            <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={() => router.push('SpecificTheme', {productId: item.postInfo.id, free: true, purchased: false})}>
-              <img src={item.postInfo.images[0]} style={image}/>
-            </button>
-          </div>  : null}
-        </div>
-        
-        </div> 
-        :
-        item.item.comment ? item.item.likedComment ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? 
-          <img src={{uri: item.info.pfp}} style={image}/> : <UserCircleIcon className='userBtn' style={image}/>}
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> liked your comment:  {item.item.item} </span>
-        </div>
-        {!item.postInfo.repost ? item.postInfo.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button> : item.postInfo.post.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post.post[0].value}</span>
-      </button>}
-        </div> : 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? 
-          <img src={{uri: item.info.pfp}} style={image}/> : <UserCircleIcon className='userBtn' style={image}/>}
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> commented:  {item.item.item} </span>
-        </div>
-        {!item.postInfo.repost ? item.postInfo.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button> : item.postInfo.post.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post.post[0].value}</span>
-      </button>}
-        </div>
-        : item.item.reply ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? 
-          <img src={{uri: item.info.pfp}} style={image}/> : <UserCircleIcon className='userBtn' style={image}/>}
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> replied to you:  {item.item.item} </span>
-        </div>
-        {!item.postInfo.repost ? item.postInfo.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button> :item.postInfo.post.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post.post[0].value}</span>
-      </button>}
-        </div> :
-        item.item.theme ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? 
-          <img src={{uri: item.info.pfp}} style={image}/> : <UserCircleIcon className='userBtn' style={image}/>}
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.info.userName}</span> bought your theme: </span>
-        </div>
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={() => router.push('SpecificTheme', {productId: item.postInfo.id, free: true, purchased: false})}>
-              <img src={item.postInfo.images[0]} style={image}/>
-            </button>
-        
-        </div> :
-        item.item.mention ? 
-         <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? 
-          <img src={{uri: item.info.pfp}} style={image}/> : <UserCircleIcon className='userBtn' style={image}/>}
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> mentioned you in a comment.</span>
-        </div>
-        {!item.postInfo.repost ? item.postInfo.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button> : item.postInfo.post.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <img src={item.postInfo.post.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={!item.postInfo.repost ? () => router.push({pathname: 'Post',  query: {post: item.postInfo.id}}) : () => router.push('Repost', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post.post[0].value}</span>
-      </button>}
-        </div> : item.item.remove ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-          <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
-            <span className='numberOfLInes2' style={addTextReport}>You have been removed from this Cliq: {item.postInfo.name}</span>
-            {<div style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}}>
-              <img src={item.postInfo.banner ? {uri: item.postInfo.banner, priority: 'normal'} : null} style={image}/>
-            </div>}
-          </div>
-        </div> 
-        : item.item.postMention ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-        <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '75%'}} className='cursor-pointer' onClick={() => router.push({pathname: 'ViewingProfile', query: {name: item.item.requestUser, viewing: true}})}>
-          {item.info.pfp ? 
-          <img src={{uri: item.info.pfp}} style={image}/> : <UserCircleIcon className='userBtn' style={image}/>}
-          <span className='numberOfLInes2' style={addText}><span  style={{fontWeight: '700'}} >@{item.item.likedBy}</span> mentioned you in a post.</span>
-        </div>
-        {item.postInfo.post[0].image ? 
-      <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={() => router.push({pathname: 'Post',  query: {post: item.postInfo.id}})}>
-        <img src={item.postInfo.post[0].post} style={imageBorder}/>
-      </button> : item.postInfo.post[0].video ? <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={() => router.push('Post', {post: item.postInfo.id, requests: requests, name: item.postInfo.userId, groupId: null, video: true})}>
-        <img src={item.postInfo.post[0].thumbnail} style={imageBorder}/>
-      </button> : <button style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}} onClick={() => router.push({pathname: 'Post',  query: {post: item.postInfo.id}})}>
-        <span className='numberofLines2' style={imageText}>{item.postInfo.post[0].value}</span>
-      </button>}
-        </div>
-        : item.item.ban ? 
-        <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 15}}>
-          <div style={{flexDirection: 'row', display: 'flex', flex: 1, marginTop: 0}}>
-            <span className='numberOfLInes2' style={addTextReport}>You have been banned from this Cliq: {item.postInfo.name}</span>
-            {<div style={{borderRadius: 10, marginLeft: 'auto', alignSelf: 'center'}}>
-              <img src={item.postInfo.banner} style={image}/>
-            </div>}
-          </div>
-        </div > :
-        null
-        }
-        {revealed ? <TrashIcon className='trashBtn' /> : null}
-        </div>
-        </div>
-                )
-            })}
-            
-        </div> : null}
-        {loading ? 
-            <div style={{alignItems: 'center', flex: 1, justifyContent: 'flex-end', marginVertical: '5%'}}>
-         <BeatLoader color="#9edaff"/>
-        </div> : null
-            }
-      {/* </div> */}
-      </> 
-      :
-      <div style={{justifyContent: 'center', flex: 1, marginBottom: '40%'}}>
-        <span style={noFriendsText}>Sorry no Notifications</span>
-      </div>}
-      </>
-      }
             
       </div>
   </div>

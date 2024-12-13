@@ -2,14 +2,15 @@ import { useAuth } from '@/context/AuthContext';
 import React from 'react'
 import {useState, useEffect, useRef} from 'react'
 import { BeatLoader } from 'react-spinners';
-import { onSnapshot, getDoc, doc, getDocs, updateDoc, query, collection } from 'firebase/firestore';
+import { onSnapshot, getDoc, doc, getDocs, updateDoc, query, collection, arrayUnion } from 'firebase/firestore';
 import { db } from '@/firebase';
 import {HeartIcon as SolidHeart, UserCircleIcon } from '@heroicons/react/24/solid';
-import { PhotoIcon, DocumentDuplicateIcon, TrashIcon, FlagIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import { PhotoIcon} from '@heroicons/react/24/outline';
 import { styles } from '@/styles/styles';
-import { activeFunction } from '@/firebaseUtils';
+import { activeFunction, fetchMessages } from '@/firebaseUtils';
 import getDateAndTime from '@/lib/getDateAndTime';
-function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notificationToken}) {
+import CopyModal from '@/components/CopyModal';
+function PersonalChat({firstName, lastName, pfp, friendId, id, notificationToken}) {
     const [newMessages, setNewMessages] = useState([]);
     const chatContainerRef = useRef(null);
     const [messages, setMessages] = useState([]);
@@ -19,7 +20,6 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
     const [lastVisible, setLastVisible] = useState(null);
     const [active, setActive] = useState();
     const [reportedContent, setReportedContent] = useState([]);
-    const [textCopied, setTextCopied] = useState('');
     const [singleMessageLoading, setSingleMessageLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const {user} = useAuth();
@@ -34,16 +34,6 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
       });
       setNewMessages(updatedArray) 
     }
-    function toggleCopyToFalse(e) {
-      const updatedArray = newMessages.map(item => {
-        if (item.id === e.id) {
-          // Update the "isActive" property from false to true
-          return { ...item, copyModal: false, saveModal: false };
-        }
-        return item;
-      });
-      setNewMessages(updatedArray)
-    }
   const sendMessage = async() => {
     if (active && inputText.trim() !== '') {
     if (inputText.trim() === '') {
@@ -57,11 +47,11 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
       schedulePushTextNotification(id, firstName, lastName, newMessage, notificationToken)
       const messageDetails = {
         friendId: friendId, // ID of the friends
-        newMessage,                // The message text
-        id: id,    // ID of the recipient
-        userId: user.uid,  // ID of the sender
-        firstName: firstName,         // Sender's first name
-        lastName: lastName,           // Sender's last name
+        newMessage, // The message text
+        id: id, // ID of the recipient
+        userId: user.uid, // ID of the sender
+        firstName: firstName, // Sender's first name
+        lastName: lastName, // Sender's last name
         pfp: pfp // Sender's profile picture
       };
       await sendMessage(messageDetails);
@@ -119,10 +109,10 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
       renderLiked(item)
     }
   }
-    useEffect(() => {
+    /* useEffect(() => {
       const unsub = activeFunction(friendId, setActive);
-      return () => unsub();
-    }, [onSnapshot, friendId]);
+      return unsub;
+    }, [onSnapshot, friendId]); */
     useEffect(() => {
     let unsub;
     const queryData = async() => {
@@ -187,18 +177,6 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
       });
       setNewMessages(updatedArray) 
     }
-    function toggleSaveToFalse(e) {
-      const updatedArray = newMessages.map(item => {
-        if (item.id === e.id) {
-          return { ...item, copyModal: false, saveModal: false };
-        }
-        return item;
-      });
-      setNewMessages(updatedArray)
-    }
-    async function copyFunction(item) {
-      await Clipboard.setStringAsync(textCopied).then(()=> toggleCopyToFalse(item)).catch((error) => console.warn(error))
-    }
     function handleThemePress(item) {
       setTapCount(tapCount + 1);
       if (tapCount === 0) {
@@ -234,105 +212,12 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
         renderLiked(item)
       }
     }
-  async function deleteMessage(item) {
-      const newMessage = newMessages[newMessages.indexOf(item.id) + 2]
-      //item.message.image
-      if (newMessage) {
-        if (item.message.image) {
-            try {
-    const response = await fetch(`${BACKEND_URL}/api/deleteImageMessageNewMessage`, {
-      method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
-      headers: {
-        'Content-Type': 'application/json', // Set content type as needed
-      },
-      body: JSON.stringify({ data: {item: item, image: item.message.image, friendId: friendId, newMessage: newMessage}}), // Send data as needed
-    })
-    const data = await response.json();
-    //console.log(data)
-      if (data.done) {
-        setNewMessages(newMessages.filter((e) => e.id != item.id))
-        setLastMessageId(newMessage.id)
-      }
-    } catch (e) {
-      console.error(e);
-      
-    }
-
-        }
-        else {
-          try {
-    const response = await fetch(`${BACKEND_URL}/api/deleteMessageNewMessage`, {
-      method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
-      headers: {
-        'Content-Type': 'application/json', // Set content type as needed
-      },
-      body: JSON.stringify({ data: {item: item, friendId: friendId, newMessage: newMessage}}), // Send data as needed
-    })
-    const data = await response.json();
-    //console.log(data)
-      if (data.done) {
-        setNewMessages(newMessages.filter((e) => e.id != item.id))
-        setLastMessageId(newMessage.id)
-      }
-    } catch (e) {
-      console.error(e);
-      
-    }
-        }
-        
-      }
-      else {
-        if (item.message.image) {
-          try {
-    const response = await fetch(`${BACKEND_URL}/api/deleteImageMessage`, {
-      method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
-      headers: {
-        'Content-Type': 'application/json', // Set content type as needed
-      },
-      body: JSON.stringify({ data: {item: item, image: item.message.image, friendId: friendId, newMessage: newMessage}}), // Send data as needed
-    })
-    const data = await response.json();
-    //console.log(data)
-      if (data.done) {
-          setNewMessages(newMessages.filter((e) => e.id != item.id))
-      }
-    } catch 
-    (e) {
-      console.error(e);
-      
-    }
-        }
-        else {
-
-          try {
-    const response = await fetch(`${BACKEND_URL}/api/deleteMessage`, {
-      method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
-      headers: {
-        'Content-Type': 'application/json', // Set content type as needed
-      },
-      body: JSON.stringify({ data: {item: item, friendId: friendId, newMessage: newMessage}}), // Send data as needed
-    })
-    const data = await response.json();
-    //console.log(data)
-      if (data.done) {
-          setNewMessages(newMessages.filter((e) => e.id != item.id))
-      }
-    } catch 
-    (e) {
-      console.error(e);
-      
-    }
-        }
-        
-      }
-
-  }
   useEffect(() => {
     let unsubscribe;
 
     if (friendId) {
       // Call the utility function and pass state setters as callbacks
-      unsubscribe = fetchPosts(friendId, setMessages, setLastVisible);
+      unsubscribe = fetchMessages(friendId, setMessages, setLastVisible);
     }
 
     // Clean up the listener when the component unmounts
@@ -411,7 +296,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
     }
   }, [messages])
   return (
-    <div className='flex flex-col h-screen' style={{marginLeft: '30%'}}>
+    <div className='flex flex-col h-screen' style={{marginLeft: '26%'}}>
       {newMessages.length >= 0 ? 
         <div className='chatHeader' style={{display: 'flex'}}>
           {pfp ? <img src={pfp} style={styles.searchPfp}/> :
@@ -473,7 +358,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
                     : <UserCircleIcon className='userBtn' style={styles.profileImage} />
                   )}
                 <div style={item.user == user.uid ? styles.userBubbleStyle : styles.bubbleStyle}>
-                  <button onClick={() => handleMessagePress(item)} onLongPress={() => {toggleCopyToTrue(item); setTextCopied(item.message.text)}}>
+                  <button onClick={() => handleMessagePress(item)} onLongPress={() => {toggleCopyToTrue(item)}}>
                     {item.message.text !== "" ?
                       <p style={item.user == user.uid ? styles.userText : styles.text}>{item.message.text}</p>
                     : null}
@@ -490,30 +375,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
               </div>
               : null}
               {(item.saveModal && item.user == user.uid) || (item.saveModal && !reportedContent.includes(item.id)) ?  
-                <div style={styles.copyModal}>
-                  {item.user == user.uid ? 
-                    <>
-                      <button style={styles.copyTextContainer} onClick={() => deleteMessage(item)}>
-                        <p style={styles.copyText}>Delete Message</p>
-                        <TrashIcon className='btn' style={{alignSelf: 'center'}} />
-                      </button>
-                      <div className='divider' />
-                    </>
-                      : null}
-                    {!reportedContent.includes(item.id) ? 
-                      <>
-                        <button style={styles.copyTextContainer}>
-                          <p style={styles.copyText}>Report</p>
-                          <FlagIcon className='btn' style={{alignSelf: 'center'}} />
-                        </button> 
-                        <div className='divider' />
-                      </>
-                    : null}
-                      <button style={styles.copyTextContainer} onClick={() => toggleSaveToFalse(item)}>
-                        <p style={styles.copyText}>Cancel</p>
-                        <XMarkIcon className='btn' style={{alignSelf: 'center'}} />
-                      </button>
-                </div> 
+                <CopyModal item={item} userId={user.uid} reportedContent={reportedContent} copy={false}/>
             : null}
             {lastMessageId == item.id && readBy.includes(item.toUser) && item.user == user.uid && <p style={styles.readReceipt}>Read</p>}
               </div>
@@ -527,7 +389,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
                     )}
                     <div style={item.user == user.uid ? styles.userBubbleStyle : styles.bubbleStyle}>
                       <button style={{alignItems: 'flex-end'}} onClick={() => handleMessagePress(item)}
-                        onLongPress={() => {toggleCopyToTrue(item); setTextCopied(item.message.text);}}>
+                        onLongPress={() => {toggleCopyToTrue(item);}}>
                         {item.message.text !== "" ?
                           <p style={item.user == user.uid ? styles.userText : styles.text}>{item.message.text}</p>
                         : null}
@@ -545,35 +407,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
                   </div>
                 </div> : null}
                 {item.copyModal ?
-                  <div style={styles.copyModal}>
-                    <button style={styles.copyTextContainer} onClick={() => copyFunction(item)}>
-                      <p style={styles.copyText}>Copy</p>
-                      <DocumentDuplicateIcon style={{alignSelf: 'center'}} className='btn'/>
-                    </button>
-                    <div className='divider' />
-                    {item.user == user.uid ? 
-                    <>
-                      <button style={styles.copyTextContainer} onClick={() => deleteMessage(item)}>
-                        <p style={styles.copyText}>Delete Message</p>
-                        <TrashIcon className='btn' style={{alignSelf: 'center'}} />
-                      </button>
-                      <div className='divider' />
-                    </>
-                    : null}
-                    {!reportedContent.includes(item.id) ? 
-                      <>
-                      <button style={styles.copyTextContainer}>
-                        <p style={styles.copyText}>Report</p>
-                        <FlagIcon className='btn' style={{alignSelf: 'center'}} />
-                      </button> 
-                      <div className='divider' />
-                      </>
-                    : null}
-                    <button style={styles.copyTextContainer} onClick={() => toggleCopyToFalse(item)}>
-                      <p style={styles.copyText}>Cancel</p>
-                      <XMarkIcon className='btn' style={{alignSelf: 'center'}} />
-                    </button>
-                  </div> :
+                  <CopyModal copy={true} userId={user.uid} item={item} reportedContent={reportedContent}/> :
                   <div style={{margin: '2.5%'}}>
                     <button activeOpacity={1}  onClick={() => handleImagePress(item)} onLongPress={() => {toggleSaveToTrue(item);}}>
                       {item.message.image != undefined ? 
@@ -584,30 +418,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
                           <img src={item.message.image} style={styles.regImage}/>
                           {lastMessageId == item.id && readBy.includes(item.toUser) && item.user == user.uid && <p style={styles.readReceipt}>Read</p>}
                           {(item.saveModal && item.user == user.uid) || (item.saveModal && !reportedContent.includes(item.id)) ?  
-                            <div style={styles.copyModal}>
-                              {item.user == user.uid ? 
-                                <>
-                                  <button style={styles.copyTextContainer} onClick={() => deleteMessage(item)}>
-                                    <p style={styles.copyText}>Delete Message</p>
-                                    <TrashIcon className='btn' style={{alignSelf: 'center'}} />
-                                  </button>
-                                  <div className='divider' />
-                                </>
-                              : null}
-                              {!reportedContent.includes(item.id) ? 
-                                <>
-                                  <button style={styles.copyTextContainer}>
-                                    <p style={styles.copyText}>Report</p>
-                                    <FlagIcon className='btn' style={{alignSelf: 'center'}} />
-                                  </button> 
-                                  <div className='divider' />
-                                </>
-                              : null}
-                              <button style={styles.copyTextContainer} onClick={() => toggleSaveToFalse(item)}>
-                                <p style={styles.copyText}>Cancel</p>
-                                <XMarkIcon className='btn' style={{alignSelf: 'center'}} />
-                              </button>
-                            </div> 
+                            <CopyModal copy={false} userId={user.uid} item={item} reportedContent={reportedContent}/>
                         : null}
                         </div>
                       : null}
@@ -668,7 +479,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
                   : <UserCircleIcon className='userBtn' style={styles.profileImage} />
                 )}
                 <div style={item.user == user.uid ? styles.userBubbleStyle : styles.bubbleStyle}>
-                  <button onClick={() => handleMessagePress(item)} onLongPress={() => {toggleCopyToTrue(item); setTextCopied(item.message.text)}}>
+                  <button onClick={() => handleMessagePress(item)} onLongPress={() => {toggleCopyToTrue(item)}}>
                     {item.message.text !== "" ?
                       <p  style={item.user == user.uid ? styles.userText : styles.text}>{item.message.text}</p>
                     : null}
@@ -683,30 +494,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, userName, id, notific
               </div>
               : null}
               {(item.saveModal && item.user == user.uid) || (item.saveModal && !reportedContent.includes(item.id)) ?  
-                <div style={styles.copyModal}>
-                  {item.user == user.uid ? 
-                    <>
-                      <button style={styles.copyTextContainer} onClick={() => deleteMessage(item)}>
-                        <p style={styles.copyText}>Delete Message</p>
-                        <TrashIcon className='btn' style={{alignSelf: 'center'}} />
-                      </button>
-                      <div className='divider' />
-                    </>
-                  : null}
-                  {!reportedContent.includes(item.id) ? 
-                    <>
-                      <button style={styles.copyTextContainer}>
-                        <p style={styles.copyText}>Report</p>
-                        <FlagIcon className='btn' style={{alignSelf: 'center'}} />
-                      </button> 
-                      <div className='divider' />
-                    </>
-                  : null}
-                  <button style={styles.copyTextContainer} onClick={() => toggleSaveToFalse(item)}>
-                    <p  style={styles.copyText}>Cancel</p>
-                    <XMarkIcon className='btn' style={{alignSelf: 'center'}} />
-                  </button>
-                </div> 
+                <CopyModal copy={false} userId={user.uid} item={item} reportedContent={reportedContent}/>
               : null}
               {lastMessageId == item.id && readBy.includes(item.toUser) && item.user == user.uid && <p style={styles.readReceipt}>Read</p>}
             </div> 

@@ -318,7 +318,9 @@ const handleSwipe = (dir) => {
         if (tempPosts.length === index + 1) {      
             return (
           <div ref={lastElementRef} key={e.id}>
-            <IndPost user={user} item={e} likesModal={() => setLikesModal(true)}/>
+            <IndPost user={user} item={e} likesModal={() => setLikesModal(true)} commentModal={() => setCommentModal(true)}
+              sendingModal={() => setSendingModal(true)} reportModal={() => setReportModal(true)} repostModal={() => setRepostModal(true)}
+              focusedItem={(e) => setFocusedItem(e)} repostItem={(e) => setRepostItem(e)}/>
           </div>
             )
           
@@ -326,7 +328,9 @@ const handleSwipe = (dir) => {
           else {
             return (
             <div key={e.id}>
-              <IndPost user={user} item={e} likesModal={() => setLikesModal(true)}/>
+              <IndPost user={user} item={e} likesModal={() => setLikesModal(true)} commentModal={() => setCommentModal(true)}
+              sendingModal={() => setSendingModal(true)} reportModal={() => setReportModal(true)} repostModal={() => setRepostModal(true)}
+              focusedItem={(e) => setFocusedItem(e)} repostItem={(e) => setRepostItem(e)}/>
             </div>
             )
           }

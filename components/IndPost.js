@@ -6,14 +6,28 @@ import LikeButton from './LikeButton';
 import { ChatBubbleBottomCenterIcon, ArrowUturnRightIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import {EllipsisVerticalIcon} from '@heroicons/react/24/solid';
 import SaveButton from './SaveButton';
-function IndPost({item, user, likesModal}) {
+function IndPost({item, user, likesModal, commentModal, sendingModal, reportModal, repostModal, focusedItem, repostItem}) {
     const [isOpen, setIsOpen] = useState(false);
     const [focusedLikedItem, setFocusedLikedItem] = useState(null);
     useEffect(() => {
     if (focusedLikedItem != null) {
-      likesModal();
+        likesModal();
     }
   }, [focusedLikedItem])
+    const handleComments = (item) => {
+        focusedItem(item)
+        commentModal();
+    }
+    const handleSending = () => {
+        sendingModal();
+    }
+    const handleRepost = (item) => {
+        repostItem(item)
+        repostModal();
+    }
+    const handleReport = () => {
+        reportModal();
+    }
     async function addHomeSave(item) {
         await addHomeSaveFunction(item, user, tempPosts, setTempPosts)
     }
@@ -75,16 +89,16 @@ function IndPost({item, user, likesModal}) {
             <div className='flex justify-between pt-4 px-4'>
                 <div className='flex space-x-4'>
                     <LikeButton key={item.id} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
-                    <div className='flex flex-row' onClick={() => {setCommentModal(true); setFocusedItem(item)}}>
+                    <div className='flex flex-row' onClick={() => handleComments(item)}>
                         <ChatBubbleBottomCenterIcon className='btn'/>
                         <span style={styles.numberCommentText}>{item.comments}</span>
                     </div>
                     <SaveButton key={item.id} item={item} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
                     {!item.private ? 
-                        <ArrowUturnRightIcon className='btn' onClick={() => setSendingModal(true)}/> : null}
+                        <ArrowUturnRightIcon className='btn' onClick={() => handleSending()}/> : null}
                     {item.post[0].text && item.userId != user.uid && !item.private ? 
                         <div style={styles.repostButtonContainer}>
-                        <div className='cursor-pointer' onClick={() => {setRepostModal(true); setRepostItem(item)}}>
+                        <div className='cursor-pointer' onClick={() => handleRepost(item)}>
                             <ArrowPathIcon className='btn' color='#fafafa'/>
                         </div>
                         {item.reposts ?
@@ -103,7 +117,7 @@ function IndPost({item, user, likesModal}) {
                 </label>
                 {isOpen && ( 
                     <ul className="dropdown-list">
-                        <li className='reportList' style={styles.reportText} onClick={() => setReportModal(true)}>Report</li>
+                        <li className='reportList' style={styles.reportText} onClick={() => handleReport()}>Report</li>
                     </ul>
                 )}
             </div>

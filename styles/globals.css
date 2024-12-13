@@ -266,6 +266,9 @@ textarea {
 .chat-header {
   width: 70vw;
 }
+.chatHeader {
+  margin-top: 20px;
+}
 .messageInput {
   width: 150vw;
   margin-left: -48px;

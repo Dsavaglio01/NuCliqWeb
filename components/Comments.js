@@ -1,8 +1,5 @@
 import React, {useCallback, useRef, useState} from 'react'
 import ReactModal from 'react-modal'
-import RequestedIcon from './RequestedIcon';
-import FollowIcon from './FollowIcon';
-import FollowingIcon from './FollowingIcon';
 import { BeatLoader } from 'react-spinners';
 import { UserCircleIcon, ChevronDownIcon, FlagIcon, XMarkIcon} from '@heroicons/react/24/solid';
 import CarouselComponent from './Carousel';
@@ -181,7 +178,7 @@ const handleReply = (event) => {
           
           <div style={{flexWrap: 'wrap'}}>
             <p style={styles.usernameText} className='numberOfLines1'>{focusedItem.username}</p>
-            <p style={styles.captionText}>{focusedItem.caption}</p>
+            <p style={{...styles.captionText, ...{paddingTop: 0}}}>{focusedItem.caption}</p>
           </div>
           
         </div>

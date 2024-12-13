@@ -9,6 +9,7 @@ import PersonalChat from './PersonalChat';
 import UserSearchBar from '@/components/UserSearchBar';
 import { getMessageNotifications, fetchFriends, getProfileDetails } from '@/firebaseUtils';
 import getDateAndTime from '@/lib/getDateAndTime';
+import { styles } from '@/styles/styles';
 function Chat () {
     //const BACKEND_URL = process.env.BACKEND_URL
     const [searches, setSearches] = useState([]);
@@ -184,13 +185,7 @@ function Chat () {
     } 
   }, [specificSearch])
 const MessageItem = ({item, index}) => (
-  <div className='cursor-pointer' style={{backgroundColor: '#121212', borderRadius: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#d3d3d3",
-        padding: 10,
-        flexDirection: 'row',
-        display: 'flex',
-        alignItems: 'center'}} onClick={() => {deleteMessageNotifications(item); setFocusedItem(item)}}>
+  <div className='cursor-pointer' style={styles.chatContainer} onClick={() => {deleteMessageNotifications(item); setFocusedItem(item)}}>
               {item.pfp ? <img src={item.pfp} style={{height: 45, width: 45, borderRadius: 8, borderWidth: 1.5}}/> :
              <UserCircleIcon className='userBtn' style={{height: 45, width: 45, borderRadius: 8, borderWidth: 1.5}}/>
               }
@@ -263,13 +258,13 @@ const SendingMessageItem = ({item, index}) => (
       <>
       {friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ? 
           <div style={{marginVertical: '5%', marginLeft: '11%', width: '100%'}}>
-            <div className='cursor-pointer' style={{width: '100%', marginTop: '2.5%', zIndex: 0}}>
+            <div className='cursor-pointer' style={{width: '100%', marginTop: '2.5%', marginBottom: '2.5%', zIndex: 0}}>
             <UserSearchBar searching={searching} noSearchInput={() => setSearching(false)} openSearching={() => setSearching(true)} closeSearching={() => setSearching(false)}/>     
             </div>
               
           </div>
       : null}
-        {!searching ? <div style={{width: '100%', marginLeft: '10%'}}>
+        {!searching ? <div style={focusedItem ? {width: '123.25%'} : {width: '100%'}}>
             {filteredGroup.length > 0 ? 
             <ul style={{height: '50%'}}
                   > 
@@ -318,8 +313,9 @@ const SendingMessageItem = ({item, index}) => (
       null}
           </>  
       </div>
+       
       </div>
-      {focusedItem ? <PersonalChat firstName={focusedItem.firstName} userName={focusedItem.username} id={focusedItem.id} lastName={focusedItem.lastName} pfp={focusedItem.pfp} friendId={completeFriends.filter((element) => element.id.includes(focusedItem.id))[0].id}/> : null}
+          {focusedItem ? <PersonalChat firstName={focusedItem.firstName} userName={focusedItem.username} id={focusedItem.id} lastName={focusedItem.lastName} pfp={focusedItem.pfp} friendId={completeFriends.filter((element) => element.id.includes(focusedItem.id))[0].id}/> : null}
               
     </div>
   )
