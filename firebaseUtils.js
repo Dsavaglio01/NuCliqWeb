@@ -1692,7 +1692,7 @@ export const filterPotentialFriends = async (list, user) => {
     throw error;
   }
 };
-export const fetchActualRecentSearches = ({userId, callback}) => {
+export const fetchActualRecentSearches = (userId, callback) => {
   if (!userId) {
     throw new Error("Error: 'userId' is undefined.");
   }
@@ -1706,7 +1706,7 @@ export const fetchActualRecentSearches = ({userId, callback}) => {
   });
   return unsub;
 }
-export const fetchRecentSearches = ({actualRecentSearches}) => {
+export const fetchRecentSearches = (actualRecentSearches) => {
   const tempSearches = [];
   actualRecentSearches.map(async(item) => {
     const docSnap = await getDoc(doc(db, 'profiles', item.id))

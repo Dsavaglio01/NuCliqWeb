@@ -22,7 +22,8 @@ import { ableToShareFunction, addHomeSaveFunction, deleteReplyFunction, removeHo
 import ReportModal from './ReportModal'
 import RepostModal from './RepostModal'
 import ViewLikes from './ViewLikes'
-function Posts({post, changeWidth}) {
+import IndPost from './IndPost'
+function Posts({changeWidth}) {
   const [meet, setMeet] = useState(true);
   const [reloadPage, setReloadPage] = useState(true);
   const [blockedUsers, setBlockedUsers] = useState(null);
@@ -37,9 +38,8 @@ function Posts({post, changeWidth}) {
   const [ableToShare, setAbleToShare] = useState(true);
   const [repostItem, setRepostItem] = useState(null);
   const [reportModal, setReportModal] = useState(false);
-    const [tempReplyId, setTempReplyId] = useState('');
+  const [tempReplyId, setTempReplyId] = useState('');
   const [lastVisible, setLastVisible] = useState(null);
-  const [requests, setRequests] = useState([]);
   const [focusedLikedItem, setFocusedLikedItem] = useState(null);
   const [forSale, setForSale] = useState(false);
   const [background, setBackground] = useState(null);
@@ -61,9 +61,6 @@ function Posts({post, changeWidth}) {
   const [commentModal, setCommentModal] = useState(false)
   const bottomObserver = useRef(null);
   const dropdownRef = useRef(null);
-  const toggleOpen = () => {
-    setIsOpen(!isOpen);
-  };
   useEffect(() => {
     const fetchPostExistence = async () => {
       if (focusedItem != null) {
@@ -93,221 +90,10 @@ function Posts({post, changeWidth}) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  async function addHomeSave(item) {
-    await addHomeSaveFunction(item, user, tempPosts, setTempPosts)
-  }
   const deleteReply = async(item, reply) => {
     await deleteReplyFunction(item, reply, focusedItem, comments, setComments, tempPosts, setTempPosts);
   }
-  async function removeHomeSave(item) {
-    await removeHomeSaveFunction(item, user, tempPosts, setTempPosts)
-  }
-  async function addHomeLike(item, likedBy) {
-    await addHomeLikeFunction(item, likedBy, user, tempPosts, setTempPosts, schedulePushLikeNotification, username)
-  }
-  async function removeHomeLike(item) {
-    await removeLikeFunction(item, user, tempPosts, setTempPosts)
-  }
-  const Row = ({index, item}) => (
-    item.post != null && item.post.length > 1 ? 
-    <div className='my-7 border-rounded-sm w-96 relative flex flex-col justify-center' style={{ 
-      backgroundColor: "#121212",
-      height: 700,
-      backgroundImage: `url(${item.background})`, // Add background image URL here
-      backgroundSize: 'cover',  // Or 'contain', depending on desired behavior
-      backgroundPosition: 'center',
-    }}>
-    <div className='mt-8'>
-    <div className='bg-[#121212] rounded-xl m-5 pb-3'>
-      <div className='flex p-5 py-3 items-center border-rounded-sm'>
-        {item.pfp ? <img src={item.pfp} className='rounded-xl h-12 w-12 object-fill p-1 mr-3'/> : 
-          <img src='../public/defaultpfp.jpg' height={44} width={44} style={styles.pfpBorder}/>
-        }
-        <p className='flex-1 font-bold' style={{color: "#fafafa"}}>{item.username}</p>
-        <FollowButtons user={user} item={item}/>
-      </div>
-      <CarouselComponent itemPost={item.post}/>
-    </div>
-    </div>
-    <div className='bg-[#121212] rounded-xl m-5 mb-16 mt-0 relative'>
-      <div className='flex justify-between pt-4 px-4'>
-        <div className='flex space-x-4'>
-          <LikeButton key={item.id} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
-          <div className='flex flex-row' onClick={() => {setCommentModal(true); setFocusedItem(item)}}>
-            <ChatBubbleBottomCenterIcon className='btn'/>
-            <span style={styles.numberCommentText}>{item.comments}</span>
-          </div>
-          <SaveButton key={item.id} item={item} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
-          {!item.private ? 
-          <ArrowUturnRightIcon className='btn' onClick={() => setSendingModal(true)}/> : null}
-          {item.post[0].text && item.userId != user.uid && !item.private ? 
-            <div style={styles.repostButtonContainer}>
-              <div className='cursor-pointer' onClick={() => {setRepostModal(true); setRepostItem(item)}}>
-                <ArrowPathIcon className='btn' color='#fafafa'/>
-              </div>
-              {item.reposts ?
-                <div>
-                  <p style={styles.postFooterText}>{item.reposts > 999 && item.reposts < 1000000 ? `${item.reposts / 1000}k` : item.reposts > 999999 ? `${item.reposts / 1000000}m` : item.reposts}</p>
-                </div>
-              : null}
-            </div>
-          : null}
-        </div>
-        <label htmlFor="hero-select">
-          {!isOpen && (
-            <EllipsisVerticalIcon className='btn' onClick={toggleOpen}/>
-          )}
-        </label>
-      {isOpen && ( 
-        <ul className="dropdown-list">
-          <li className='reportList' style={styles.reportText} onClick={() => setReportModal(true)}>Report</li>
-
-        </ul>
-      )}
-      </div>
-      <p className='p-5 truncate text-white'>
-        <span className='font-bold mr-1'>{item.username}</span> {item.caption}
-      </p>
-      
-      </div>
-        <div className='arrow' />
-      </div>
-      :
-      item.post != null && item.post.length == 1 && !item.repost ?
-      <div className='my-7 border-rounded-sm w-96 relative flex flex-col justify-center' style={{ 
-      backgroundColor: "#121212",
-      height: 700,
-      backgroundImage: `url(${item.background})`, // Add background image URL here
-      backgroundSize: 'cover',  // Or 'contain', depending on desired behavior
-      backgroundPosition: 'center',
-  }}>
-    <div className='mt-8'>
-    <div className='bg-[#121212] rounded-xl m-5'>
-      <div className='flex p-5 py-3 items-center border-rounded-sm'>
-          {item.pfp ? <img src={item.pfp} className='rounded-xl h-12 w-12 object-fill p-1 mr-3'/> : 
-            <img src='../public/defaultpfp.jpg' height={44} width={44} style={styles.pfpBorder}/>
-            }
-          <p className='flex-1 font-bold' style={{color: "#fafafa"}}>{item.username}</p>
-        <FollowButtons user={user} item={item}/>
-      </div>
-      {item.post[0].image ? 
-        <div className='px-5 pb-5'>
-            <img src={item.post[0].post} className='object-cover w-full rounded-md'/>
-        </div> : item.post[0].text ?
-        <div style={{marginLeft: '5%'}}> 
-            <p style={styles.postText}>{item.post[0].value}</p>
-        </div> : null}
-    </div>
-    </div>
-        <div className='bg-[#121212] rounded-xl m-5 mb-16 mt-0 relative'>
-        
-        <div className='flex justify-between pt-4 px-4'>
-            <div className='flex space-x-4'>
-              <LikeButton key={item.id} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
-              <div className='flex flex-row' onClick={() => {setCommentModal(true); setFocusedItem(item)}}>
-                <ChatBubbleBottomCenterIcon className='btn'/>
-                <span style={styles.numberCommentText}>{item.comments}</span>
-              </div>
-              <SaveButton key={item.id} item={item} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
-              <ArrowUturnRightIcon className='btn' onClick={() => setSendingModal(true)}/>
-              {item.post[0].text && item.userId != user.uid && !item.private ? 
-            <div style={styles.repostButtonContainer}>
-            <div className='cursor-pointer' onClick={() => {setRepostModal(true); setRepostItem(item)}}>
-              <ArrowPathIcon className='btn' color='#fafafa'/>
-            </div>
-            {item.reposts ?
-            <div>
-              <p style={styles.postFooterText}>{item.reposts > 999 && item.reposts < 1000000 ? `${item.reposts / 1000}k` : item.reposts > 999999 ? `${item.reposts / 1000000}m` : item.reposts}</p>
-            </div>
-            : null}
-            </div>
-            : null}
-            </div>
-            <label htmlFor="hero-select">
-              {!isOpen && (
-          <EllipsisVerticalIcon className='btn' onClick={toggleOpen}/>
-              )}
-        </label>
-        {isOpen && ( 
-          <ul className="dropdown-list">
-            <li className='reportList' style={styles.reportText} onClick={() => setReportModal(true)}>Report</li>
-
-          </ul>
-        )}
-        </div>
-        <p className='p-5 truncate text-white'>
-          <span className='font-bold mr-1'>{item.username}</span> {item.caption}
-        </p>
-        
-        </div>
-        <div className='arrow' />
-      </div> : 
-      <div className='my-7 border-rounded-sm w-96 relative flex flex-col justify-center' style={{ 
-      backgroundColor: "#121212",
-      height: 700,
-      backgroundImage: `url(${item.background})`, // Add background image URL here
-      backgroundSize: 'cover',  // Or 'contain', depending on desired behavior
-      backgroundPosition: 'center',
-  }}>
-    <div className='mt-8'>
-        <div className='bg-[#121212] rounded-xl m-5'>
-        <div className='flex p-5 py-3 items-center border-rounded-sm'>
-          {item.pfp ? <img src={item.pfp} className='rounded-xl h-12 w-12 object-fill p-1 mr-3'/> : 
-            <img src='../public/defaultpfp.jpg' height={44} width={44} style={styles.pfpBorder}/>
-            }
-          <p className='flex-1 font-bold' style={{color: "#fafafa"}}>{item.username}</p>
-          <FollowButtons user={user} item={item}/>
-      </div>
-      <div>
-        <p style={styles.rePostText}>{item.caption}</p>
-            <button className='mb-5' onClick={() => router.push('Repost', {post: item.post.id, requests: requests, name: user.uid, groupId: null, video: false})} style={styles.repostContainer}>
-              <div style={styles.postHeader}>
-              {item.post.pfp ? <img src={item.post.pfp} height={44} width={44} style={styles.pfpBorder}/> : 
-            <UserCircleIcon height={44} width={44} style={styles.pfpBorder}/>
-            }
-              <button className='mt-0 pt-0'>
-                <span style={styles.addText}>@{item.post.username}</span>
-              </button>
-              <span style={styles.timeText}>{getDateAndTime(item.post.timestamp)}</span>
-            </div> 
-              <p style={styles.actualrepostText} className=''>{item.post.post[0].value}</p>
-            </button>
-      </div>
-      </div>
-      </div>
-      <div className='bg-[#121212] rounded-xl m-5 mb-16 mt-0 relative'>
-        
-        <div className='flex justify-between pt-4 px-4'>
-            <div className='flex space-x-4'>
-              <LikeButton key={item.id} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
-              <div className='flex flex-row' onClick={() => {setCommentModal(true); setFocusedItem(item)}}>
-                <ChatBubbleBottomCenterIcon className='btn'/>
-                <span style={styles.numberCommentText}>{item.comments}</span>
-              </div>
-              <SaveButton key={item.id} item={item} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
-              <ArrowUturnRightIcon className='btn' onClick={() => setSendingModal(true)}/>
-              
-            </div>
-            <label htmlFor="hero-select">
-              {!isOpen && (
-          <EllipsisVerticalIcon className='btn' onClick={toggleOpen}/>
-              )}
-        </label>
-        {isOpen && ( 
-          <ul className="dropdown-list">
-            <li className='reportList' style={styles.reportText} onClick={() => setReportModal(true)}>Report</li>
-
-          </ul>
-        )}
-        </div>
-        <p className='p-5 truncate text-white'>
-          <span className='font-bold mr-1'>{item.username}</span> {item.caption}
-        </p>
-        
-        </div>
-        <div className='arrow' />
-      </div>
-  )
+  
   useEffect(() => {
     if (focusedItem != null) {
       setCommentModal(true)
@@ -317,11 +103,6 @@ function Posts({post, changeWidth}) {
       getComments()
     }
   }, [focusedItem])
-  useEffect(() => {
-    if (focusedLikedItem != null) {
-      setLikesModal(true)
-    }
-  }, [focusedLikedItem])
   useEffect(() => {
     if (user.uid) {
       const fetchProfileData = async () => {
@@ -537,16 +318,16 @@ const handleSwipe = (dir) => {
         if (tempPosts.length === index + 1) {      
             return (
           <div ref={lastElementRef} key={e.id}>
-        <Row index={index} item={e}/>
-        </div>
+            <IndPost user={user} item={e} likesModal={() => setLikesModal(true)}/>
+          </div>
             )
           
           }
           else {
-            return(
+            return (
             <div key={e.id}>
-        <Row index={index} item={e}/>
-        </div>
+              <IndPost user={user} item={e} likesModal={() => setLikesModal(true)}/>
+            </div>
             )
           }
       })}

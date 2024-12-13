@@ -19,6 +19,7 @@ function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}
   const [actualRecentSearches, setActualRecentSearches] = useState([]);
   const [tempSearches, setTempSearches] = useState([]);
   const [recentSearches, setRecentSearches] = useState(false);
+  const [tempPosts, setTempPosts] = useState([]);
   const [filteredGroup, setFilteredGroup] = useState([]);
   const handleOpen = () => {
     openSearching()
@@ -71,7 +72,8 @@ function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}
   useEffect(() => {
     let unsubscribe;
 
-    if (user.uid) {
+    if (user?.uid) {
+      console.log(user.uid)
       unsubscribe = fetchActualRecentSearches(user.uid, (data) => {
         setActualRecentSearches(data);
       });
