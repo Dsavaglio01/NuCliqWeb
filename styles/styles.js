@@ -396,6 +396,12 @@ postHeader: {
     alignSelf: 'center', 
     margin: 5
   },
+  separator: {
+    height: 35, 
+    borderWidth: 0.5, 
+    alignSelf: 'center', 
+    borderColor: "grey"
+  },
   themeContainer: {
     margin: 15,
     borderWidth: 1,
@@ -820,10 +826,20 @@ postHeader: {
     flexDirection: 'column', 
     position: 'sticky'
   },
+  videoContainer: {
+    height: '100vh',
+    overflowY: 'auto'
+  },
   sendingCheck: {
     position: 'relative', 
     bottom: 20, 
     left: 80
+  },
+  videoItemContainer: {
+    backgroundColor: "#121212",
+    width: '30vw',
+    objectFit: 'contain',
+    overflow: 'auto',
   },
   swipeContainer: {
     flex: 1, 
@@ -845,6 +861,21 @@ postHeader: {
     maxWidth: '800px', 
     height: '100%', 
     overflow: 'hidden'
+  },
+  videoItem: {
+    height: '100%',
+    width: '100%'
+  },
+  video: { 
+    width: '100%', 
+    height: '100%', 
+    objectFit: 'cover' 
+  },
+  videoHeader: {
+    position: 'relative', 
+    bottom: 105, 
+    display: 'flex', 
+    marginLeft: '2.5%'
   },
   commentScrollable: {
     flex: 1, 
@@ -943,6 +974,13 @@ postHeader: {
     flexDirection: 'column', 
     display: 'flex'
   },
+  videoButtonContainer: {
+    flexDirection: 'column', 
+    display: 'flex', 
+    marginBottom: '10%', 
+    width: 100, 
+    justifyContent: 'flex-end'
+  },
   likeButton: {
     top: 5,
     right: 10, // Default: right side
@@ -996,9 +1034,18 @@ postHeader: {
     width: 35, 
     borderRadius: 17.5
   },
+  videoPfp: {
+    height: window.innerHeight / 30.36, 
+    width: window.innerHeight / 30.36, 
+    borderRadius: 8
+  },
   searchInfo: {
     paddingLeft: 20, 
     width: '75%'
+  },
+  videoInfo: {
+    display: 'flex', 
+    width: '70%'
   },
   chatSendButton: {
     width: 70,

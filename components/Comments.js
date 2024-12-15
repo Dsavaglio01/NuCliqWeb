@@ -1,70 +1,138 @@
-import React, {useCallback, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import ReactModal from 'react-modal'
 import { BeatLoader } from 'react-spinners';
-import { UserCircleIcon, ChevronDownIcon, FlagIcon, XMarkIcon} from '@heroicons/react/24/solid';
+import { UserCircleIcon, ChevronDownIcon, XMarkIcon} from '@heroicons/react/24/solid';
 import CarouselComponent from './Carousel';
 import { useRouter } from 'next/router';
 import { useSwipeable } from 'react-swipeable';
 import getDateAndTime from '@/lib/getDateAndTime';
 import FollowButtons from './FollowButtons';
 import { styles } from '@/styles/styles';
-function Comments({ commentModal, closeCommentModal, deleteReply, pfp, toggleShowReply, noComments, focusedItem, addLike, removeLike,
-  comments, CustomCommentText, handleSwipe, user }) {
+import { fetchComments, fetchMoreComments, addCommentLike, removeCommentLike} from '@/firebaseUtils';
+function Comments({ commentModal, closeCommentModal, pfp, focusedItem,handleSwipe, user, blockedUsers }) {
     const router = useRouter();
     const [replyToReplyFocus, setReplyToReplyFocus] = useState(false);
     const [tempReplyName, setTempReplyName] = useState();
+    const [comments, setComments] = useState([]);
     const [replyFocus, setReplyFocus] = useState(false);
     const [tempReplyId, setTempReplyId] = useState('');
+    const [usernames, setUsernames] = useState([]);
     const [reportComment, setReportComment] = useState('');
     const [tempCommentId, setTempCommentId] = useState(null);
     const [reportCommentModal, setReportCommentModal ] = useState(false);
+    const [lastCommentVisible, setLastCommentVisible] = useState(null);
+    const [replyLastVisible, setReplyLastVisible] = useState(0);
     const [comment, setComment] = useState('');
     const [reply, setReply] = useState('');
     const textInputRef = useRef();
-      const commentDivRef = useRef(null);
-      const handleClose = () => {
-        closeCommentModal()
-      }
-      const handleNoComments = () => {
-        noComments()
-      }
-    const toggleShowReplyFunction = useCallback(
-      async (currentItem) => {
-        if (currentItem) {
-          await toggleShowReply(currentItem);
+    const commentDivRef = useRef(null);
+    const handleClose = () => {
+      closeCommentModal()
+    }
+    const CustomCommentText = (props) => {
+      const arr = props.text.split(' ');
+      const reducer = (acc, cur, index) => {
+        let previousVal = acc[acc.length - 1];
+        if (
+          previousVal &&
+          previousVal.startsWith('@') &&
+          previousVal.endsWith('@')
+        ) {
+          acc[acc.length - 1] = previousVal + ' ' + cur;
         } else {
-          console.error("Error: 'item' is undefined.");
+          acc.push(cur);
         }
-      },
-      [toggleShowReply]
-    );
-    const addLikeFunction = useCallback(
-      async(currentItem) => {
-        if (currentItem) {
-          await addLike(item)
+        return acc;
+      };
+      const text = arr.reduce(reducer, []);
+      async function findUser(text) {
+        const getData = async() => {
+          const q = query(collection(db, "usernames"), where("username", "==", text));
+          const docSnap = await getDocs(q)
+          docSnap.forEach((item) => {
+            if (item.id != undefined) {
+            setCommentModal(false)
+            setfocusedItem(null)
+            setComments([]);
+            if (item.id == user.uid) {
+              router.push('Profile', {screen: 'ProfileScreen', params: {name: user.uid, preview: false, viewing: false, previewImage: null, previewMade: false, applying: false}})
+            }
+            else {
+            router.push('ViewingProfile', {name: item.id, viewing: true})
+            }
+          } 
+          })
+          /* */
+        }
+        getData();
+        //console.log(text)
+      }
+        return (
+            <p>
+            {text.slice(0).map((text) => {
+
+              if (text.startsWith('@')) {
+                return (
+                    <p style={text.startsWith('@') ? usernames.some((substring) => text.includes(substring)) ? {fontWeight: '600'} : null : null} 
+                    onClick={usernames.some((substring) => text.includes(substring)) ? () => findUser(usernames.find((substring) => text.includes(substring))) : null}>
+                      {text.startsWith('@') ? text.replaceAll('@', '@') : null}{' '}
+                    </p>
+                  
+                );
+              }
+              return `${text} `;
+            })}
+          </p>
+        );
+      };
+    async function fetchMoreCommentData () {
+      if (lastCommentVisible != undefined && videoStyling) {
+        const { newComments, lastVisible: newLastVisible } = await fetchMoreComments(focusedItem, lastCommentVisible, blockedUsers, 'videos')
+        setComments([...comments, ...newComments]);
+        setLastCommentVisible(newLastVisible);
+      }
+      else if (lastCommentVisible != undefined && !videoStyling) {
+        const { newComments, lastVisible: newLastVisible } = await fetchMoreComments(focusedItem, lastCommentVisible, blockedUsers, 'posts')
+        setComments([...comments, ...newComments]);
+        setLastCommentVisible(newLastVisible);
+      }
+    }
+    async function removeLike(item) {
+      await removeCommentLike(item, user, setComments, comments, focusedItem)
+    }
+    async function addLike(item) {
+      await addCommentLike(item, user, setComments, comments, username, focusedItem)
+    }
+    async function toggleShowReply(e) {
+      const updatedArray = comments.map(item => {
+        if (item.id === e.id) {
+          // Update the "isActive" property from false to true
+          return { ...item, actualReplies: item.replies.slice(0, replyLastVisible + 2), showReply: true};
+        }
+        return item;
+      });
+      setReplyLastVisible(prevValue => prevValue + 2)
+      setComments(updatedArray) 
+    }
+    useEffect(() => {
+      const loadComments = async() => {
+        if (videoStyling) {
+          const { comments, lastVisible } = await fetchComments(focusedItem, blockedUsers, 'videos')
+          setComments(comments)
+          setLastCommentVisible(lastVisible);
         }
         else {
-           console.error("Error: 'item' is undefined.");
+          const { comments, lastVisible } = await fetchComments(focusedItem, blockedUsers, 'posts')
+          setComments(comments)
+          setLastCommentVisible(lastVisible);
         }
-        
-      },
-      [addLike],
-    )
-    const removeLikeFunction = useCallback(
-      async(currentItem) => {
-        if (currentItem) {
-          await removeLike(item)
-        }
-        else {
-           console.error("Error: 'item' is undefined.");
-        }
-        
-      },
-      [removeLike],
-    )
-    
-    
-    const deleteReplyFunction = useCallback(
+      }
+      loadComments();
+    }, [])
+    /* const deleteReplyFunction = async(item, reply) => {
+      await deleteReply(item, reply, focusedItem, comments, setComments, tempPosts, setTempPosts);
+    } */
+    /* const deleteReplyFunction = useCallback(
       async(currentItem, currentElement) => {
         if (currentItem && currentElement) {
           await deleteReply(item, element)
@@ -75,24 +143,47 @@ function Comments({ commentModal, closeCommentModal, deleteReply, pfp, toggleSho
         
       },
       [deleteReply],
-    )
+    ) */
     
     
     const swipeHandlers = useSwipeable({
-    onSwipedLeft: useCallback(
-    async() => {await handleSwipe('left')}, [handleSwipe]),
-    onSwipedRight: useCallback(
-    async() => {await handleSwipe('right')}, [handleSwipe]),
-    trackMouse: true, // Enables mouse tracking for desktop swipes
-  })
-  const handleComment = (event) => {
-    setComment(event.target.value)
-}
-const handleReply = (event) => {
-  setReply(event.targe.value)
-}
+      onSwipedLeft: handleSwipe('left'),
+      onSwipedRight: handleSwipe('right'),
+      trackMouse: true, // Enables mouse tracking for desktop swipes
+    })
+    const handleSwipe = (dir) => {
+      if (dir === 'left') {
+        const updatedData = comments.filter((e) => e.id == tempReplyId)
+        const newObject = {reply: reply,
+        commentId: tempReplyId,
+        loading: false,
+        pfp: pfp,
+        notificationToken: notificationToken,
+        username: username,
+        replyToComment: true,
+        timestamp: Timestamp.fromDate(new Date()),
+        likedBy: [],
+        postId: focusedItem.id,
+        user: user.uid}
+        // Add the new object to the array
+        updatedData[0].replies = [...updatedData[0].replies, newObject]
+        const objectInd = comments.findIndex(obj => obj.id === tempReplyId)
+        const dataUpdated = [...comments];
+        dataUpdated[objectInd] = updatedData[0];
+        setComments(dataUpdated)
+      } 
+      else if (dir === 'right') {
+        return;
+      }
+    };
+    const handleComment = (event) => {
+      setComment(event.target.value)
+    }
+    const handleReply = (event) => {
+      setReply(event.targe.value)
+    }
   return (
-    <ReactModal isOpen={commentModal} style={{content: styles.commentModalContainer}} preventScroll={true} onRequestClose={() => {handleClose(); handleNoComments()}}>
+    <ReactModal isOpen={commentModal} style={{content: styles.commentModalContainer}} preventScroll={true} onRequestClose={() => {handleClose(); setComments([])}}>
         <div className='swipe-container' {...swipeHandlers} style={styles.swipeContainer}>
             {focusedItem != null && focusedItem.post != null && Array.isArray(focusedItem.post) ?
     <div className='border-rounded-sm' style={{ 
@@ -227,16 +318,16 @@ const handleReply = (event) => {
                         </div>
                     </div>
                     <div style={{display: 'flex'}}>
-                        <div style={{display: 'flex'}} onClick={item.likedBy.includes(user.uid) == false ? () => {addLikeFunction(item)} : () => {removeLikeFunction(item)}}>
+                        <div style={{display: 'flex'}} onClick={item.likedBy.includes(user.uid) == false ? () => {addLike(item)} : () => {removeLike(item)}}>
                             {item.likedBy.includes(user.uid) ? <HeartIcon className='btn' style={styles.commentHeart} color="red"/> : <HeartIcon className='btn' style={{alignSelf: 'center'}} color="#808080"/>}
                         </div>
                         <p style={styles.commentText}>{item.likedBy.length}</p>
                     </div>
                 </div>
-                {item.replies.length == 1 && item.showReply == false ? <div style={{display: 'flex'}} onClick={() => toggleShowReplyFunction(item)}>
+                {item.replies.length == 1 && item.showReply == false ? <div style={{display: 'flex'}} onClick={() => toggleShowReply(item)}>
                     <p style={styles.viewRepliesText}>View {item.replies.length} Reply</p>
                     <ChevronDownIcon className='btn' style={{alignSelf: 'center'}}/>
-                </div> : item.replies.length > 1 && item.showReply == false ? <div style={{display: 'flex'}} onClick={() => toggleShowReplyFunction(item)}>
+                </div> : item.replies.length > 1 && item.showReply == false ? <div style={{display: 'flex'}} onClick={() => toggleShowReply(item)}>
                     <p style={styles.viewRepliesText}>View {item.replies.length} Replies</p>
                     <ChevronDownIcon className='btn' style={{alignSelf: 'center'}}/>
                 </div> : <></>}
@@ -268,7 +359,7 @@ const handleReply = (event) => {
                                     
                                     </div>
                                 </div>
-                                {replyLastVisible < item.replies.length && item.actualReplies.indexOf(element) == replyLastVisible - 1 ? <div style={styles.replyContainer} onClick={() => toggleShowReplyFunction(item)}>
+                                {replyLastVisible < item.replies.length && item.actualReplies.indexOf(element) == replyLastVisible - 1 ? <div style={styles.replyContainer} onClick={() => toggleShowReply(item)}>
                                   <p style={styles.moreRepliesText}>Show more replies</p>
                                 </div> : null}
                         </> : <div style={{margin: '2.5%'}}>
@@ -315,7 +406,7 @@ const handleReply = (event) => {
           
           
         </div>
-      <button className="close-button" onClick={() => {handleClose(); handleNoComments()}}>
+      <button className="close-button" onClick={() => {handleClose(); setComments([])}}>
         <XMarkIcon className='btn'/>
             </button>
       </ReactModal>

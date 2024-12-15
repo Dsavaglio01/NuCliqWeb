@@ -8,6 +8,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import MainButton from './MainButton';
 import { getProfileDetails } from '@/firebaseUtils';
 import { useAuth } from '@/context/AuthContext';
+const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
     const fileInputRef = useRef(null);
     const fileVideoInputRef = useRef(null);
@@ -48,6 +49,12 @@ function NewPostModal({newPostModal, closePostModal}) {
         result.splice(endIndex, 0, removed);
         return result;
     };
+    function addToArray() {
+        if (text.length > 0) {
+            setData({id: 1, image: false, visible: false, value: text, text: true, textSize: 15.36, textColor: "#fafafa", textAlign: 'left', backgroundColor: "#121212"})
+            setText('')
+        }
+    }
     function onDragEnd(result) {
         // dropped outside the list
         if (!result.destination) {
@@ -116,7 +123,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                         </button>
                         <input type='file' multiple ref={fileInputRef} style={{display: 'none'}} accept="image/*" onChange={handleFileChange}/>
                     </>
-                    <div style={{height: 35, borderWidth: 0.5, alignSelf: 'center', borderColor: "grey"}}/>
+                    <div style={styles.separator}/>
                     <>
                         <button style={styles.selectImageContainer} onClick={handleVideoClick}>
                         <VideoCameraIcon className='postBtn' color='#005278' style={{alignSelf: 'center'}}/>

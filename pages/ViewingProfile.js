@@ -47,11 +47,9 @@ function ViewingProfile() {
   const [additionalInfoMode, setAdditionalInfoMode] = useState(false);
   const [username, setUsername] = useState('');
   const [pfp, setPfp] = useState(null);
-  const [song, setSong] = useState(null);
   const [friendId, setFriendId] = useState(null);
   const [forSale, setForSale] = useState(false);
   const [bio, setBio] = useState('');
-  const [groupsJoined, setGroupsJoined] = useState([]);
   const [notificationToken, setNotificationToken] = useState(null);
   const {user} = useAuth();
   //console.log(name)

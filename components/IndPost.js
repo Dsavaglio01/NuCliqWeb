@@ -5,29 +5,72 @@ import CarouselComponent from './Carousel';
 import LikeButton from './LikeButton';
 import { ChatBubbleBottomCenterIcon, ArrowUturnRightIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import {EllipsisVerticalIcon} from '@heroicons/react/24/solid';
+import { ableToShareFunction } from '@/firebaseUtils';
 import SaveButton from './SaveButton';
-function IndPost({item, user, likesModal, commentModal, sendingModal, reportModal, repostModal, focusedItem, repostItem}) {
+import getDateAndTime from '@/lib/getDateAndTime';
+import Comments from './Comments';
+import RepostModal from './RepostModal';
+import SendingModal from './SendingModal';
+import ReportModal from './ReportModal';
+import ViewLikes from './ViewLikes';
+import { useRouter } from 'next/router';
+function IndPost({item, user, pfp, username, notificationToken, followers, following, blockedUsers, background, forSale, dropdownRef}) {
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [focusedLikedItem, setFocusedLikedItem] = useState(null);
+    const [focusedItem, setFocusedItem] = useState(null);
+    const [ableToShare, setAbleToShare] = useState(false);
+    const [commentModal, setCommentModal] = useState(false);
+    const [likesModal, setLikesModal] = useState(false);
+    const [repostModal, setRepostModal] = useState(false);
+    const [sendingModal, setSendingModal] = useState(false);
+    const [repostItem, setRepostItem] = useState(null);
+    const [reportModal, setReportModal] = useState(false);
     useEffect(() => {
-    if (focusedLikedItem != null) {
-        likesModal();
-    }
-  }, [focusedLikedItem])
-    const handleComments = (item) => {
-        focusedItem(item)
-        commentModal();
-    }
-    const handleSending = () => {
-        sendingModal();
-    }
-    const handleRepost = (item) => {
-        repostItem(item)
-        repostModal();
-    }
-    const handleReport = () => {
-        reportModal();
-    }
+        if (focusedLikedItem != null) {
+            setLikesModal(true)
+        }
+    }, [focusedLikedItem])
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+        if (
+            dropdownRef.current &&
+            !dropdownRef.current.contains(event.target)
+        ) {
+            setIsOpen(false);
+        }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+    useEffect(() => {
+        if (commentModal) {
+        document.body.style.overflow = 'hidden';
+        } else {
+        document.body.style.overflow = 'unset'; // or 'auto', depending on your desired default
+        }
+    }, [commentModal]);
+    useEffect(() => {
+        const fetchPostExistence = async () => {
+            if (focusedItem != null) {
+                try {
+                    const exists = await ableToShareFunction(focusedItem.id);
+                    setAbleToShare(exists);
+                } 
+                catch (error) {
+                    setAbleToShare(false); // Handle error by setting `ableToShare` to false
+                }
+            }
+        };
+        fetchPostExistence();
+    }, [focusedItem]);
+    useEffect(() => {
+        if (focusedItem != null) {
+            setCommentModal(true)
+        }
+    }, [focusedItem])
     async function addHomeSave(item) {
         await addHomeSaveFunction(item, user, tempPosts, setTempPosts)
     }
@@ -89,16 +132,16 @@ function IndPost({item, user, likesModal, commentModal, sendingModal, reportModa
             <div className='flex justify-between pt-4 px-4'>
                 <div className='flex space-x-4'>
                     <LikeButton key={item.id} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
-                    <div className='flex flex-row' onClick={() => handleComments(item)}>
+                    <div className='flex flex-row' onClick={() => setFocusedItem(item)}>
                         <ChatBubbleBottomCenterIcon className='btn'/>
                         <span style={styles.numberCommentText}>{item.comments}</span>
                     </div>
                     <SaveButton key={item.id} item={item} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
                     {!item.private ? 
-                        <ArrowUturnRightIcon className='btn' onClick={() => handleSending()}/> : null}
+                        <ArrowUturnRightIcon className='btn' onClick={() => setSendingModal(true)}/> : null}
                     {item.post[0].text && item.userId != user.uid && !item.private ? 
                         <div style={styles.repostButtonContainer}>
-                        <div className='cursor-pointer' onClick={() => handleRepost(item)}>
+                        <div className='cursor-pointer' onClick={() => {setRepostModal(true); setRepostItem(item)}}>
                             <ArrowPathIcon className='btn' color='#fafafa'/>
                         </div>
                         {item.reposts ?
@@ -117,7 +160,7 @@ function IndPost({item, user, likesModal, commentModal, sendingModal, reportModa
                 </label>
                 {isOpen && ( 
                     <ul className="dropdown-list">
-                        <li className='reportList' style={styles.reportText} onClick={() => handleReport()}>Report</li>
+                        <li className='reportList' style={styles.reportText} onClick={() => setReportModal(true)}>Report</li>
                     </ul>
                 )}
             </div>
@@ -126,6 +169,12 @@ function IndPost({item, user, likesModal, commentModal, sendingModal, reportModa
             </p>
         </div>
         <div className='arrow' />
+        <Comments commentModal={commentModal} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
+        {/* <ViewLikes likesModal={likesModal} closeLikesModal={() => setLikesModal(false)} focusedLikedItem={focusedLikedItem} user={user}/> */}
+        <RepostModal repostModal={repostModal} closeRepostModal={() => setRepostModal(false)} user={user} username={username} notificationToken={notificationToken}
+            blockedUsers={blockedUsers} forSale={forSale} background={background} pfp={pfp} repostItem={repostItem} ableToShare={ableToShare}/>
+        <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={false} post={true} video={false}/>
+        <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} video={false} theme={false} post={true} user={user} followers={followers} following={following}/>
     </div>
   )
 }
