@@ -453,13 +453,13 @@ postHeader: {
   },
   headerText: {
     fontSize: 24,
-        flex: 1,
-        textAlign: 'left',
-        paddingLeft: 0,
-        fontWeight: '700',
-        color: "#fff",
-        alignSelf: 'center',
-        padding: 10,
+    flex: 1,
+    textAlign: 'left',
+    paddingLeft: 0,
+    fontWeight: '700',
+    color: "#fff",
+    alignSelf: 'center',
+    padding: 10,
   },
   profileHeaderText: {
     fontSize: 15.36,
@@ -920,7 +920,6 @@ postHeader: {
     width: 40, 
     borderRadius: 8, 
     alignSelf: 'center', 
-    borderWidth: 1
   },
   notificationImageBorder: {
     height: 40, 
@@ -1195,6 +1194,69 @@ postHeader: {
     padding: 10,
     paddingTop: 0, 
     fontSize: 15.36
+  },
+  contentListContainer: {
+    borderRadius: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#d3d3d3",
+    padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '105%',
+    marginLeft: '-2.5%'
+  },
+  contentListHeaderText: {
+    fontSize: 19.20,
+    textAlign: 'center',
+    padding: 10,
+    margin: '2.5%',
+    fontWeight: '700',
+    color: "#fafafa"
+  },
+  commentListContentContainer: {
+    margin: '2.5%', 
+    display: 'flex', 
+    marginTop: 0, 
+    borderBottomWidth: 1, 
+    borderBottomColor: "#d3d3d3", 
+    paddingBottom: 10
+  },
+  commentContentImage: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginLeft: '-2.5%'
+  },
+  leftCommentContentImage: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginLeft: 'auto'
+  },
+  contentListBlockedContainer: {
+    marginLeft: '1%',
+    display: 'flex'
+  },
+  contentListBlockedInfo: {
+    paddingLeft: 20, 
+    width: '100%', 
+    justifyContent: 'center'
+  },
+  unBlock: {
+    marginLeft: 'auto', 
+    marginRight: '1%'
+  },
+  contentListPosts: {
+    borderRadius: 10, 
+    margin: '2.5%', 
+    width: 155,
+    height: 155 / 1.015625,
+    backgroundColor: "#262626"
+  },
+  contentListImage: {
+    width: typeof window !== 'undefined' ? window.innerHeight / 5.45 : 0,
+    height: typeof window !== 'undefined' ? (window.innerHeight / 5.45) / 1.015625 : 0,
+    borderRadius: 8
   }
-  
 }

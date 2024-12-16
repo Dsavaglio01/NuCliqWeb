@@ -1287,78 +1287,66 @@ export const fetchPurchasedThemes = (userId, subCollection, order, setPurchasedT
  * @param {String} subCollection - The name of the field/subCollection that we are ordering the query by (price, date, etc.).
  * @param {String} order - The name of the order that we are ordering the query by (ascending, descending, etc.).
  * @param {Object} lastVisible - The Firestore document object (last purchased theme object) to `startAfter` when fetching more data.
- * @param {Function} setPurchasedThemes - State setter function for updating `purchasedThemes` after fetching the first 10 purchased themes.
- * @param {Function} setPurchasedLastVisible - State setter function for updating `purchasedLastVisible` after fetching the first 10 purchasedThemes.
- * Used to get the last document in our query in case user fetches more (separate function).
  * @returns {Function} - An unsubscribe function to stop listening to changes.
  * @throws {Error} - If `userId` or `subCollection` is not provided.
 */
-export const fetchMorePurchasedThemes = (userId, subCollection, order, lastVisible, setPurchasedThemes, setPurchasedLastVisible) => {
+export const fetchMorePurchasedThemes = async(userId, subCollection, order, lastVisible) => {
   if (!userId || !subCollection) {
     throw new Error("userId is undefined");
   }
-  const purchasedQuery = query(collection(db, 'profiles', userId, 'purchased'), orderBy(subCollection, order), startAfter(lastVisible), limit(10))
-  const unsubscribe = onSnapshot(purchasedQuery, (snapshot) => {
-    const purchased = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      transparent: false
-    }));
-    setPurchasedThemes(purchased);
-    if (snapshot.docs.length > 0) {
-      setPurchasedLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-    }
-
-  return unsubscribe;
-  });
+  const tempPosts = [];
+  try {
+    const purchasedQuery = query(collection(db, 'profiles', userId, 'purchased'), orderBy(subCollection, order), startAfter(lastVisible), limit(10))
+    const querySnapshot = await getDocs(purchasedQuery)
+    querySnapshot.forEach((doc) => {
+      tempPosts.push({id: doc.id, ...doc.data(), transparent: false})
+    });
+    return {tempPosts, lastPurchasedVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
+  } 
+  catch (e) {
+    console.error(e)
+  }
 }
-export const fetchMoreFreeThemes = (userId, subCollection, order, setFreeThemes, setFreeLastVisible, freeLastVisible) => {
+export const fetchMoreFreeThemes = async(userId, subCollection, order, freeLastVisible) => {
   if (!userId || !subCollection) {
     throw new Error("userId or subcollection is undefined");
   }
-  const q = query(collection(db, 'freeThemes'), orderBy(subCollection, order), startAfter(freeLastVisible), limit(10))
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const themes = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      transparent: false
-    }))
-    setFreeThemes(themes);
-    if (snapshot.docs.length > 0) {
-      setFreeLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-    }
-
-  return unsubscribe;
-  })
+  const tempPosts = []
+  try {
+    const q = query(collection(db, 'freeThemes'), orderBy(subCollection, order), startAfter(freeLastVisible), limit(10))
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((doc) => {
+      tempPosts.push({id: doc.id, ...doc.data(), transparent: false})
+    });
+    return {tempPosts, lastFreeVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
+  } 
+  catch (e) {
+    console.error(e)
+  }
 }
 /**
  * Gets first 10 themes based on subCollection (price, date, etc.) and order (ascending, descending) that are 'free'.
  * @param {String} subCollection - The name of the field/subCollection that we are ordering the query by (date, count, etc.).
  * @param {String} order - The name of the order that we are ordering the query by (ascending, descending, etc.).
- * @param {Function} setFreeThemes - State setter function for updating `freeThemes` after fetching the first 10 free themes.
- * @param {Function} setFreeLastVisible - State setter function for updating `freeLastVisible` after fetching the first 10 freeThemes.
- * Used to get the last document in our query in case user fetches more (separate function).
  * @returns {Function} - An unsubscribe function to stop listening to changes.
  * @throws {Error} - If `subCollection` is not provided.
 */
-export const fetchFreeThemes = (subCollection, order, setFreeThemes, setFreeLastVisible) => {
-  if (!subCollection) {
+export const fetchFreeThemes = async(subCollection, order) => {
+  if (!userId || !subCollection) {
     throw new Error("userId or subcollection is undefined");
   }
-  const q = query(collection(db, 'freeThemes'), orderBy(subCollection, order), limit(10))
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const themes = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      transparent: false
-    }))
-    setFreeThemes(themes);
-    if (snapshot.docs.length > 0) {
-      setFreeLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-    }
-
-  return unsubscribe;
-  })
+  const tempPosts = []
+  try {
+    const q = query(collection(db, 'freeThemes'), orderBy(subCollection, order), limit(10))
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((doc) => {
+      tempPosts.push({id: doc.id, ...doc.data(), transparent: false})
+    });
+    return {tempPosts, lastFreeVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
+  } 
+  catch (e) {
+    console.error(e)
+  }
 
 }
 /**
