@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react'
+import React, { useState, useRef, useContext} from 'react'
 import ReactModal from 'react-modal';
 import { styles } from '@/styles/styles';
 import NewPostHeader from './NewPostHeader';
@@ -6,19 +6,17 @@ import { PhotoIcon, VideoCameraIcon, ChatBubbleBottomCenterTextIcon, EllipsisVer
 import { BeatLoader } from 'react-spinners';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import MainButton from './MainButton';
-import { getProfileDetails } from '@/firebaseUtils';
-import { useAuth } from '@/context/AuthContext';
+import ProfileContext from '@/context/ProfileContext';
 const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
+    const profile = useContext(ProfileContext);
     const fileInputRef = useRef(null);
     const fileVideoInputRef = useRef(null);
-    const {user} = useAuth();
     const [initialText, setInitialText] = useState({});
     const [text, setText] = useState('');
     const [data, setData] = useState([]);
     const [textOpen, setTextOpen] = useState(false);
     const [loading, setLoading] = useState(false)
-    const [pfp, setPfp] = useState(null);
     const handleClose = () => {
         closePostModal();
     }
@@ -92,24 +90,13 @@ function NewPostModal({newPostModal, closePostModal}) {
     const handleText = (event) => {
         setText(event.target.value)
     }
-    useEffect(() => {
-        if(newPostModal && user.uid) {
-            const getData = async() => {
-                const profileData = await getProfileDetails(user.uid);
-                if (profileData) {
-                    setPfp(profileData.pfp);
-                }
-            }
-            getData()
-        }
-    }, [newPostModal, user.uid]) 
     return (
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
             <div>
             <p className='text-white'>New Post</p>
             <div className='divider'/>
             <div>
-                <NewPostHeader group={false} data={data} pfp={pfp}/>
+                <NewPostHeader group={false} data={data} pfp={profile.pfp}/>
                 <div style={styles.toggleView}>
                 <div style={{display: 'flex'}}>
                     <div style={styles.newPostContainer}>

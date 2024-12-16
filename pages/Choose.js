@@ -11,9 +11,7 @@ function Choose () {
     const theme = useContext(themeContext)
     const router = useRouter();
     const [lastFour, setLastFour] = useState([]);
-    const [lastName, setLastName] = useState('');
     const [customerId, setCustomerId] = useState(null);
-    const [firstName, setFirstName] = useState('');
     const [paymentMethodID, setPaymentMethodID] = useState(null);
     const {user} = useAuth();
   
@@ -34,35 +32,6 @@ const MAX_RETRY_ATTEMPTS = 3;
         getData()
         return unsub;
     }, [])
-    useEffect(() => {
-    const getProfileDetails = async() => {
-    const docSnap = await getDoc(doc(db, "profiles", user.uid)); 
-    if (docSnap.exists()) {
-      const profileVariables = {
-        firstName: await (await getDoc(doc(db, 'profiles', user.uid))).data().firstName,
-        lastName: await (await getDoc(doc(db, 'profiles', user.uid))).data().lastName,
-        paymentMethodID: await (await getDoc(doc(db, 'profiles', user.uid))).data().paymentMethodID,
-        lastFour: await (await getDoc(doc(db, 'profiles', user.uid))).data().paymentMethodLast4,
-        customerId: await (await getDoc(doc(db, 'profiles', user.uid))).data().customerId
-      };
-      //console.log(profileVariables)
-      setFirstName(profileVariables.firstName);
-      setLastName(profileVariables.lastName)
-      setLastFour(profileVariables.lastFour)
-      setCustomerId(profileVariables.customerId)
-      if (profileVariables.paymentMethodID == undefined) {
-        setPaymentMethodID(null)
-      }
-      else {
-        setPaymentMethodID(profileVariables.paymentMethodID)
-      }
-      //)
-      
-    } 
-  }
-  
-  getProfileDetails();
-  }, [])
   //console.log(lastFour)
   const header = {
         fontSize: 24,

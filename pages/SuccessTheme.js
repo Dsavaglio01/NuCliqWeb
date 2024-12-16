@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import InputBox from '@/components/InputBox';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { onSnapshot, doc, getDocs, collection} from 'firebase/firestore';
@@ -10,14 +10,15 @@ import { BeatLoader } from 'react-spinners';
 import NextButton from '@/components/NextButton';
 import PreviewFooter from '@/components/PreviewFooter';
 import { CurrencyDollarIcon } from '@heroicons/react/24/solid';
+import ProfileContext from '@/context/ProfileContext';
 function SuccessTheme({post, handleStateChange}) {
+    const profile = useContext(ProfileContext);
     const [edit, setEdit] = useState(false);
     const [emptyThemeName, setEmptyThemeName] = useState(false);
     const [emptyKeywords, setEmptyKeywords] = useState(false);
     const [profileChecked, setProfileChecked] = useState(false);
     const [postChecked, setPostChecked] = useState(false);
     const router = useRouter();
-    const [notificationToken, setNotificationToken] = useState(null);
     const [stripeId, setStripeId] = useState(null);
     const [themeName, setThemeName] = useState('');
     const [price, setPrice]  = useState(0);
@@ -45,24 +46,12 @@ function SuccessTheme({post, handleStateChange}) {
   setOriginalKeywords(sanitizedText)
 }
 const goToPurchased = () => {
-    handleStateChange(true, themeName, post, price, keywords, stripeId, profileChecked, postChecked, notificationToken)
+    handleStateChange(true, themeName, post, price, keywords, stripeId, profileChecked, postChecked, profile.notificationToken)
 }
 const priceAlert = () => {
         setErrorPriceRange(true)
         setUploading(false)
     }
-useEffect(() => {
-      let unsub;
-      const getData = () => {
-        unsub = onSnapshot(doc(db, 'profiles', user.uid), (doc) => {
-          setPrivacy(doc.data().private)
-      setStripeId(doc.data().stripeAccountID)
-      setNotificationToken(doc.data().notificationToken)
-        })
-      }
-      getData()
-      return unsub;
-    }, [])
     useEffect(() => {
       const getNames = async() => {
         const querySnapshot = await getDocs(collection(db, "profiles", user.uid, 'myThemes'));

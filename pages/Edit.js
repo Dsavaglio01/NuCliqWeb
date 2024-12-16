@@ -11,7 +11,7 @@ import axios from 'axios';
 import { BeatLoader } from 'react-spinners';
 import { useRouter } from 'next/router';
 //import {MODERATION_API_USER, MODERATION_API_SECRET, TEXT_MODERATION_URL} from "@env"
-const EditScreen = ({firstName, lastName, bio}) => {
+const EditScreen = ({firstName, lastName, bio, username}) => {
     const router = useRouter();
     const [editedBio, setEditedBio] = useState(bio);
     const [editedBanner, setEditedBanner] = useState();

@@ -1,5 +1,5 @@
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
-import React, { useState, useEffect, useMemo } from 'react'
+import { ChevronRightIcon } from '@heroicons/react/24/solid'
+import React, { useState, useMemo, useContext } from 'react'
 import Switch from 'react-switch';
 import { updateDoc, doc, getDoc, query, addDoc, serverTimestamp, collection, arrayRemove, getDocs, orderBy, limit, startAfter} from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -8,13 +8,12 @@ import { useRouter } from 'next/router';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import NextButton from '@/components/NextButton';
 import TransactionHistory from './TransactionHistory';
-import InputBox from '@/components/InputBox';
+import ProfileContext from '@/context/ProfileContext';
 function Settings() {
+  const profile = useContext(ProfileContext);
     const {user} = useAuth();
     const [activityEnabled, setActivityEnabled] = useState(false);
-    const [notificationToken, setNotificationToken] = useState(null);
     const [isEnabled, setIsEnabled] = useState(false); 
-    const [myMentions, setMyMentions] = useState(false);
     const [lastVisible, setLastVisible] = useState(null);
     const [completePosts, setCompletePosts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,12 +21,7 @@ function Settings() {
     const [postDone, setPostDone] = useState(false);
     const [sentReport, setSentReport] = useState(false);
     const [posts, setPosts] = useState([]);
-    const [myBlockedUsers, setMyBlockedUsers] = useState(false)
-    const [pfp, setPfp] = useState(null);
-    const [myComments, setMyComments] = useState(false);
-    const [mySaves, setMySaves] = useState(false)
     const [privacyEnabled, setPrivacyEnabled] = useState(false);
-    const [gettingData, setGettingData] = useState(false);
     const [report, setReport] = useState('');
     const [bugChecked, setBugChecked] = useState(false);
     const [uxChecked, setUxChecked] = useState(false);
@@ -39,20 +33,6 @@ function Settings() {
     const [addingChecked, setAddingChecked] = useState(false);
     const [othersChecked, setOthersChecked] = useState(false);
     const router = useRouter();
-    const {username} = router.query
-    useEffect(() => {
-        const getData = async() => {
-            const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-            setPrivacyEnabled(docSnap.data().private)
-            setIsEnabled(docSnap.data().allowNotifications)
-            setActivityEnabled(docSnap.data().showStatus)
-            setPfp(docSnap.data().pfp)
-            setNotificationToken(docSnap.data().notificationToken)
-            
-        }
-        setGettingData(true)
-        getData()
-    }, [])
     async function unBlock(item) {
       await updateDoc(doc(db, 'profiles', user.uid), {
       blockedUsers: arrayRemove(item.id)
@@ -287,7 +267,7 @@ function Settings() {
         }).then(() => setActivityEnabled(previousState => !previousState))
     }
     async function notificationFunction() {
-        if (notificationToken != null) {
+        if (profile.notificationToken != null) {
             await updateDoc(doc(db, 'profiles', user.uid), {
             allowNotifications: !isEnabled
         }).then(() => setIsEnabled(previousState => !previousState))
@@ -525,7 +505,7 @@ function Settings() {
         )) : contentState == 'comments' ? completePosts.map((item, index) => (
         <div style={{margin: '2.5%', width: '63vw', flexDirection: 'row', display: 'flex', borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 10}}>
         <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '92.5%', marginLeft: '2.5%'}}>
-            {pfp ? <img src={pfp} style={commentImage}/> : <UserCircleIcon className='userBtn' style={commentImage}/>}
+            {profile.pfp ? <img src={profile.pfp} style={commentImage}/> : <UserCircleIcon className='userBtn' style={commentImage}/>}
           <p className='numberofLines2' style={addText}>You {item.reply != undefined ? 'replied' : 'commented'}: {item.comment} </p>
         </div>
         {!item.repost && item.post[0].image ? 

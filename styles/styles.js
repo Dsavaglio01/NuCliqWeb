@@ -738,6 +738,7 @@ postHeader: {
     alignSelf: 'center', 
     marginLeft: 'auto'
   },
+
   notificationButton: {
     borderRadius: 10,
     marginLeft: 'auto', 
@@ -1128,6 +1129,72 @@ postHeader: {
     padding: 10,
     display: 'flex',
     alignItems: 'center'
+  },
+  specificTheme: {
+    height: 240, 
+    width: 200, 
+    marginBottom: 7.5
+  },
+  themeCloseContainer: {
+    display: 'flex', 
+    justifyContent: 'flex-end', 
+    alignItems: 'center'
+  },
+  themeOptionsContainer: {
+    alignItems: 'center', 
+    display: 'flex', 
+    flexDirection: 'column'
+  },
+  themePageContainer: {
+    display: 'flex', 
+    overflow: 'hidden', 
+    flexDirection: 'row', 
+    position: 'sticky'
+  },
+  themeMainContainer: {
+    display: 'grid', 
+    flex: 1, 
+    overflow: 'hidden', 
+    height: '100vh', 
+    gridTemplateColumns: '20vw 1fr'
+  },
+  optionHeader: {
+    marginLeft: '5%', 
+    marginRight: '5%'
+  },
+  noSearchResultsThemeText: {
+    color: "#9EDAFF", 
+    fontSize: 15.36, 
+    paddingHorizontal: 10, 
+    textAlign: 'center', 
+    marginRight: '5%', 
+    marginTop: '5%'
+  },
+  profileHeaderContainer: {
+    width: '100%', 
+    height: typeof window !== 'undefined' ? window.innerHeight * 0.25 : 0, 
+    objectFit: 'cover'
+  },
+  profileLoader: {
+    marginTop: '-7.5%', 
+    alignItems: 'flex-end', 
+    marginLeft: '2.5%', 
+    flex: 1
+  },
+  friendsHeaderTwo: {
+    paddingLeft: 80, 
+    padding: 3,
+    borderRadius: 5,
+    minWidth: 200,
+    backgroundColor: "lightblue",
+    marginTop: '2.5%',
+  },
+  noPostsSupp: {
+    color: "#fafafa",
+    textAlign: 'center',
+    padding: 10,
+    paddingTop: 0, 
+    fontSize: 15.36
   }
   
 }

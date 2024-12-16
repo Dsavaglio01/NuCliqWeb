@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState, useMemo, useContext } from 'react'
 import { collection, getDoc, getDocs, onSnapshot, query, where, doc, updateDoc, arrayRemove, limit, startAfter, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { FaceFrownIcon } from '@heroicons/react/24/outline';
@@ -8,10 +8,11 @@ import { db } from '@/firebase';
 import { useRouter } from 'next/router';
 import { BeatLoader } from 'react-spinners';
 import { fetchMoreSettings, fetchSettings, getProfileDetails, getRequests } from '@/firebaseUtils';
+import ProfileContext from '@/context/ProfileContext';
 function ContentList() {
+  const profile = useContext(ProfileContext);
     const {user} = useAuth()
     const [posts, setPosts] = useState([]);
-    const [pfp, setPfp] = useState(null);
     const [editedCards, setEditedCards] = useState([]);
     const [postDone, setPostDone] = useState(false);
     const [completePosts, setCompletePosts] = useState([]);
@@ -21,7 +22,7 @@ function ContentList() {
     
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const {likes, comments, saves, archived, cards, username, blocked, mentions} = router.query;
+    const {likes, comments, saves, archived, cards, blocked, mentions} = router.query;
     useMemo(() => {
        let unsubscribe;
 
@@ -39,15 +40,6 @@ function ContentList() {
       }
     };
     }, [user?.uid])
-    useMemo(() => {
-      if (comments) {
-        const getData = async() => {
-          const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-          setPfp(docSnap.data().pfp)
-        }
-        getData()
-      }
-    }, [comments])
     useMemo(() => {
       setPosts([])
       const getData = async() => {
@@ -275,7 +267,7 @@ function ContentList() {
             <div>
                 <div style={{margin: '2.5%', flexDirection: 'row', display: 'flex', marginTop: 0, borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 10}}>
                 <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '89%'}}>
-                <img src={pfp ? pfp : require('../public/defaultpfp.jpg')} style={commentPfpimage}/>
+                <img src={profile.pfp ? profile.pfp : require('../public/defaultpfp.jpg')} style={commentPfpimage}/>
                 <p className='numberofLines2' style={addText}>You {item.reply != undefined ? 'replied' : 'commented'}: {item.comment} </p>
                 </div>
                 {item.post[0].image ? 

@@ -1,19 +1,18 @@
-import React, { useState, useMemo, useEffect} from 'react'
+import React, { useState, useMemo, useEffect, useContext} from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { db } from '../firebase';
 import { onSnapshot, query, collection, where, orderBy, limit, getDoc, setDoc, doc, addDoc, serverTimestamp, updateDoc, arrayUnion } from 'firebase/firestore';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { useRouter } from 'next/router';
+import ProfileContext from '@/context/ProfileContext';
 function SendingModal () {
-    
+    const profile = useContext(ProfileContext);
     const [friends, setFriends] = useState([]);
     const [alert, setAlert] = useState(false);
     const [completeFriends, setCompleteFriends] = useState([]);
     const router = useRouter();
     const {video, payload, payloadUsername, theme} = router.query;
     const [caption, setCaption] = useState('');
-    const [following, setFollowing] = useState([])
-    const [followers, setFollowers] = useState([]);
     const [actuallySending, setActuallySending] = useState(false);
     const [person, setPerson] = useState(null);
     const [sendingFriend, setSendingFriend] = useState(null);
@@ -22,7 +21,6 @@ function SendingModal () {
     const [lastVisible, setLastVisible] = useState(null);
     const {user} = useAuth();
      async function schedulePushThemeNotification(item, friendId, firstName, lastName, notificationToken) {
-      //console.log(firstName, lastName, notificationToken)
       let notis = (await getDoc(doc(db, 'profiles', item.id))).data().allowNotifications
       const deepLink = `nucliqv1://PersonalChat?person=${item}&friendId=${friendId}`;
      let banned = (await getDoc(doc(db, 'profiles', item.id))).data().banned
@@ -85,15 +83,6 @@ function SendingModal () {
         // Handle errors
       });
     }, [friends])
-    useEffect(() => {
-        const getData = async() => {
-           const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-           setFollowing(docSnap.data().following)
-           setFollowers(docSnap.data().followers)
-        }
-        getData()
-    }, [])
-    //console.log(followers)
     useEffect(() => {
         if (alert){
         window.alert("Message Sent", "Your message has been sent!", [
@@ -211,13 +200,12 @@ function SendingModal () {
       
       
     }
-    //console.log(followers)
     useMemo(()=> {
       setFriends([])
       let unsub;
       const fetchCards = async () => {
         unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'friends'), where('actualFriend', '==', true), orderBy('lastMessageTimestamp', 'desc'), limit(20)), (snapshot) => {
-          setFriends(snapshot.docs.filter((doc => followers.includes(doc.id) && following.includes(doc.id))).map((doc)=> ( {
+          setFriends(snapshot.docs.filter((doc => profile.followers.includes(doc.id) && profile.following.includes(doc.id))).map((doc)=> ( {
             id: doc.id,
             ...doc.data()
           })))
@@ -227,7 +215,7 @@ function SendingModal () {
       } 
       fetchCards();
       return unsub;
-    }, [followers, following]);
+    }, [profile.followers, profile.following]);
     useMemo(() => {
       if (friends.length > 0) {
         Promise.all(friends.map(async(item) => await getDoc(doc(db, 'profiles', item.id))))

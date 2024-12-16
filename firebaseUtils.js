@@ -1286,12 +1286,32 @@ export const fetchPurchasedThemes = (userId, subCollection, order, setPurchasedT
  * @param {String} userId - The id of the user perfoming this action.
  * @param {String} subCollection - The name of the field/subCollection that we are ordering the query by (price, date, etc.).
  * @param {String} order - The name of the order that we are ordering the query by (ascending, descending, etc.).
- * @param {Function} setPurchasedThemes - State setter function for updating `purchasedThemes` after fetching the next 10 purchased themes.
- * @param {Function} setPurchasedLastVisible - State setter function for updating `purchasedLastVisible` after fetching the next 10 purchasedThemes.
+ * @param {Object} lastVisible - The Firestore document object (last purchased theme object) to `startAfter` when fetching more data.
+ * @param {Function} setPurchasedThemes - State setter function for updating `purchasedThemes` after fetching the first 10 purchased themes.
+ * @param {Function} setPurchasedLastVisible - State setter function for updating `purchasedLastVisible` after fetching the first 10 purchasedThemes.
  * Used to get the last document in our query in case user fetches more (separate function).
  * @returns {Function} - An unsubscribe function to stop listening to changes.
  * @throws {Error} - If `userId` or `subCollection` is not provided.
 */
+export const fetchMorePurchasedThemes = (userId, subCollection, order, lastVisible, setPurchasedThemes, setPurchasedLastVisible) => {
+  if (!userId || !subCollection) {
+    throw new Error("userId is undefined");
+  }
+  const purchasedQuery = query(collection(db, 'profiles', userId, 'purchased'), orderBy(subCollection, order), startAfter(lastVisible), limit(10))
+  const unsubscribe = onSnapshot(purchasedQuery, (snapshot) => {
+    const purchased = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      transparent: false
+    }));
+    setPurchasedThemes(purchased);
+    if (snapshot.docs.length > 0) {
+      setPurchasedLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+    }
+
+  return unsubscribe;
+  });
+}
 export const fetchMoreFreeThemes = (userId, subCollection, order, setFreeThemes, setFreeLastVisible, freeLastVisible) => {
   if (!userId || !subCollection) {
     throw new Error("userId or subcollection is undefined");

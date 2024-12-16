@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useState, useEffect, useMemo } from 'react';
 import { query, collection, onSnapshot, getDoc, getDocs, deleteDoc, doc, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -11,7 +11,9 @@ import { useRouter } from 'next/router';
 import { useSwipeable } from 'react-swipeable';
 import { styles } from '@/styles/styles';
 import { getRequests } from '@/firebaseUtils';
+import ProfileContext from '@/context/ProfileContext';
 const Notifications = () => {
+    const profile = useContext(ProfileContext);
     const [completeNotificationsDone, setCompleteNotificationsDone] = useState(false);
     const [notificationDone, setNotificationDone] = useState(false);
     const [actualNotifications, setActualNotifications] = useState([])
@@ -19,7 +21,6 @@ const Notifications = () => {
     const [friends, setFriends] = useState([]);
     const [requests, setRequests] = useState([]);
     const [nonMessageNotifications, setNonMessageNotifications] = useState([]);
-    const [username, setUsername] = useState('');
     const [smallKeywords, setSmallKeywords] = useState([]);
     const [largeKeywords, setLargeKeywords] = useState([]);
     const [completeNotifications, setCompleteNotifications] = useState([]);
@@ -78,15 +79,6 @@ const Notifications = () => {
       getRequest()
       
     }, [onSnapshot]);
-    useEffect(()=> {
-      const getRequest = async() => {
-        const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-         setUsername(docSnap.data().userName)
-         setSmallKeywords(docSnap.data().smallKeywords)
-         setLargeKeywords(docSnap.data().largeKeywords)
-      } 
-      getRequest()
-    }, []);
     useEffect(() => {
       let unsub;
       const fetchCards = async () => {
@@ -118,8 +110,6 @@ const Notifications = () => {
       return unsubscribe;
     }, [])
     async function schedulePushAcceptNotification(id, username, notificationToken) {
-    //console.log(username)
-    //console.log(notificationToken)
     let notis = (await getDoc(doc(db, 'profiles', id))).data().allowNotifications
       let banned = (await getDoc(doc(db, 'profiles', id))).data().banned
       if (notis && !banned) {
@@ -390,73 +380,6 @@ const Notifications = () => {
   }]);
     
   }
-  //console.log(completeNotifications[0])
-  //console.log(friends)
- // console.log(friends)
-  async function addFriend(item, ele) {
-    //console.log(ele)
-      const updatedObject = { ...ele };
-   //console.log(updatedObject.loading)
-    // Update the array in the copied object
-    updatedObject.loading = true
-      const objectIndex = completeNotifications.findIndex(obj => obj.item.id === ele.id);
-      //console.log(objectIndex)
-    if (objectIndex !== -1) {
-      // Create a new array with the replaced object
-      const updatedData = [...completeNotifications];
-      updatedData[objectIndex].item = updatedObject;
-      // Set the new array as the state
-      setCompleteNotifications(updatedData);
-    }
-    //console.log(newFriend)
-    let newFriend = generateId(item.id, user.uid)
-    //console.log(newFriend)
-    //console.log(ele)
-   // let url = 'https://us-central1-nucliq-c6d24.cloudfunctions.net/addFriendTwo'
-    try {
-    const response = await fetch(`${BACKEND_URL}/api/addFriendTwo`, {
-      method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
-      headers: {
-        'Content-Type': 'application/json', // Set content type as needed
-      },
-      body: JSON.stringify({ data: {item: item, newFriend: newFriend, user: user.uid, username: username, smallKeywords: smallKeywords, largeKeywords: largeKeywords,}}), // Send data as needed
-    })
-    const data = await response.json();
-   // console.log(data)
-      if (data.request) {
-        const updatedObject = { ...ele };
-        
-    // Update the array in the copied object
-    updatedObject.loading = false
-      const objectIndex = completeNotifications.findIndex(obj => obj.item.id === ele.id);
-    if (objectIndex !== -1) {
-      // Create a new array with the replaced object
-      const updatedData = [...completeNotifications];
-      updatedData[objectIndex].item = updatedObject;
-      // Set the new array as the state
-      setCompleteNotifications(updatedData);
-    }
-        schedulePushRequestFriendNotification(item.id, username, item.notificationToken)
-      }
-      else if (data.friend) {
-        const updatedObject = { ...ele };
-
-    // Update the array in the copied object
-    updatedObject.loading = false
-      const objectIndex = completeNotifications.findIndex(obj => obj.item.id === ele.id);
-    if (objectIndex !== -1) {
-      // Create a new array with the replaced object
-      const updatedData = [...completeNotifications];
-      updatedData[objectIndex].item = updatedObject;
-      // Set the new array as the state
-      setCompleteNotifications(updatedData);
-    }
-        schedulePushFriendNotification(item.id, username, item.notificationToken)
-      }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-  }
   
 async function deleteNotification(item)  {
   if (item.item.request) {
@@ -484,59 +407,7 @@ async function deleteAllNotifications()  {
   
   //console.log(item)
 }
-async function schedulePushRequestFriendNotification(id, username, notificationToken) {
-      let notis = (await getDoc(doc(db, 'profiles', id))).data().allowNotifications
-      let banned = (await getDoc(doc(db, 'profiles', id))).data().banned
-      if (notis && !banned) {
-     fetch(`${BACKEND_URL}/api/requestedNotification`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username, pushToken: notificationToken
-      }),
-      })
-    .then(response => response.json())
-    .then(responseData => {
-      // Handle the response from the server
-      console.log(responseData);
-    })
-    .catch(error => {
-      // Handle any errors that occur during the request
-      console.error(error);
-    })
-  }
-  }
-  async function schedulePushFriendNotification(id, username, notificationToken) {
-    let notis = (await getDoc(doc(db, 'profiles', id))).data().allowNotifications
-    let banned = (await getDoc(doc(db, 'profiles', id))).data().banned
-      if (notis && !banned) {
-      fetch(`${BACKEND_URL}/api/friendNotification`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username, pushToken: notificationToken
-      }),
-      })
-    .then(response => response.json())
-    .then(responseData => {
-      // Handle the response from the server
-      console.log(responseData);
-    })
-    .catch(error => {
-      // Handle any errors that occur during the request
-      console.error(error);
-    })
-  }
-  }
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => handleSwipe('left'),
-    onSwipedRight: () => handleSwipe('right'),
-    trackMouse: true, // Enables mouse tracking for desktop swipes
-  });
+
   async function acceptRequest(item) {
   const newUser = generateId(item.item.requestUser, user.uid)
   //let url = 'https://us-central1-nucliq-c6d24.cloudfunctions.net/acceptRequestInd'
@@ -546,11 +417,11 @@ async function schedulePushRequestFriendNotification(id, username, notificationT
       headers: {
         'Content-Type': 'application/json', // Set content type as needed
       },
-      body: JSON.stringify({ data: {item: item, newUser: newUser, username: username, smallKeywords: smallKeywords, largeKeywords: largeKeywords, user: user.uid}}), // Send data as needed
+      body: JSON.stringify({ data: {item: item, newUser: newUser, username: profile.username, smallKeywords: smallKeywords, largeKeywords: largeKeywords, user: user.uid}}), // Send data as needed
     })
     const data = await response.json();
       if (data.done) {
-        schedulePushAcceptNotification(item.item.requestUser, username, item.info.notificationToken)
+        schedulePushAcceptNotification(item.item.requestUser, profile.username, item.info.notificationToken)
         setCompleteNotifications(completeNotifications.filter((e) => e.item.id != item.item.id)) 
       }
   } catch (error) {

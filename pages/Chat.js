@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect, useMemo, useContext} from 'react'
 import { useAuth } from '@/context/AuthContext';
 import { query, collection, orderBy, doc, getDocs, getDoc, getFirestore, startAt, endAt} from 'firebase/firestore';
 import { BeatLoader } from 'react-spinners';
@@ -10,16 +10,15 @@ import UserSearchBar from '@/components/UserSearchBar';
 import { getMessageNotifications, fetchFriends, getProfileDetails } from '@/firebaseUtils';
 import getDateAndTime from '@/lib/getDateAndTime';
 import { styles } from '@/styles/styles';
+import ProfileContext from '@/context/ProfileContext';
 function Chat () {
     //const BACKEND_URL = process.env.BACKEND_URL
+    const profile = useContext(ProfileContext);
     const [searches, setSearches] = useState([]);
     const [friends, setFriends] = useState([]);
     const [specificSearch, setSpecificSearch] = useState('');
-    const [username, setUsername] = useState('');
     const [filtered, setFiltered] = useState([]);
     const [routeSending, setRouteSending] = useState(false);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
     const [focusedItem, setFocusedItem] = useState(null);
     const [completeMessages, setCompleteMessages] = useState([]);
     const [messageNotifications, setMessageNotifications] = useState([]);
@@ -32,7 +31,6 @@ function Chat () {
   const [moreResultButton, setMoreResultButton] = useState(false);
     const [lastVisible, setLastVisible] = useState();
     const [loading, setLoading] = useState(true);
-    const [blockedUsers, setBlockedUsers] = useState([]);
     const {user} = useAuth()
     const db = getFirestore();
   
@@ -53,27 +51,13 @@ function Chat () {
       }
     };
     }, [user.uid])
-    useEffect(() => {
-    const fetchProfileData = async () => {
-      const profileData = await getProfileDetails(user.uid);
-
-      if (profileData) {
-        setUsername(profileData.username);
-        setFirstName(profileData.firstName)
-        setLastName(profileData.lastName)
-        setBlockedUsers(profileData.blockedUsers);
-      }
-    };
-
-    fetchProfileData();
-  }, [user.uid]);
 
     useEffect(() => {
     let unsubscribe;
 
     if (user.uid) {
       // Call the utility function and pass state setters as callbacks
-      unsubscribe = fetchFriends(user.uid, blockedUsers, setFriends, setLastVisible);
+      unsubscribe = fetchFriends(user.uid, profile.blockedUsers, setFriends, setLastVisible);
 
       // Handle loading state
       setLoading(false);
@@ -85,7 +69,7 @@ function Chat () {
         return unsubscribe;
       }
     };
-  }, [user.uid, blockedUsers]);
+  }, [user.uid, profile.blockedUsers]);
     
     useMemo(() => {
       if (friends.length > 0) {

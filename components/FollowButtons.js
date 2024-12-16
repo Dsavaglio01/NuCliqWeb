@@ -1,25 +1,13 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState, useContext } from 'react';
 import FollowIcon from './FollowIcon';
 import FollowingIcon from './FollowingIcon';
 import RequestedIcon from './RequestedIcon';
 import { getProfileDetails, getRequests } from '@/firebaseUtils';
+import ProfileContext from '@/context/ProfileContext';
 
 function FollowButtons({ user, item }) {
-  const [following, setFollowing] = useState([]);
+  const profile = useContext(ProfileContext);
   const [requests, setRequests] = useState([]);
-
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (user.uid) {
-        const profileData = await getProfileDetails(user.uid);
-        if (profileData) {
-          setFollowing(profileData.following);
-        }
-      }
-    };
-
-    fetchProfileData();
-  }, [user.uid]); // Dependency on user.uid
 
   useEffect(() => {
     let unsubscribe;
@@ -40,7 +28,7 @@ function FollowButtons({ user, item }) {
   const handleClick = useCallback(() => {
     if (!user.uid) return;
 
-    const isFollowing = following.includes(item.userId);
+    const isFollowing = profile.following.includes(item.userId);
     const isRequested = requests.some(e => e.id === item.userId);
 
     if (isFollowing) {
@@ -48,13 +36,13 @@ function FollowButtons({ user, item }) {
     } else if (item.userId !== user.uid && !isRequested) {
       addFriend(item);
     }
-  }, [user.uid, following, item.userId, requests]); // Dependencies for useCallback
+  }, [user.uid, profile.following, item.userId, requests]); // Dependencies for useCallback
 
   return (
     <button onClick={handleClick} disabled={!user.uid || item.userId === user.uid || requests.some(e => e.id === item.userId)}> 
       {requests.some(e => e.id === item.userId) ? (
         <RequestedIcon color="#9EDAFF" width={65} height={32} />
-      ) : following.includes(item.userId) ? (
+      ) : profile.following.includes(item.userId) ? (
         <FollowingIcon color="#9EDAFF" width={70} height={32} />
       ) : item.userId === user.uid ? null : (
         <FollowIcon color="#9EDAFF" width={50} height={32} />

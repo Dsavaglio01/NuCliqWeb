@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import 'reactjs-popup/dist/index.css';
@@ -8,26 +8,20 @@ import { fetchMorePublicPostsExcludingBlockedUsersVideo, fetchPublicPostsExcludi
   getProfileDetails} from '@/firebaseUtils'
 import { styles } from '@/styles/styles'
 import IndVidPost from './IndVidPost'
+import ProfileContext from '@/context/ProfileContext';
 function VidPosts() {
+  const profile = useContext(ProfileContext);
   const [meet, setMeet] = useState(true);
   const [reloadPage, setReloadPage] = useState(true);
-  const [blockedUsers, setBlockedUsers] = useState(null);
   const [tempPosts, setTempPosts] = useState([]);
   const containerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollDirection, setScrollDirection] = useState(0);
   const [reportedPosts, setReportedPosts] = useState([]);
-  const [followers, setFollowers] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
-  const [forSale, setForSale] = useState(false);
-  const [background, setBackground] = useState(null);
   const [loading, setLoading] = useState(false);
   const snapPoints = [0, 300, 600, 900];
-  const [following, setFollowing] = useState(false);
-  const [username, setUsername] = useState('')
-  const [pfp, setPfp] = useState(null);
-  const [notificationToken, setNotificationToken] = useState(null); 
   const {user} = useAuth();
   const [isFetching, setIsFetching] = useState(false);
   const bottomObserver = useRef(null);
@@ -92,42 +86,14 @@ function VidPosts() {
       }
     };
   }, [user?.uid]);
-    /* useEffect(() => {
-      const getUsernames = async() => {
-        (await getDocs(collection(db, 'usernames'))).forEach((doc) => {
-          setUsernames(prevState  => [...prevState, doc.data().username])
-        })
-      }
-      getUsernames()
-    }, []) */
-  useEffect(() => {
-    if (user.uid) {
-    const fetchProfileData = async () => {
-      const profileData = await getProfileDetails(user.uid);
-
-      if (profileData) {
-        setUsername(profileData.username);
-        setPfp(profileData.pfp);
-        setFollowers(profileData.followers);
-        setFollowing(profileData.following);
-        setForSale(profileData.forSale);
-        setBackground(profileData.postBackground);
-        setBlockedUsers(profileData.blockedUsers);
-        setNotificationToken(profileData.notificationToken);
-      }
-    };
-
-    fetchProfileData();
-  }
-  }, []);
 
   useEffect(() => {
     const loadPosts = async () => {
       setLoading(true);
       setTempPosts([]);
 
-      if (meet && reloadPage && blockedUsers !== null) {
-        const { posts, lastVisible } = await fetchPublicPostsExcludingBlockedUsersVideo(blockedUsers);
+      if (meet && reloadPage && profile.blockedUsers !== null) {
+        const { posts, lastVisible } = await fetchPublicPostsExcludingBlockedUsersVideo(profile.blockedUsers);
         setTempPosts(posts);
         setLastVisible(lastVisible);
       }
@@ -138,7 +104,7 @@ function VidPosts() {
     if (reloadPage) {
       loadPosts();
     }
-  }, [meet, reloadPage, blockedUsers]);
+  }, [meet, reloadPage, profile.blockedUsers]);
     useEffect(() => {
     if (bottomObserver.current) {
       const observer = new IntersectionObserver(entries => {
@@ -154,7 +120,7 @@ function VidPosts() {
   }, [isFetching]);
   async function fetchMorePosts() {
       if (lastVisible != undefined && meet) {
-        const { posts, lastVisible: newLastVisible } = await fetchMorePublicPostsExcludingBlockedUsersVideo(blockedUsers, lastVisible);
+        const { posts, lastVisible: newLastVisible } = await fetchMorePublicPostsExcludingBlockedUsersVideo(profile.blockedUsers, lastVisible);
         setTempPosts([...tempPosts, ...posts]);
         setLastVisible(newLastVisible);
     }
@@ -164,8 +130,8 @@ function VidPosts() {
       <div style={styles.videoContainer} className='vidContainer' ref={containerRef}>
         {tempPosts.map((e, index) => (
           <div key={e.id} className="video-item">
-            <IndVidPost item={item} user={user} followers={followers} following={following} username={username} reportedPosts={reportedPosts}
-              blockedUsers={blockedUsers} notificationToken={notificationToken} pfp={pfp} forSale={forSale} background={background}/>
+            <IndVidPost item={item} user={user} followers={profile.followers} following={profile.following} username={profile.username} reportedPosts={reportedPosts}
+              blockedUsers={profile.blockedUsers} notificationToken={profile.notificationToken} pfp={profile.pfp} forSale={profile.forSale}/>
           </div>
         ))}
       </div>

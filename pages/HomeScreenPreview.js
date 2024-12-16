@@ -3,9 +3,10 @@ import { db } from '@/firebase';
 import { ArrowUturnRightIcon, BookmarkIcon, ChatBubbleBottomCenterIcon, ChevronDownIcon, EllipsisVerticalIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as SolidHeart, CheckIcon, BookmarkIcon as SolidBookmark, UserCircleIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
 import { doc, getDoc } from 'firebase/firestore';
-import React from 'react'
+import React, { useContext } from 'react'
 import { useState, useEffect } from 'react';
 import FollowingIcon from '@/components/FollowingIcon';
+import ProfileContext from '@/context/ProfileContext';
 function HomeScreenPreview({theme}) {
     const headerHeader = {
         color: "#fafafa",
@@ -13,17 +14,8 @@ function HomeScreenPreview({theme}) {
         padding: 10,
         textAlign: 'center'
     }
-    const {user} = useAuth();
-    const [pfp, setPfp] = useState(null);
-    const [username, setUsername] = useState('');
-    useEffect(() => {
-        const getData = async() => {
-            const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-            setPfp(docSnap.data().pfp)
-            setUsername(docSnap.data().username)
-        }
-        getData()
-    }, [])
+    const profile = useContext(ProfileContext);
+    
   return (
     <div>
          <div className='flex justify-center mt-5'>
@@ -39,10 +31,10 @@ function HomeScreenPreview({theme}) {
   <div className='mt-8'>
   <div className='bg-[#121212] rounded-xl m-5'>
     <div className='flex p-5 py-3 items-center border-rounded-sm'>
-        {pfp ? <img src={pfp} height={44} width={44} style={{borderRadius: 8}}/> :
+        {profile.pfp ? <img src={profile.pfp} height={44} width={44} style={{borderRadius: 8}}/> :
           <UserCircleIcon className='userBtn' height={44} width={44} style={{borderRadius: 8}}/>}
           
-        <p className='flex-1 font-bold' style={{color: "#fafafa"}}>{username}</p>
+        <p className='flex-1 font-bold' style={{color: "#fafafa"}}>{profile.username}</p>
         <FollowingIcon color={"#9EDAFF"} width={70} height={32} />
     </div>
     <div className='px-5 pb-5'>
@@ -72,7 +64,7 @@ function HomeScreenPreview({theme}) {
       
       </div>
       <p className='p-5 truncate text-white'>
-        <span className='font-bold mr-1'>{username}</span>Example Caption</p>
+        <span className='font-bold mr-1'>{profile.username}</span>Example Caption</p>
       
       </div>
       <div className='arrow' />

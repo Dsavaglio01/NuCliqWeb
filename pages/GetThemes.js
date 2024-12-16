@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo, useCallback, useRef,} from 'react'
+import React, {useState, useEffect, useMemo, useCallback, useRef, useContext,} from 'react'
 import SearchInput from '@/components/SearchInput'
 import { collection, getDoc, getDocs, getFirestore, onSnapshot, query, where, addDoc, limit, updateDoc, orderBy, startAfter, doc, serverTimestamp, deleteDoc, documentId, startAt, endAt } from 'firebase/firestore'
 import { useAuth } from '@/context/AuthContext';
@@ -6,8 +6,8 @@ import useStore from '@/components/store';
 import Head from 'next/head';
 import RecentSearches from '@/components/RecentSearches'
 import { useRouter } from 'next/router'
-import { XMarkIcon, ChevronRightIcon, AdjustmentsHorizontalIcon, CheckIcon, ArrowUpLeftIcon} from '@heroicons/react/24/solid';
-import { Bars3Icon, MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronRightIcon, AdjustmentsHorizontalIcon, ArrowUpLeftIcon} from '@heroicons/react/24/solid';
+import { Bars3Icon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { BeatLoader } from 'react-spinners';
 import Sidebar from '@/components/Sidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -23,9 +23,10 @@ import ReportModal from '@/components/ReportModal';
 import SendingModal from '@/components/SendingModal';
 import { styles } from '@/styles/styles';
 import { fetchFreeThemes, fetchMyThemes, fetchPurchasedThemes, fetchReportedThemes, fetchThemeSearches } from '@/firebaseUtils';
+import ProfileContext from '@/context/ProfileContext';
 function GetThemes ({route}) {
-    const BACKEND_URL = process.env.BACKEND_URL
-  //usePreventScreenCapture();
+  const profile = useContext(ProfileContext);
+  const BACKEND_URL = process.env.BACKEND_URL
   const router = useRouter();
   const {name, goToMy, registers, goToPurchased} = router.query;
   const [searching, setSearching] = useState(false);
@@ -38,15 +39,12 @@ function GetThemes ({route}) {
   const [uploadGuidelines, setUploadGuidelines] = useState(false);
   const [applyLoading, setApplyLoading] = useState(false);
   const [free, setFree] = useState(true);
-  const [followers, setFollowers] = useState([])
-  const [following, setFollowing] = useState([]);
   const [specificId, setSpecificId] = useState(null);
   const [file, setFile] = useState(null);
   const [sendingModal, setSendingModal] = useState(false);
   const [specificSearch, setSpecificSearch] = useState('');
   const [createTheme, setCreateTheme] = useState(false);
   const [themeName, setThemeName] = useState('');
-  const [notificationToken, setNotificationToken] = useState(null);
   const [price, setPrice] = useState(0);
   const [keywords, setKeywords] = useState('');
   const [originalKeywords, setOriginalKeywords]  = useState('');
@@ -89,19 +87,14 @@ function GetThemes ({route}) {
   const [sortIncreasingPrice, setIncreasingPrice] = useState(false);
   const [sortDecreasingPrice, setDecreasingPrice] = useState(false);
   const [sortVisible, setSortVisible] = useState(false)
-  const [recommendedPosts, setRecommendedPosts] = useState([]);
-  const [getRecommendedPosts, setGetRecommendedPosts] = useState(false);
   const [postDoneApplying, setPostDoneApplying] = useState(false);
   const [profileDoneApplying, setProfileDoneApplying] = useState(false);
   const [bothDoneApplying, setBothDoneApplying] = useState(false);
-  const [postBackground, setPostBackground] = useState(null);
-  const [background, setBackground] = useState(null);
   const [registrationModal, setRegistrationModal] = useState(false);
   const openSortMenu = () => setSortVisible(true);
   const [chosenTheme, setChosenTheme] = useState(null);
   const [useThemeModalLoading, setUseThemeModalLoading] = useState(false);
   const closeSortMenu = () => setSortVisible(false)
-  const [current, setCurrent] = useState('')
   const db = getFirestore();
   const observer = useRef();
   const lastElementRef = useCallback(node => {
@@ -140,22 +133,6 @@ function GetThemes ({route}) {
       }).then(() => setLoading(false))
     }
   }, [router.query])
-    useEffect(() => {
-    if (user.uid) {
-    const fetchProfileData = async () => {
-      const profileData = await getProfileDetails(user.uid);
-
-      if (profileData) {
-        setFollowers(profileData.followers);
-        setFollowing(profileData.following);
-        setBackground(profileData.background);
-        setPostBackground(profileData.postBackground)
-      }
-    };
-
-    fetchProfileData();
-  }
-  }, []);
     useEffect(() => {
     let unsubscribe;
 
@@ -242,32 +219,7 @@ function GetThemes ({route}) {
   }, [specificSearch, get, free, my, purchased])
   function fetchPurchasedData() {
     if (purchasedLastVisible != undefined && mostPopular) {
-    let newData = [];
-    let unsub;
-
-      const fetchCards = async () => {
-  
-        unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'purchased'), orderBy('timestamp', 'desc'), startAfter(purchasedLastVisible), limit(10)), (snapshot) => {
-          snapshot.docs.map((doc) => {
-            if (!purchasedThemes.some((doc2 => doc2.id == doc.id))) {
-              newData.push({
-              id: doc.id,
-              transparent: false,
-              ...doc.data()
-            })
-            }
-          })
-          
-          //console.log(newData)
-          if (newData.length > 0 ) {
-          setPurchasedThemes([...purchasedThemes, ...newData])
-          //console.log(posts.map((item) => (item.id)))
-          setPurchasedLastVisible(snapshot.docs[snapshot.docs.length-1])
-          }
-        })
-      }
-      fetchCards();
-      return unsub;
+      unsubscribe = fetchFreeThemes(user.uid, 'bought_count', 'desc', setFreeTempPosts, setFreeLastVisible);
     }
     else if (purchasedLastVisible != undefined && sortDecreasingDate) {
       let newData = [];
@@ -388,7 +340,7 @@ function GetThemes ({route}) {
   function fetchMoreFreeData () {
     if (mostPopular) {
       //console.log('seocng')
-        let newData = [];
+      let newData = [];
       const fetchCards = async () => {
         const q = query(collection(db, 'freeThemes'), orderBy('bought_count', 'desc'), startAfter(lastVisible), limit(10));
             const querySnapshot = await getDocs(q);
@@ -1251,7 +1203,7 @@ function GetThemes ({route}) {
       headers: {
         'Content-Type': 'application/json', // Set content type as needed
       },
-      body: JSON.stringify({ data: { background: background, theme: item.item.images[0], postBackground: postBackground, item: item, user: user.uid}}), // Send data as needed
+      body: JSON.stringify({ data: { background: profile.background, theme: item.item.images[0], postBackground: profile.postBackground, item: item, user: user.uid}}), // Send data as needed
     })
     const data = await response.json();
     if (data.done) {
@@ -1329,9 +1281,9 @@ function GetThemes ({route}) {
   const renderRecentThemes = ({item}) => {
     return (
       <div className='cursor-pointer' style={styles.categoriesContainer} onClick={() => recentSearchFunction(item)}>
-        <img src={item.images[0]} style={{height: 40, width: 40, borderRadius: 8}}/>
+        <img src={item.images[0]} style={styles.searchPfp}/>
             <p numberOfLines={1} style={styles.categories}>{item.name}</p>
-            <div className='cursor-pointer' onClick={() => removeSearch(item)} style={{alignSelf: 'center', marginLeft: "auto"}}>
+            <div className='cursor-pointer' onClick={() => removeSearch(item)} style={styles.threeDotIcon}>
                 <XMarkIcon className='navBtn'/>
             </div>
         </div>
@@ -1351,9 +1303,9 @@ function GetThemes ({route}) {
     return (
       <div key={item[0].id} style={styles.themeContainer} className='max-w-full'>
       <div className='cursor-pointer' onClick={() => {setSpecificThemeState(true); setSpecificId(item[0].id); setSpecificState('free'); setSpecificUsername(item[0].username)} }>
-        <img src={item[0].images[0]} style={{height: 240, width: 200, marginBottom: 7.5}}/>
+        <img src={item[0].images[0]} style={styles.specificTheme}/>
       </div>
-      <div style={{flexDirection: 'row',display: 'flex', justifyContent: 'space-between'}}>
+      <div style={styles.closeSend}>
           <p className='themeText'>{item[0].name}</p>
           <div className='cursor-pointer' onClick={free ? () => itemFreeToTransparent(item[0]) : () => itemAllToTransparent(item[0])}>
             <Bars3Icon className='navBtn' color='#fafafa' style={{alignSelf: 'center'}}/>
@@ -1362,12 +1314,12 @@ function GetThemes ({route}) {
         </div>
       {item[0].transparent ? 
         <div style={styles.overlay}>
-          <div style={{flexDirection: 'row', display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}} onClick={free ? () => {itemFreeNotToTransparent(item[0] ); setChosenTheme(null)} :
+          <div style={styles.themeCloseContainer} onClick={free ? () => {itemFreeNotToTransparent(item[0] ); setChosenTheme(null)} :
             () => {itemAllNotToTransparent(item[0] ); setChosenTheme(null)}}>
             <p style={styles.closeText}>Close</p>
             <XMarkIcon className='navBtn'/>
           </div>
-          <div style={{alignItems: 'center', display: 'flex', flexDirection: 'column'}}>
+          <div style={styles.themeOptionsContainer}>
             <div className='cursor-pointer' style={styles.applyContainer} onClick={() => {setSpecificThemeState(true); setSpecificId(item[0] .id); setSpecificState('free'); setSpecificUsername(item[0] .username)}}>
                 <p style={styles.applyText}>Get Theme</p>
               </div>
@@ -1430,9 +1382,9 @@ function GetThemes ({route}) {
        free ? () => {setSpecificThemeState(true); setSpecificId(item.id); setSpecificState('free'); setSpecificUsername(item.username)} 
       : my ? () => {setSpecificThemeState(true); setSpecificId(item.id); setSpecificState('my'); setSpecificUsername(item.username)} :
       purchased ? () => {setSpecificThemeState(true); setSpecificId(item.id); setSpecificState('purchased'); setSpecificUsername(item.username)} : null}>
-        <img src={item.images[0]} style={{height: 240, width: 200, marginBottom: 7.5}}/>
+        <img src={item.images[0]} style={styles.specificTheme}/>
       </div>
-      <div style={{flexDirection: 'row',display: 'flex', justifyContent: 'space-between'}}>
+      <div style={styles.closeSend}>
           <p className='themeText'>{item.name}</p>
           <div className='cursor-pointer' onClick={get ? () => itemAllToTransparent(item) : free ? () => itemFreeToTransparent(item) 
             : my ? () => itemToTransparent(item) : purchased ? () => itemPurchaseToTransparent(item) : null}>
@@ -1442,13 +1394,13 @@ function GetThemes ({route}) {
         </div>
       {item.transparent ? 
         <div style={styles.overlay}>
-          <div style={{flexDirection: 'row', display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}} 
+          <div style={styles.themeCloseContainer} 
           onClick={get ? () =>{itemAllNotToTransparent(item); setChosenTheme(null)} : free ? () => {itemFreeNotToTransparent(item); setChosenTheme(null)} : my ?
             () => {itemNotToTransparent(item); setChosenTheme(null)} : purchased ? () => {itemPurchaseNotToTransparent(item); setChosenTheme(null)}: null}>
             <p style={styles.closeText}>Close</p>
             <XMarkIcon className='navBtn'/>
           </div>
-          <div style={{alignItems: 'center', display: 'flex', flexDirection: 'column'}}>
+          <div style={styles.themeOptionsContainer}>
             {free || get ? 
             <div className='cursor-pointer' style={styles.applyContainer} onClick={() => {setSpecificThemeState(true); setSpecificId(item.id); setSpecificState('free'); setSpecificUsername(item.username)}}>
                 <p style={styles.applyText}>Get Theme</p>
@@ -1478,20 +1430,20 @@ function GetThemes ({route}) {
         <link rel="icon" href='/favicon.icon' />
       </Head>
       {sidebarValue ? null :
-      <div style={{ display: 'flex', overflow: 'hidden', flexDirection: 'row', position: 'sticky'}}>
+      <div style={styles.themePageContainer}>
          <div className='flex'>
           <Sidebar />
          </div>
-          <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} followers={followers} following={following}/>
+          <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} followers={profile.followers} following={profile.following}/>
       <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={true} post={false} video={false}/>
-         <div style={{display: 'grid', flex: 1, overflow: 'hidden', height: '100vh', gridTemplateColumns: '20vw 1fr'}}>
+         <div style={styles.themeMainContainer}>
           <div className='themeSidebar'>
               <div style={styles.themeHeader}>
                   
                   <p style={styles.headerText}>Themes</p>
                   <AdjustmentsHorizontalIcon className='btn' color='#fafafa'/>
               </div>
-              <div style={{marginLeft: '5%', marginRight: '5%'}}>
+              <div style={styles.optionHeader}>
                   <div className='cursor-pointer' style={styles.sections} onClick={() => {setMy(false); setFree(true); setPurchased(false)}}>
                       <p style={styles.pushNotiText}>Get Themes</p>
                       <ChevronRightIcon className='btn'/>
@@ -1514,7 +1466,7 @@ function GetThemes ({route}) {
 
           {!createTheme && !uploadGuidelines && !preview && !successTheme && !priceSummary &&!addCard && !specificThemeState && !homePreview ? 
           <div>
-            {searching ? <div className='flex justify-end m-10 mr-20' style={{flexDirection: 'row', display: 'flex'}}>
+            {searching ? <div className='flex justify-end m-10 mr-20' style={{display: 'flex'}}>
                   <SearchInput width={'100%'} autoFocus={true} value={specificSearch} icon={'magnify'} placeholder={get ? 'Search Themes to Buy' : free ? 'Search Themes to Get' : my ? 'Search My Themes' : purchased ? 'Search Collected Themes' 
                   : null} onFocus={() => {setRecentSearches(true); setSearching(true)}} iconStyle={styles.postIcon}
                   containerStyle={{borderWidth: 1, borderColor: "#fafafa"}} onSubmitEditing={() => {setRecentSearches(false) }} text={searching ? true : false} onChangeText={setSpecificSearchFunction} 
@@ -1529,7 +1481,7 @@ function GetThemes ({route}) {
                   <div className='recentThemes'>
                   {searching && filtered.length == 0 && specificSearch.length > 0 ?
                   <div>
-                    <p style={{color: "#9EDAFF", fontSize: 15.36, paddingHorizontal: 10, textAlign: 'center', marginRight: '5%', marginTop: '5%'}}>No Search Results</p>
+                    <p style={styles.noSearchResultsThemeText}>No Search Results</p>
                   </div> :  
                   searching
                   ?
@@ -1538,17 +1490,17 @@ function GetThemes ({route}) {
                   {!moreResults ? filtered.slice(0, 3).map((item, index) => {
                     return (
                         <div key={index} className='cursor-pointer' style={styles.categoriesContainer} onClick={() => {setFilteredGroup([item]); addToRecentSearches(item); setSearching(false)}}>
-                             <img src={item.images[0]} style={{height: 40, width: 40, borderRadius: 8}}/>
+                             <img src={item.images[0]} style={styles.searchPfp}/>
                             <p numberOfLines={1} style={styles.categories}>{item.name}</p>
-                            <ArrowUpLeftIcon className='btn' style={{alignSelf: 'center', marginLeft: 'auto'}}/>
+                            <ArrowUpLeftIcon className='btn' style={styles.threeDotIcon}/>
                         </div>
                     )
                   }) : filtered.slice(0, 10).map((item, index) => {
                     return (
                         <div key={index} className='cursor-pointer' style={styles.categoriesContainer} onClick={() => {setFilteredGroup([item]); addToRecentSearches(item); setSearching(false)}}>
-                             <img src={item.images[0]} style={{height: 40, width: 40, borderRadius: 8}}/>
+                             <img src={item.images[0]} style={styles.searchPfp}/>
                             <p numberOfLines={1} style={styles.categories}>{item.name}</p>
-                            <ArrowUpLeftIcon className='btn' style={{alignSelf: 'center', marginLeft: 'auto'}}/>
+                            <ArrowUpLeftIcon className='btn' style={styles.threeDotIcon}/>
                         </div>
                     )
                   })}
@@ -1624,9 +1576,9 @@ function GetThemes ({route}) {
               )
             }
           })
-          : loading ? <div style={{alignItems: 'center', flex: 1, display: 'flex', backgroundColor: "#121212", justifyContent: 'flex-end'}}>
+          : loading ? <div style={styles.loadContainer}>
             <BeatLoader color="#9edaff" />
-          </div> : <div style={{ display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          </div> : <div style={styles.loadContainer}>
             {purchased ? <p style={styles.noThemesText}>Sorry you have no Purchased Themes!</p> : my ? <p style={styles.noThemesText}>Sorry you have no themes created right now!</p> :
             free ? <p style={styles.noThemesText}>Sorry no Themes to Get Right Now!</p> : <p style={styles.noThemesText}>Sorry no Themes to Get Right Now!</p>}
             

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import {collection, getDocs, getDoc, doc, addDoc, increment, Timestamp, query, orderBy, limit, setDoc, deleteDoc, serverTimestamp, updateDoc, arrayRemove, arrayUnion, startAfter, where, onSnapshot} from 'firebase/firestore'
 import { db } from '@/firebase'
@@ -17,7 +17,9 @@ import { useSwipeable } from 'react-swipeable'
 
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
+import ProfileContext from '@/context/ProfileContext'
 function Post ({}) {
+  const profile = useContext(ProfileContext);
   const [meet, setMeet] = useState(true);
   const [reloadPage, setReloadPage] = useState(true);
   const [blockedUsers, setBlockedUsers] = useState(null);
@@ -60,7 +62,6 @@ function Post ({}) {
   const [following, setFollowing] = useState(false);
   const [sendingModal, setSendingModal] = useState(false);
   const [followingCount, setFollowingCount] = useState(3);
-  const [username, setUsername] = useState('')
   const [finishedReporting, setFinishedReporting] = useState(false);
   const [reply, setReply] = useState('');
   const [pfp, setPfp] = useState(null);

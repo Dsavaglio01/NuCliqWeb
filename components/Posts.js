@@ -1,59 +1,34 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import 'reactjs-popup/dist/index.css';
 import { styles } from '@/styles/styles'
-import { fetchUserFeedPosts, getProfileDetails, fetchPublicPostsExcludingBlockedUsers, 
-  fetchMorePublicPostsExcludingBlockedUsers} from '@/firebaseUtils'
+import { fetchUserFeedPosts, fetchPublicPostsExcludingBlockedUsers, fetchMorePublicPostsExcludingBlockedUsers} from '@/firebaseUtils'
 import IndPost from './IndPost'
+import ProfileContext from '@/context/ProfileContext';
 function Posts({changeWidth}) {
+  const profile = useContext(ProfileContext);
   const [meet, setMeet] = useState(true);
   const [reloadPage, setReloadPage] = useState(true);
-  const [blockedUsers, setBlockedUsers] = useState(null);
   const [tempPosts, setTempPosts] = useState([]);
-  const [followers, setFollowers] = useState([]);
   const [marginClassOne, setMarginClassOne] = useState('mx-60')
   const [marginClassTwo, setMarginClassTwo] = useState('mx-42')
   const [lastVisible, setLastVisible] = useState(null);
-  const [forSale, setForSale] = useState(false);
-  const [background, setBackground] = useState(null);
   const [loading, setLoading] = useState(false);
   const [following, setFollowing] = useState(false);
   const [followingCount, setFollowingCount] = useState(3);
-  const [username, setUsername] = useState('')
-  const [pfp, setPfp] = useState(null);
-  const [notificationToken, setNotificationToken] = useState(null); 
   const {user} = useAuth();
   const [isFetching, setIsFetching] = useState(false);
   const bottomObserver = useRef(null);
   const dropdownRef = useRef(null);
-  useEffect(() => {
-    if (user.uid) {
-      const fetchProfileData = async () => {
-        const profileData = await getProfileDetails(user.uid);
-
-        if (profileData) {
-          setUsername(profileData.username);
-          setPfp(profileData.pfp);
-          setFollowers(profileData.followers);
-          setFollowing(profileData.following);
-          setForSale(profileData.forSale);
-          setBackground(profileData.postBackground);
-          setBlockedUsers(profileData.blockedUsers);
-          setNotificationToken(profileData.notificationToken);
-        }
-      };
-      fetchProfileData();
-  }
-  }, []);
 
   useEffect(() => {
     const loadPosts = async () => {
       setLoading(true);
       setTempPosts([]);
 
-      if (meet && reloadPage && blockedUsers !== null) {
-        const { posts, lastVisible } = await fetchPublicPostsExcludingBlockedUsers(blockedUsers);
+      if (meet && reloadPage && profile.blockedUsers !== null) {
+        const { posts, lastVisible } = await fetchPublicPostsExcludingBlockedUsers(profile.blockedUsers);
         setTempPosts(posts);
         setLastVisible(lastVisible);
       } 
@@ -67,7 +42,7 @@ function Posts({changeWidth}) {
     if (reloadPage) {
       loadPosts();
     }
-  }, [meet, following, reloadPage, blockedUsers, followingCount]);
+  }, [meet, following, reloadPage, profile.blockedUsers, followingCount]);
     useEffect(() => {
       if (bottomObserver.current) {
         const observer = new IntersectionObserver(entries => {
@@ -96,7 +71,7 @@ function Posts({changeWidth}) {
   }, [loading, lastVisible]);
   async function fetchMorePosts() {
       if (lastVisible != undefined && meet) {
-        const { posts, lastVisible: newLastVisible } = await fetchMorePublicPostsExcludingBlockedUsers(blockedUsers, lastVisible);
+        const { posts, lastVisible: newLastVisible } = await fetchMorePublicPostsExcludingBlockedUsers(profile.blockedUsers, lastVisible);
         setTempPosts([...tempPosts, ...posts]);
         setLastVisible(newLastVisible);
     }
@@ -128,8 +103,8 @@ function Posts({changeWidth}) {
         if (tempPosts.length === index + 1) {      
             return (
           <div ref={lastElementRef} key={e.id}>
-            <IndPost user={user} item={e} pfp={pfp} blockedUsers={blockedUsers} followers={followers} following={following} 
-            forSale={forSale} background={background} username={username} notificationToken={notificationToken} dropdownRef={dropdownRef}/>
+            <IndPost user={user} item={e} pfp={profile.pfp} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
+            forSale={profile.forSale} background={profile.postBackground} username={profile.username} notificationToken={profile.notificationToken} dropdownRef={dropdownRef}/>
           </div>
             )
           
@@ -137,8 +112,8 @@ function Posts({changeWidth}) {
           else {
             return (
             <div key={e.id}>
-              <IndPost user={user} item={e} pfp={pfp} blockedUsers={blockedUsers} followers={followers} following={following} 
-              forSale={forSale} background={background} username={username} notificationToken={notificationToken} dropdownRef={dropdownRef}/>
+              <IndPost user={user} item={e} pfp={profile.pfp} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
+              forSale={profile.forSale} background={profile.postBackground} username={profile.username} notificationToken={profile.notificationToken} dropdownRef={dropdownRef}/>
             </div>
             )
           }
