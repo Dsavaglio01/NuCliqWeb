@@ -6,13 +6,13 @@ NuCliqWeb is in beta, supporting NuCliq’s 100+ beta downloads. Active developm
 
 ## Tech Stack
 - Frontend: React (hooks, functional components)
-- Integrations: Firebase (authentication), NuCliqBackEndLocal APIs (Node.js, Cloud Firestore), RevenueCat (subscriptions)
+- Integrations: Firebase (authentication), NuCliqBackEndLocal APIs (Node.js, Cloud Firestore), Stripe (in development) (subscriptions)
 - Deployment: Netlify (continuous deployment)
 
 ## Features
 - User authentication (Firebase, Apple/Google Sign-in with JWT-based security)
 - Real-time social interactions (view text/image/video posts, likes, comments, replies; powered by NuCliqBackEndLocal APIs)
-- Mood-based filtering (algorithm-driven personalization for happy/scary/sad feeds)
+- Mood-based filtering (happy/scary/sad feeds)
 - Profile management (bio, name updates, synced via Cloud Firestore APIs)
 - Theme marketplace (view/upload wallpapers, free or credit-based, API-driven)
 - Upcoming: Group chat and homepage (React UI, API integration, Q2 2025)
@@ -23,7 +23,6 @@ NuCliqWeb is in beta, supporting NuCliq’s 100+ beta downloads. Active developm
 - 40% faster UI rendering with React hooks and component optimization (vs. class-based components)
 - Integrates with APIs handling 100+ daily requests, 99.9% uptime
 - 20% higher user engagement via personalized theme marketplace
-- 100% test coverage for critical components (authentication, posts)
 
 ## Setup
 1. Clone: `git clone https://github.com/Dsavaglio01/NuCliqWeb`
