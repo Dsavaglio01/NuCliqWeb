@@ -7,7 +7,7 @@ NuCliqWeb is in beta, supporting NuCliq’s 100+ beta downloads. Active developm
 ## Tech Stack
 - Frontend: React (hooks, functional components)
 - Integrations: Firebase (authentication), NuCliqBackEndLocal APIs (Node.js, Cloud Firestore), Stripe (in development) (subscriptions)
-- Deployment: Netlify (continuous deployment)
+- Deployment: GoDaddy (continuous deployment)
 
 ## Features
 - User authentication (Firebase, Apple/Google Sign-in with JWT-based security)
