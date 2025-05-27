@@ -3,7 +3,7 @@ import useStore from '@/components/store'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import Posts from '@/components/Posts'
 import { useRouter } from 'next/router'
-import { useState, useEffect, } from 'react'
+import { useState, useEffect, useContext, } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import { UserCircleIcon } from '@heroicons/react/24/solid'
 import Sidebar from '@/components/Sidebar'
@@ -12,6 +12,7 @@ import FollowButtons from '@/components/FollowButtons'
 import UserSearchBar from '@/components/UserSearchBar'
 import { styles } from '@/styles/styles'
 import { fetchNewFriendsList } from '@/firebaseUtils'
+import ProfileContext from '@/context/ProfileContext'
 
 export default function Home() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function Home() {
   const sidebarValue = useStore((state) => state.sidebarValue);
   const [changeWidth, setChangeWidth] = useState(false);
   const {user} = useAuth();
+  const profile = useContext(ProfileContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +39,7 @@ export default function Home() {
 
   }, []);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (listDone && list.length != 0) {
         const fetchFilteredList = async () => {
           try {
@@ -50,7 +52,7 @@ export default function Home() {
         };
         fetchFilteredList();
     }
-  }, [listDone, list])
+  }, [listDone, list]) */
 
 const handleStateChange = (newState) => {
   setChangeWidth(!newState)
@@ -91,7 +93,7 @@ const FriendItem = ({item, index}) => (
         <div className='flex'>
           <Sidebar onStateChange={handleStateChange}/>
           <div>
-            {sidebarValue ? null :
+            {sidebarValue || !profile ? null :
               <div className='flex flex-row'>
                 <section>
                   <Posts changeWidth={changeWidth}/>

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import ReactModal from 'react-modal'
 import { BeatLoader } from 'react-spinners';
 import { UserCircleIcon, ChevronDownIcon, XMarkIcon} from '@heroicons/react/24/solid';
@@ -9,7 +9,7 @@ import getDateAndTime from '@/lib/getDateAndTime';
 import FollowButtons from './FollowButtons';
 import { styles } from '@/styles/styles';
 import { fetchComments, fetchMoreComments, addCommentLike, removeCommentLike} from '@/firebaseUtils';
-function Comments({ commentModal, closeCommentModal, pfp, focusedItem,handleSwipe, user, blockedUsers }) {
+function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blockedUsers }) {
     const router = useRouter();
     const [replyToReplyFocus, setReplyToReplyFocus] = useState(false);
     const [tempReplyName, setTempReplyName] = useState();
@@ -146,12 +146,8 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem,handleSwip
     ) */
     
     
-    const swipeHandlers = useSwipeable({
-      onSwipedLeft: handleSwipe('left'),
-      onSwipedRight: handleSwipe('right'),
-      trackMouse: true, // Enables mouse tracking for desktop swipes
-    })
-    const handleSwipe = (dir) => {
+    
+    /* const handleSwipe = (dir) => {
       if (dir === 'left') {
         const updatedData = comments.filter((e) => e.id == tempReplyId)
         const newObject = {reply: reply,
@@ -175,7 +171,12 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem,handleSwip
       else if (dir === 'right') {
         return;
       }
-    };
+    }; */
+    const swipeHandlers = useSwipeable({
+      /* onSwipedLeft: handleSwipe('left'),
+      onSwipedRight: handleSwipe('right'), */
+      trackMouse: true, // Enables mouse tracking for desktop swipes
+    })
     const handleComment = (event) => {
       setComment(event.target.value)
     }

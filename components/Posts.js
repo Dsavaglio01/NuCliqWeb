@@ -42,7 +42,7 @@ function Posts({changeWidth}) {
     if (reloadPage) {
       loadPosts();
     }
-  }, [meet, following, reloadPage, profile.blockedUsers, followingCount]);
+  }, [meet, following, reloadPage, followingCount]);
     useEffect(() => {
       if (bottomObserver.current) {
         const observer = new IntersectionObserver(entries => {

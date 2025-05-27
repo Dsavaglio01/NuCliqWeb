@@ -1035,8 +1035,8 @@ postHeader: {
     borderRadius: 17.5
   },
   videoPfp: {
-    height: window.innerHeight / 30.36, 
-    width: window.innerHeight / 30.36, 
+    height: typeof window !== 'undefined' ? window.innerHeight / 30.36 : 0, 
+    width: typeof window !== 'undefined' ? window.innerHeight / 30.36 : 0, 
     borderRadius: 8
   },
   searchInfo: {
@@ -1258,5 +1258,11 @@ postHeader: {
     width: typeof window !== 'undefined' ? window.innerHeight / 5.45 : 0,
     height: typeof window !== 'undefined' ? (window.innerHeight / 5.45) / 1.015625 : 0,
     borderRadius: 8
+  },
+  signUpMain: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }

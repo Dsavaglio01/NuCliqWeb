@@ -8,7 +8,7 @@ export const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const {user} = useAuth();
   useEffect(() => {
-    if (user.uid) {
+    if (user?.uid) {
         const fetchProfileData = async () => {
             const profileData = await getProfileDetails(user.uid);
 
@@ -19,7 +19,7 @@ export const ProfileProvider = ({ children }) => {
         fetchProfileData();
     }
   }, [user?.uid]);
-
+  console.log(profile)
   return (
     <ProfileContext.Provider value={profile}>
       {children}
