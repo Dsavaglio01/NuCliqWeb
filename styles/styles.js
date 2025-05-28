@@ -256,7 +256,6 @@ postHeader: {
       fontSize: 15.36,
       color: "#fafafa",
       padding: 7.5,
-      paddingLeft: 0,
       maxWidth: '90%',
       marginLeft: 0
     },
@@ -309,6 +308,7 @@ postHeader: {
     notificationImageText: {
       height: 45, 
       width: 100, 
+      marginTop: 20,
       borderRadius: 8, 
       alignSelf: 'center', 
       fontSize: 15.36,
@@ -334,7 +334,7 @@ postHeader: {
     },
     notificationContainer: {
       flex: 1, 
-      margin: '2.5%'
+      marginVertical: '2.5%'
     },
     inputPfp: {
       height: 35, 
@@ -535,20 +535,21 @@ postHeader: {
     paddingBottom: 10,
   },
   notificationItemContainer: {
-    margin: '2.5%', 
+    marginBottom: '2.5%', 
     width: '100%', 
+    height: 50,
     justifyContent: 'space-between', 
     display: 'flex',
-    marginTop: 0, 
     borderBottomWidth: 1, 
     borderBottomColor: "#d3d3d3", 
     paddingBottom: 15, 
-    marginTop: 0
+    marginTop: 0,
   },
   notificationItemHeader: {
     display: 'flex', 
     alignItems: 'center', 
-    width: '91%'
+    width: '100%',
+        marginLeft: '2.5%'
   },
   copyTextContainer:{
     flexDirection: 'row',
@@ -736,7 +737,7 @@ postHeader: {
   notificationButton: {
     borderRadius: 10,
     marginLeft: 'auto', 
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   userNewMessage: {
     alignSelf: 'flex-end', 

@@ -33,7 +33,7 @@ export default function Sidebar({onStateChange}) {
         {newPostModal ? <NewPostModal newPostModal={newPostModal} closePostModal={() => setNewPostModal(false)}/> : null}
         <aside className={`${expanded || notificationsExpanded ? 'small-side-footer' : 'side-footer'}`}>
           {!expanded && !notificationsExpanded ?
-            <div style={{marginLeft: '25%'}} className='relative hidden lg:inline-grid items-center mt-5 justify-center h-24 w-24 cursor-pointer'>
+            <div className='smallLogoWrapper'>
               <Image
                 src={require('../assets/DarkMode5.png')} // Make sure this path is correct
                 alt="Your logo description"

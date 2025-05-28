@@ -44,7 +44,7 @@ span {
 }
 
 .side-footer {
-  width: 300px; /* Adjust width as needed */
+  width: 18vw; /* Adjust width as needed */
   padding: 20px;
   position: sticky; /* Keep the footer visible on scroll */
   top: 0px;
@@ -63,13 +63,17 @@ span {
   height: 100vh;  /* Match viewport height for full-length footer */
 }
 .side-chat {
-  width: 25vw; /* Adjust width as needed */
+  width: 21vw; /* Adjust width as needed */
  /* Example background */
-  
+  position: fixed;
   position: sticky; /* Keep the footer visible on scroll */
   top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   border-right: 0.5px solid #fafafa;         
   height: 100vh; 
+  z-index: 3;
 }
 .small-side-footer {
   width: 100px; /* Adjust width as needed */
@@ -389,10 +393,10 @@ input[type="checkbox"] {
 }
 .homeContainer {
   display: flex; /* Makes the children flex items */
-  width: 150%;    /* Ensures the container takes full width */
+  width: 92vw;    /* Ensures the container takes full width */
   min-height: 200px;
+  position: sticky;
   border: 1px solid #ccc;
-  gap: 20px; /* Adds space between columns */
 }
 .column {
   padding: 20px;
@@ -401,7 +405,7 @@ input[type="checkbox"] {
 
 /* Example: Equal columns (1:1 ratio) */
 .column-left {
-  flex: 2; /* Takes 2 part of the available space */
+  flex: 2.5; /* Takes 2 part of the available space */
 }
 
 .column-right {

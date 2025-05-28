@@ -220,6 +220,7 @@ const SendingMessageItem = ({item, index}) => (
                 </div>}
            </div>
 )
+console.log(searching)
   return (
     <div>
     <div>

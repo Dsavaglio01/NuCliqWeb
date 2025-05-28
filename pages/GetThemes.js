@@ -1336,7 +1336,7 @@ function GetThemes () {
               )
             }
           }) :
-          free && freeTempPosts.length > 0
+          free && freeTempPosts && freeTempPosts.length > 0
           ? 
           freeTempPosts.map((item, index) => {
             if (freeTempPosts.length === index + 1) {      

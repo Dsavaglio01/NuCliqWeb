@@ -1332,8 +1332,8 @@ export const fetchMoreFreeThemes = async(userId, subCollection, order, freeLastV
  * @throws {Error} - If `subCollection` is not provided.
 */
 export const fetchFreeThemes = async(subCollection, order) => {
-  if (!userId || !subCollection) {
-    throw new Error("userId or subcollection is undefined");
+  if (!subCollection) {
+    throw new Error("subcollection is undefined");
   }
   const tempPosts = []
   try {

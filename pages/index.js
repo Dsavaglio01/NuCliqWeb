@@ -101,7 +101,7 @@ const FriendItem = ({item, index}) => (
                   </div>
                   
                 </section>
-                <div className='column column-right'>
+                <div className='column column-right mr-72'>
                   {searching && noSearchInput ? 
                     <UserSearchBar searching={searching} noSearchInput={() => setNoSearchInput(true)} closeSearching={() => setSearching(false)} openSearching={() => setSearching(true)}/> :
                     <>

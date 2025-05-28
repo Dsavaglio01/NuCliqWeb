@@ -1,7 +1,7 @@
 import React, {useContext, useRef} from 'react'
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { styles } from '@/styles/styles';
-const SearchInput = ({text, onChangeText, width, containerStyle, value, onClick, onFocus, placeholder, autoFocus, iconStyle, onSubmitEditing}) => {
+const SearchInput = ({text, onChangeText, width, containerStyle, value, onClick, onFocus, onXClick, placeholder, autoFocus, iconStyle, onSubmitEditing}) => {
   const textInputRef = useRef(null)
   return (
     <div className='cursor-pointer' style={{backgroundColor: '#121212', borderRadius: 10,
@@ -16,7 +16,7 @@ const SearchInput = ({text, onChangeText, width, containerStyle, value, onClick,
         <input ref={textInputRef} value={text == true ? value : ''} onChange={onChangeText} style={styles.searchInput} type='text' 
         autoFocus={autoFocus} placeholder={placeholder} onFocus={onFocus} onSubmit={onSubmitEditing}/>
         <div className='flex justify-center ml-auto p-1 pr-2'>
-          <IoIosCloseCircleOutline className='btn' size={20} stlye={{alignSelf: 'center'}}/>
+          <IoIosCloseCircleOutline className='btn' size={20} style={{alignSelf: 'center'}} onClick={onXClick}/>
         </div>
         
         

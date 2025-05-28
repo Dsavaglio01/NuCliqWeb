@@ -28,7 +28,7 @@ function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}
     setSpecificSearch(event.target.value)
   }
   const handleClose = () => {
-    closeSearching()
+    closeSearching();
   }
   const handleNoSearchInput = () => {
     noSearchInput();
@@ -162,7 +162,7 @@ function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}
       <div className='mt-10 mb-3'>
         <SearchInput width={'100%'} value={specificSearch} icon={'magnify'} placeholder={'Search'} onFocus={() => handleOpen()} iconStyle={styles.homeIcon}
         containerStyle={!searching ? {borderWidth: 1, borderColor: '#fff', width: '100%'} : {borderWidth: 1, borderColor: '#fff', width: '150%'}} text={searching ? true : false} onChangeText={specificSearchFunction} 
-        onClick={() => {setSpecificSearch(''); openSearching()}}/>
+        onClick={() => {setSpecificSearch(''); openSearching()}} onXClick={() => {setSpecificSearch(''); handleClose()}}/>
       </div>
       <div>
         {searching && filtered.length == 0 && specificSearch.length > 0 ?
