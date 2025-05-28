@@ -385,31 +385,31 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       })}
       <div style={styles.commentInputContainer}>
         <div style={styles.commentInput}>
-      {pfp != undefined ? <img src={pfp} style={styles.inputPfp}/> :
-          <img src='../public/defaultpfp.jpg' style={styles.inputPfp}/>}
+        {pfp != undefined ? <img src={pfp} style={styles.inputPfp}/> :
+          <UserCircleIcon className='userBtn' style={styles.inputPfp}/>}
           {replyToReplyFocus ? 
-      <textarea value={reply} maxLength={200}
-        onChange={handleReply}
-       className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : replyFocus ? 
-       <textarea value={reply} maxLength={200}
-        onChange={handleReply}
-       className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : <textarea value={comment}
-        onChange={handleComment} maxLength={200}
-       className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
-       <div className='justify-end flex items-end ml-3'>
-      <button style={styles.sendButton}>
-        <p style={styles.sendText}>Send</p>
-    </button>
-    </div>
-      </div>
-      </div>
-    </div>
-          
-          
-        </div>
-      <button className="close-button" onClick={() => {handleClose(); setComments([])}}>
-        <XMarkIcon className='btn'/>
+          <textarea value={reply} maxLength={200}
+            onChange={handleReply}
+          className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : replyFocus ? 
+          <textarea value={reply} maxLength={200}
+            onChange={handleReply}
+          className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : <textarea value={comment}
+            onChange={handleComment} maxLength={200}
+          className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
+          <div className='justify-end flex items-end ml-10'>
+            <button style={styles.sendButton}>
+              <p style={styles.sendText}>Send</p>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+          
+    <button className="close-button" onClick={() => {handleClose(); setComments([])}}>
+        <XMarkIcon className='btn'/>
+      </button>    
+    </div>
+      
       </ReactModal>
   )
 }

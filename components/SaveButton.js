@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react'
 import { BookmarkIcon as SolidBookmark } from '@heroicons/react/24/solid'
 import { BookmarkIcon } from '@heroicons/react/24/outline'
-function SaveButton({item, user, updateTempPostsAddSave, updateTempPostsRemoveSave}) {
+function SaveButton({item, user, video, updateTempPostsAddSave, updateTempPostsRemoveSave}) {
     const addHomeSave = useCallback(async() => {
       await updateTempPostsAddSave(item, item.savedBy)
     }, [item, updateTempPostsAddSave]);
@@ -9,7 +9,7 @@ function SaveButton({item, user, updateTempPostsAddSave, updateTempPostsRemoveSa
       await updateTempPostsRemoveSave(item, item.savedBy)
     }, [item, updateTempPostsRemoveSave]);
   return (
-     <div className='flex flex-row'>
+     <div className={`${video ? 'flex flex-col' : 'flex'}`}>
         {item.savedBy.includes(user.uid) ? 
         <SolidBookmark className='btn' style={{color: '#9EDAFF'}} onClick={() => removeHomeSave(item)}/> : <BookmarkIcon className='btn' onClick={() => addHomeSave(item)}/>}
     </div>

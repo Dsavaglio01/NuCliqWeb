@@ -5,16 +5,15 @@ import CarouselComponent from './Carousel';
 import LikeButton from './LikeButton';
 import { ChatBubbleBottomCenterIcon, ArrowUturnRightIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import {EllipsisVerticalIcon} from '@heroicons/react/24/solid';
-import { ableToShareFunction } from '@/firebaseUtils';
+import { ableToShareFunction, addHomeLikeFunction, addHomeSaveFunction, removeLikeFunction, removeHomeSaveFunction } from '@/firebaseUtils';
 import SaveButton from './SaveButton';
 import getDateAndTime from '@/lib/getDateAndTime';
 import Comments from './Comments';
 import RepostModal from './RepostModal';
 import SendingModal from './SendingModal';
 import ReportModal from './ReportModal';
-import ViewLikes from './ViewLikes';
 import { useRouter } from 'next/router';
-function IndPost({item, user, pfp, username, notificationToken, followers, following, blockedUsers, background, forSale, dropdownRef}) {
+function IndPost({item, user, pfp, username, notificationToken, followers, following, blockedUsers, background, forSale, dropdownRef, tempPosts, setTempPosts}) {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [focusedLikedItem, setFocusedLikedItem] = useState(null);
@@ -78,7 +77,7 @@ function IndPost({item, user, pfp, username, notificationToken, followers, follo
         await removeHomeSaveFunction(item, user, tempPosts, setTempPosts)
     }
     async function addHomeLike(item, likedBy) {
-        await addHomeLikeFunction(item, likedBy, user, tempPosts, setTempPosts, schedulePushLikeNotification, username)
+        await addHomeLikeFunction(item, likedBy, user, tempPosts, setTempPosts, username)
     }
     async function removeHomeLike(item) {
         await removeLikeFunction(item, user, tempPosts, setTempPosts)
@@ -169,7 +168,7 @@ function IndPost({item, user, pfp, username, notificationToken, followers, follo
             </p>
         </div>
         <div className='arrow' />
-        <Comments commentModal={commentModal} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
+        <Comments commentModal={commentModal} focusedItem={focusedItem} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
         {/* <ViewLikes likesModal={likesModal} closeLikesModal={() => setLikesModal(false)} focusedLikedItem={focusedLikedItem} user={user}/> */}
         <RepostModal repostModal={repostModal} closeRepostModal={() => setRepostModal(false)} user={user} username={username} notificationToken={notificationToken}
             blockedUsers={blockedUsers} forSale={forSale} background={background} pfp={pfp} repostItem={repostItem} ableToShare={ableToShare}/>

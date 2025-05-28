@@ -1,6 +1,7 @@
 import { db } from '@/firebase'
 import { getDoc, doc, collection, where, onSnapshot, setDoc, getDocs, startAfter, arrayUnion, serverTimestamp, documentId, updateDoc, 
   arrayRemove, increment, orderBy, limit, startAt, endAt, query, getCountFromServer} from 'firebase/firestore';
+import { schedulePushLikeNotification } from './notificationFunctions';
 /**
  * Checks if a post can be shared
  * @param {string} itemId - The id of the post to check.
@@ -263,7 +264,7 @@ export const addHomeLikeVideoFunction = async (item, likedBy, user, tempPosts, s
  * @throws {Error} - If `item` or `user` is undefined.
  * @returns {Promise<void>} - A promise that resolves when the Firestore update is complete.
 */
-export const addHomeLikeFunction = async (item, likedBy, user, tempPosts, setTempPosts, schedulePushLikeNotification, username) => {
+export const addHomeLikeFunction = async (item, likedBy, user, tempPosts, setTempPosts, username) => {
   if (!item || !user) {
     throw new Error("Error: 'item' or 'user' is undefined.");
   }
@@ -1335,14 +1336,22 @@ export const fetchFreeThemes = async(subCollection, order) => {
   if (!subCollection) {
     throw new Error("subcollection is undefined");
   }
+  console.log(subCollection, order)
   const tempPosts = []
   try {
     const q = query(collection(db, 'freeThemes'), orderBy(subCollection, order), limit(10))
     const querySnapshot = await getDocs(q)
+    console.log("querySnapshot: " + querySnapshot.docs.length)
     querySnapshot.forEach((doc) => {
       tempPosts.push({id: doc.id, ...doc.data(), transparent: false})
     });
-    return {tempPosts, lastFreeVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
+    if (tempPosts) {
+      return {tempPosts: tempPosts, lastFreeVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
+    }
+    else {
+      return {tempPosts: [], lastFreeVisible: null}
+    }
+    
   } 
   catch (e) {
     console.error(e)
@@ -1441,7 +1450,7 @@ export const fetchThemeSearches = async(collectionName, specificSearch, userId) 
  * @returns {function} - An unsubscribe function to stop listening to changes.
  * @throws {Error} - If `userId` is not provided or exists.
 */   
-export const fetchReportedPosts = ({userId, callback}) => {
+export const fetchReportedPosts = (userId, callback) => {
   if (!userId) {
     throw new Error("userId is undefined");
   }
@@ -1466,7 +1475,7 @@ export const fetchReportedPosts = ({userId, callback}) => {
  * @returns {function} - An unsubscribe function to stop listening to changes.
  * @throws {Error} - If `userId` is not provided or exists.
 */     
-export const fetchReportedThemes = ({userId, callback}) => {
+export const fetchReportedThemes = (userId, callback) => {
   if (!userId) {
     throw new Error("userId is undefined");
   }

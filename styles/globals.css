@@ -31,13 +31,6 @@
 html, body {
   color: rgb(var(--foreground-rgb));
     background-color: #121212;
-    font-family: 'Montserrat';
-}
-p {
-  font-family: 'Montserrat';
-}
-span {
-  font-family: 'Montserrat';
 }
 .app-container {
   display: flex; /* Enable flexbox for layout */

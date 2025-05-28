@@ -103,7 +103,7 @@ function Posts({changeWidth}) {
         if (tempPosts.length === index + 1) {      
             return (
           <div ref={lastElementRef} key={e.id}>
-            <IndPost user={user} item={e} pfp={profile.pfp} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
+            <IndPost user={user} item={e} pfp={profile.pfp} tempPosts={tempPosts} setTempPosts={setTempPosts} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
             forSale={profile.forSale} background={profile.postBackground} username={profile.username} notificationToken={profile.notificationToken} dropdownRef={dropdownRef}/>
           </div>
             )
@@ -112,7 +112,7 @@ function Posts({changeWidth}) {
           else {
             return (
             <div key={e.id}>
-              <IndPost user={user} item={e} pfp={profile.pfp} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
+              <IndPost user={user} item={e} pfp={profile.pfp} tempPosts={tempPosts} setTempPosts={setTempPosts} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
               forSale={profile.forSale} background={profile.postBackground} username={profile.username} notificationToken={profile.notificationToken} dropdownRef={dropdownRef}/>
             </div>
             )

@@ -220,6 +220,7 @@ postHeader: {
     width: '80%',
     left: '50%',
     right: 'auto',
+    padding: 0,
     borderRadius: 10,
     transform: 'translate(-50%, 0)',
     backgroundColor: "#121212",
@@ -317,6 +318,7 @@ postHeader: {
     commentInput: {
       display: 'flex', 
       alignItems: 'center', 
+      flexDirection: 'row',
       borderTopWidth: 1, 
       borderColor: "#fafafa"
     },
@@ -1030,8 +1032,8 @@ postHeader: {
     borderRadius: 17.5
   },
   videoPfp: {
-    height: typeof window !== 'undefined' ? window.innerHeight / 30.36 : 0, 
-    width: typeof window !== 'undefined' ? window.innerHeight / 30.36 : 0, 
+    height: typeof window !== 'undefined' ? window.innerHeight / 20 : 0, 
+    width: typeof window !== 'undefined' ? window.innerHeight / 20 : 0, 
     borderRadius: 8
   },
   searchInfo: {

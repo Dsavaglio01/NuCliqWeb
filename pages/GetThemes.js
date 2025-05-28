@@ -24,6 +24,7 @@ import SendingModal from '@/components/SendingModal';
 import { styles } from '@/styles/styles';
 import { fetchFreeThemes, fetchMoreFreeThemes, fetchMorePurchasedThemes, fetchMyThemes, fetchPurchasedThemes, fetchReportedThemes, fetchThemeSearches } from '@/firebaseUtils';
 import ProfileContext from '@/context/ProfileContext';
+import ThemeComponent from '@/components/ThemeComponent';
 function GetThemes () {
   const profile = useContext(ProfileContext);
   const BACKEND_URL = process.env.BACKEND_URL
@@ -84,15 +85,12 @@ function GetThemes () {
   const [sortDecreasingDate, setSortDecreasingDate] = useState(false);
   const [sortIncreasingPrice, setIncreasingPrice] = useState(false);
   const [sortDecreasingPrice, setDecreasingPrice] = useState(false);
-  const [sortVisible, setSortVisible] = useState(false)
   const [postDoneApplying, setPostDoneApplying] = useState(false);
   const [profileDoneApplying, setProfileDoneApplying] = useState(false);
   const [bothDoneApplying, setBothDoneApplying] = useState(false);
   const [registrationModal, setRegistrationModal] = useState(false);
-  const openSortMenu = () => setSortVisible(true);
   const [chosenTheme, setChosenTheme] = useState(null);
   const [useThemeModalLoading, setUseThemeModalLoading] = useState(false);
-  const closeSortMenu = () => setSortVisible(false)
   const db = getFirestore();
   const observer = useRef();
   const lastElementRef = useCallback(node => {
@@ -135,6 +133,7 @@ function GetThemes () {
     let unsubscribe;
 
     if (user?.uid) {
+
       // Use the utility function to subscribe to changes
       unsubscribe = fetchReportedThemes(user.uid, setReportedThemes);
     }
@@ -648,19 +647,31 @@ function GetThemes () {
   }, [sortDecreasingDate, get])
   useMemo(() => {
     if (user.uid && free && mostPopular) {
-      const { tempPosts, lastFreeVisible } = fetchFreeThemes(user.uid, 'bought_count', 'desc');
-      setFreeTempPosts(tempPosts);
-      setLastVisible(lastFreeVisible);
+      const getThemes = async() => {
+        const { tempPosts, lastFreeVisible } = await fetchFreeThemes('bought_count', 'desc');
+        console.log("tempPosts: " + tempPosts)
+        setFreeTempPosts(tempPosts);
+        setLastVisible(lastFreeVisible);
+      }
+      getThemes()
     }
     else if (user.uid && free && sortIncreasingDate) {
-      const { tempPosts, lastFreeVisible } = fetchFreeThemes(user.uid, 'timestamp', 'desc');
-      setFreeTempPosts(tempPosts);
-      setLastVisible(lastFreeVisible);
+      const getThemes = async() => {
+        const { tempPosts, lastFreeVisible } = await fetchFreeThemes('timestamp', 'desc');
+        console.log("tempPosts: " + tempPosts)
+        setFreeTempPosts(tempPosts);
+        setLastVisible(lastFreeVisible);
+      }
+      getThemes()
     }
     else if (user.uid && free && sortDecreasingDate) {
-      const { tempPosts, lastFreeVisible } = fetchFreeThemes(user.uid, 'timestamp', 'asc');
-      setFreeTempPosts(tempPosts);
-      setLastVisible(lastFreeVisible);
+      const getThemes = async() => {
+        const { tempPosts, lastFreeVisible } = await fetchFreeThemes('timestamp', 'asc');
+        console.log("tempPosts: " + tempPosts)
+        setFreeTempPosts(tempPosts);
+        setLastVisible(lastFreeVisible);
+      }
+      getThemes()
     }
   }, [mostPopular, free, user?.uid, sortIncreasingDate, sortDecreasingDate])
   useEffect(() => {
@@ -1234,7 +1245,8 @@ function GetThemes () {
          <div className='flex'>
           <Sidebar />
          </div>
-          <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} followers={profile.followers} following={profile.following}/>
+          <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} 
+          followers={profile ? profile.followers : []} following={profile ? profile.following : []}/>
       <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={true} post={false} video={false}/>
          <div style={styles.themeMainContainer}>
           <div className='themeSidebar'>
@@ -1327,12 +1339,12 @@ function GetThemes () {
           get == true && name == null && tempPosts.length > 0 ? tempPosts.map((item, index) => {
             if (tempPosts.length === index + 1) {
               return (
-                <ThemeItem item={item} ref={lastElementRef} index={index} get={get} free={free} purchased={purchased} my={my}/>
+                <ThemeComponent item={item} ref={lastElementRef} index={index} get={get} free={free} purchased={purchased} my={my}/>
             )
             }
             else {
               return (
-                <ThemeItem item={item} ref={null} index={index} get={get} free={free} purchased={purchased} my={my}/>
+                <ThemeComponent item={item} ref={null} index={index} get={get} free={free} purchased={purchased} my={my}/>
               )
             }
           }) :
@@ -1341,12 +1353,12 @@ function GetThemes () {
           freeTempPosts.map((item, index) => {
             if (freeTempPosts.length === index + 1) {      
             return (
-                <ThemeItem ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-                 <ThemeItem ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                 <ThemeComponent ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
@@ -1354,12 +1366,12 @@ function GetThemes () {
          myThemes.map((item, index) => {
             if (myThemes.length === index + 1) {      
             return (
-               <ThemeItem ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+               <ThemeComponent ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-               <ThemeItem ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+               <ThemeComponent ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
@@ -1367,12 +1379,12 @@ function GetThemes () {
           purchasedThemes.map((item, index) => {
             if (purchasedThemes.length === index + 1) {      
             return (
-                <ThemeItem ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-                <ThemeItem ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })

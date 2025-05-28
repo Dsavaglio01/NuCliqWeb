@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useState, useEffect } from 'react';
 import { onSnapshot, query, collection, where, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
@@ -6,6 +6,7 @@ import { db } from '@/firebase';
 import { useRouter } from 'next/router';
 import { fetchPosts, fetchReposts,fetchCount} from '@/firebaseUtils';
 import ProfileComponent from '@/components/ProfileComponent';
+import ProfileContext from '@/context/ProfileContext';
 function Profile() {
   const [loading, setLoading] = useState(true);
   const [lastVisible, setLastVisible] = useState(null);
@@ -16,6 +17,7 @@ function Profile() {
   const [postSetting, setPostSetting] = useState(true);
   const [repostSetting, setRepostSetting] = useState(false);
   const {user} = useAuth();
+  const profile = useContext(ProfileContext)
   const router = useRouter();
 
   useEffect(() => {
@@ -60,9 +62,12 @@ function Profile() {
       fetchCount(user.uid, 'posts', [where('repost', '==', true)], setNumberOfReposts);
     }
   }, [user?.uid]);
-  return (
-    <ProfileComponent viewing={false} preview={null} previewMade={null} />
+  if (profile) {
+     return (
+    <ProfileComponent viewing={false} profile={profile} person={user} preview={null} previewMade={null} />
   )
+  }
+ 
 }
 
 export default Profile

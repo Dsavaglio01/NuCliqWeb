@@ -7,6 +7,11 @@ import useStore from './store';
 import NewPostModal from './NewPostModal';
 const Chat = React.lazy(() => import ('../pages/Chat'))
 const Notifications = React.lazy(() => import ('../pages/Notifications'))
+import {Montserrat} from 'next/font/google'
+const montserrat = Montserrat({
+  subsets: ['latin'], // Crucial for font optimization
+  display: 'swap', 
+});
 export default function Sidebar({onStateChange}) {
   const router = useRouter();
   const [newPostModal, setNewPostModal] = useState(false);
@@ -29,7 +34,7 @@ export default function Sidebar({onStateChange}) {
     });
   }, []);
     return (
-      <>
+      <main className={montserrat.className}>
         {newPostModal ? <NewPostModal newPostModal={newPostModal} closePostModal={() => setNewPostModal(false)}/> : null}
         <aside className={`${expanded || notificationsExpanded ? 'small-side-footer' : 'side-footer'}`}>
           {!expanded && !notificationsExpanded ?
@@ -98,6 +103,6 @@ export default function Sidebar({onStateChange}) {
               <Notifications />
             </aside> : null}
         </Suspense>
-      </>
+      </main>
     )
 }

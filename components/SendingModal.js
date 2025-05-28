@@ -70,6 +70,7 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
       const handleCaption = (event) => {
     setCaption(event.target.value)
 }
+console.log(friendsInfo)
   return (
     <ReactModal isOpen={sendingModal} style={{content: styles.modalContainer}}>
          <div className='flex flex-col'>
@@ -78,22 +79,20 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
             <XMarkIcon className='btn' onClick={() => handleClose()}/>
         </div>
         <div className='flex flex-row flex-wrap'>
-        {friendsInfo.map((item, index) => {
+          {friendsInfo.length > 0 ? friendsInfo.map((item, index) => {
             return (
-                <div key={index} style={styles.sendingFriendsContainer}>
-            <div className='cursor-pointer items-center flex flex-col'  onClick={() => renderChecked(item)}>
-              {item.pfp ? <img src={item.pfp} style={styles.sendingFriendPfp}/> : 
-              <UserCircleIcon className='userBtn' style={styles.sendingFriendPfp}/>}
-                
-                {item.checked ? <CheckIcon color='#9edaff' className='btn' style={styles.sendingCheck}/> : null}
-                {!item.checked ? <p style={styles.usernameTextSending} className='numberOfLines1'>{item.userName}</p> 
-                : <p style={styles.usernameTextSendingChecked} className='numberOfLines1'>{item.userName}</p>}
-                
-            </div>
-            
-            </div>
+              <div key={index} style={styles.sendingFriendsContainer}>
+                <div className='cursor-pointer items-center flex flex-col'  onClick={() => renderChecked(item)}>
+                  {item.pfp ? <img src={item.pfp} style={styles.sendingFriendPfp}/> : 
+                  <UserCircleIcon className='userBtn' style={styles.sendingFriendPfp}/>}
+                    {item.checked ? <CheckIcon color='#9edaff' className='btn' style={styles.sendingCheck}/> : null}
+                    {!item.checked ? <p style={styles.usernameTextSending} className='numberOfLines1'>{item.userName}</p> 
+                    : <p style={styles.usernameTextSendingChecked} className='numberOfLines1'>{item.userName}</p>}
+                    
+                </div>
+              </div>
             )
-        })}
+          }) : <p>No friends to send to yet!</p>}
         </div>
       {actuallySending ?
       <div style={styles.addCommentSecondContainer} className='bg-black flex flex-col items-center absolute bottom-0 w-full'>

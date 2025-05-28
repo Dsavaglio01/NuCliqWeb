@@ -1,16 +1,13 @@
-import React, { useContext } from 'react'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import React, { } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import 'reactjs-popup/dist/index.css';
-import { useRouter } from 'next/router'
 import { useSpring } from '@react-spring/web'
-import { fetchMorePublicPostsExcludingBlockedUsersVideo, fetchPublicPostsExcludingBlockedUsersVideo, fetchReportedPosts, 
-  getProfileDetails} from '@/firebaseUtils'
+import { fetchMorePublicPostsExcludingBlockedUsersVideo, fetchPublicPostsExcludingBlockedUsersVideo, fetchReportedPosts} from '@/firebaseUtils'
 import { styles } from '@/styles/styles'
 import IndVidPost from './IndVidPost'
-import ProfileContext from '@/context/ProfileContext';
-function VidPosts() {
-  const profile = useContext(ProfileContext);
+function VidPosts({profile}) {
+  console.log(profile)
   const [meet, setMeet] = useState(true);
   const [reloadPage, setReloadPage] = useState(true);
   const [tempPosts, setTempPosts] = useState([]);
@@ -130,7 +127,7 @@ function VidPosts() {
       <div style={styles.videoContainer} className='vidContainer' ref={containerRef}>
         {tempPosts.map((e, index) => (
           <div key={e.id} className="video-item">
-            <IndVidPost item={item} user={user} followers={profile.followers} following={profile.following} username={profile.username} reportedPosts={reportedPosts}
+            <IndVidPost item={e} user={user} dropdownRef={dropdownRef} followers={profile.followers} following={profile.following} username={profile.username} reportedPosts={reportedPosts}
               blockedUsers={profile.blockedUsers} notificationToken={profile.notificationToken} pfp={profile.pfp} forSale={profile.forSale}/>
           </div>
         ))}

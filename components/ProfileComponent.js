@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, { useEffect, useState} from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { styles } from '@/styles/styles';
 import Head from 'next/head';
@@ -13,20 +13,24 @@ import Edit from '@/pages/Edit';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import { fetchPosts, fetchReposts } from '@/firebaseUtils';
-import ProfileContext from '@/context/ProfileContext';
-function ProfileComponent({person, viewing, friendId, preview, previewMade, ableToMessage}) {
+function ProfileComponent({person, viewing, friendId, profile, preview, previewMade, ableToMessage}) {
     const name = person.id;
-    const profile = useContext(ProfileContext);
     const router = useRouter();
     const {user} = useAuth();
     const [postSetting, setPostSetting] = useState(true);
     const [repostSetting, setRepostSetting] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [privacy, setPrivacy] = useState(false);
+    const [numberOfPosts, setNumberOfPosts] = useState(0);
+    const [numberOfReposts, setNumberOfReposts] = useState(0);
     const [reposts, setReposts] = useState([]);
+    const [following, setFollowing] = useState([]);
+    const [followers, setFollowers] = useState([]);
     const [lastVisible, setLastVisible] = useState(null);
     const [loading, setLoading] = useState(true);
     const [settingsShown, setSettingsShown] = useState(false);
     const [edit, setEdit] = useState(false);
+    console.log(person)
     useEffect(() => {
         let unsubscribe;
         if (user.uid && postSetting) {
@@ -161,7 +165,7 @@ function ProfileComponent({person, viewing, friendId, preview, previewMade, able
                                     <p className='numberofLines1' style={styles.nameAge}>{profile.firstName} {profile.lastName}</p>
                                 </div>
                                 <div style={styles.profileLoader}>
-                                    {uploading || loading ? <BeatLoader color="#9edaff" /> : profile.pfp ?
+                                    {loading ? <BeatLoader color="#9edaff" /> : profile.pfp ?
                                     <img src={profile.pfp} className='cursor-pointer' style={styles.profileCircle}/>
                                     : <UserCircleIcon className='userBtn' style={styles.profileCircle}/>}
                                 </div>

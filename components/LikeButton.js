@@ -3,7 +3,7 @@ import { HeartIcon as SolidHeart } from '@heroicons/react/24/solid'
 import { HeartIcon } from '@heroicons/react/24/outline'
 import { styles } from '@/styles/styles';
 
-function LikeButton({item, user, updateTempPostsAddLike, updateTempPostsRemoveLike, updateTempPostsFocusedLike}) {
+function LikeButton({item, user, video, updateTempPostsAddLike, updateTempPostsRemoveLike, updateTempPostsFocusedLike}) {
   const addHomeLike = useCallback(async() => {
       await updateTempPostsAddLike(item, item.likedBy)
     },
@@ -17,7 +17,7 @@ function LikeButton({item, user, updateTempPostsAddLike, updateTempPostsRemoveLi
     },
     [item, updateTempPostsFocusedLike]);
   return (
-    <div className='flex flex-row'>
+    <div className={`${video ? 'flex flex-col' : 'flex'}`}>
         {item.likedBy.includes(user.uid) ? 
         <SolidHeart className='btn' style={{color: 'red'}} onClick={() => removeHomeLike(item, item.likedBy)}/> : <HeartIcon className='btn' onClick={() => addHomeLike(item, item.likedBy)}/>}
         <span className='cursor-pointer' onClick={() => focusedLikedItem(item)} style={styles.numberCommentText}>{item.likedBy.length}</span>

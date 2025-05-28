@@ -3,13 +3,12 @@ import { styles } from '@/styles/styles';
 import { BeatLoader } from 'react-spinners';
 import { UserCircleIcon, ArrowUturnRightIcon, ChatBubbleBottomCenterIcon, AtSymbolIcon} from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
-import EllipsisHorizontalIcon from '@heroicons/react/24/solid';
+import {EllipsisHorizontalIcon} from '@heroicons/react/24/solid';
 import FollowButtons from './FollowButtons';
 import LikeButton from './LikeButton';
 import SaveButton from './SaveButton';
 import ReportModal from './ReportModal';
 import Comments from './Comments';
-import ViewLikes from './ViewLikes';
 import SendingModal from './SendingModal';
 import { addHomeLikeVideoFunction, removeLikeVideoFunction, addHomeSaveVideoFunction, removeHomeSaveVideoFunction, 
     ableToShareVideoFunction} from '@/firebaseUtils';
@@ -121,44 +120,44 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
 
   return (
     <div className='flex'>
-        <div className="border-rounded-sm relative flex flex-col justify-center" style={styles.videoItemContainer}>
-            <div style={styles.videoItem} className="bg-black items-center flex">
-                {!item.post ? (
-                    <BeatLoader color="#9edaff" />
-                ) : (
-                    <video
-                        controls
-                        className="video"
-                        ref={videoRef}
-                        playsInline
-                        muted
-                        preload="metadata"
-                        src={isLoaded ? item.post[0].post : undefined} // Load source only when in view
-                        style={styles.video}
-                    />
-                )}
-            </div>
-            <div style={styles.videoHeader}>
-                {item.pfp ? <img src={item.pfp} style={styles.videoPfp}/> : 
-                    <UserCircleIcon height={100} width={100} style={{ borderRadius: 8}}/>
-                }
-                <div style={styles.videoInfo}>
-                    <button onClick={item.userId != user.uid ? () => router.push('ViewingProfile', {name: item.userId, viewing: true}) : () => router.push('Profile', {screen: 'ProfileScreen', params: {name: user.uid, preview: false, viewing: false, previewImage: null, previewMade: false, applying: false}})}>
-                        <span className='numberOfLines1' style={styles.addVideoText}>@{item.username}</span>
-                    </button>
-                        {!item.blockedUsers.includes(user.uid) ? item.loading ? 
-                            <div className='mr-5'>
-                                <BeatLoader color={"#9edaff"}/> 
-                            </div> :
-                            <FollowButtons user={user} item={item}/> 
-                        : null}
-                </div>
-                </div>
-            
+      <div className="border-rounded-sm relative flex flex-col justify-center" style={styles.videoItemContainer}>
+        <div style={styles.videoItem} className="bg-black items-center flex">
+          {!item.post ? (
+            <BeatLoader color="#9edaff" />
+          ) : (
+            <video
+                controls
+                className="video"
+                ref={videoRef}
+                playsInline
+                muted
+                preload="metadata"
+                src={isLoaded ? item.post[0].post : undefined} // Load source only when in view
+                style={styles.video}
+            />
+          )}
         </div>
+        <div style={styles.videoHeader}>
+          {item.pfp ? <img src={item.pfp} style={styles.videoPfp}/> : 
+              <UserCircleIcon height={100} width={100} style={{ borderRadius: 8}}/>
+          }
+          <div style={styles.videoInfo}>
+              <button onClick={item.userId != user.uid ? () => router.push('ViewingProfile', {name: item.userId, viewing: true}) : () => router.push('Profile', {screen: 'ProfileScreen', params: {name: user.uid, preview: false, viewing: false, previewImage: null, previewMade: false, applying: false}})}>
+                  <span className='numberOfLines1' style={styles.addVideoText}>@{item.username}</span>
+              </button>
+                  {!item.blockedUsers.includes(user.uid) ? item.loading ? 
+                      <div className='mr-5'>
+                          <BeatLoader color={"#9edaff"}/> 
+                      </div> :
+                      <FollowButtons user={user} item={item}/> 
+                  : null}
+          </div>
+        </div>
+          
+      </div>
         <div style={styles.videoButtonContainer}>
             <div className='flex flex-col mb-5'>
-                <LikeButton key={item.id} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
+                <LikeButton key={item.id} video={true} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
             </div>
             <div className='flex flex-col mb-5' onClick={() => {setCommentModal(true); setFocusedItem(item)}}>
                 <ChatBubbleBottomCenterIcon className='btn'/>
@@ -167,7 +166,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
             {!item.private ? 
                 <ArrowUturnRightIcon className='btn mb-5' onClick={() => setSendingModal(true)}/>  : null}
                 <div className='flex flex-col mb-5'>
-                    <SaveButton key={item.id} item={item} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
+                    <SaveButton key={item.id} item={item} video={true} user={user} updateTempPostsAddSave={addHomeSave} updateTempPostsRemoveSave={removeHomeSave}/>
                 </div>
             {item.mentions && item.mentions.length > 0 ?
                 <div className='flex flex-col mb-5'>
