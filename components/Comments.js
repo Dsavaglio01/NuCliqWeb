@@ -85,18 +85,18 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           </p>
         );
       };
-    async function fetchMoreCommentData () {
-      if (lastCommentVisible != undefined && videoStyling) {
-        const { newComments, lastVisible: newLastVisible } = await fetchMoreComments(focusedItem, lastCommentVisible, blockedUsers, 'videos')
-        setComments([...comments, ...newComments]);
-        setLastCommentVisible(newLastVisible);
-      }
-      else if (lastCommentVisible != undefined && !videoStyling) {
-        const { newComments, lastVisible: newLastVisible } = await fetchMoreComments(focusedItem, lastCommentVisible, blockedUsers, 'posts')
-        setComments([...comments, ...newComments]);
-        setLastCommentVisible(newLastVisible);
-      }
-    }
+    // async function fetchMoreCommentData () {
+    //   if (lastCommentVisible != undefined && videoStyling) {
+    //     const { newComments, lastVisible: newLastVisible } = await fetchMoreComments(focusedItem, lastCommentVisible, blockedUsers, 'videos')
+    //     setComments([...comments, ...newComments]);
+    //     setLastCommentVisible(newLastVisible);
+    //   }
+    //   else if (lastCommentVisible != undefined && !videoStyling) {
+    //     const { newComments, lastVisible: newLastVisible } = await fetchMoreComments(focusedItem, lastCommentVisible, blockedUsers, 'posts')
+    //     setComments([...comments, ...newComments]);
+    //     setLastCommentVisible(newLastVisible);
+    //   }
+    // }
     async function removeLike(item) {
       await removeCommentLike(item, user, setComments, comments, focusedItem)
     }
@@ -115,20 +115,20 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       setComments(updatedArray) 
     }
     useEffect(() => {
+      if (focusedItem) {
       const loadComments = async() => {
-        if (videoStyling) {
+        /* if (videoStyling) {
           const { comments, lastVisible } = await fetchComments(focusedItem, blockedUsers, 'videos')
           setComments(comments)
           setLastCommentVisible(lastVisible);
-        }
-        else {
+        } */
           const { comments, lastVisible } = await fetchComments(focusedItem, blockedUsers, 'posts')
           setComments(comments)
           setLastCommentVisible(lastVisible);
-        }
       }
       loadComments();
-    }, [])
+    }
+    }, [focusedItem])
     /* const deleteReplyFunction = async(item, reply) => {
       await deleteReply(item, reply, focusedItem, comments, setComments, tempPosts, setTempPosts);
     } */

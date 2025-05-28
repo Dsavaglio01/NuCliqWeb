@@ -94,11 +94,14 @@ const FriendItem = ({item, index}) => (
           <Sidebar onStateChange={handleStateChange}/>
           <div>
             {sidebarValue || !profile ? null :
-              <div className='flex flex-row'>
-                <section>
-                  <Posts changeWidth={changeWidth}/>
+              <div className='homeContainer'>
+                <section className='column column-left'>
+                  <div className='flex justify-center align-center'>
+                    <Posts changeWidth={changeWidth}/>
+                  </div>
+                  
                 </section>
-                <div>
+                <div className='column column-right'>
                   {searching && noSearchInput ? 
                     <UserSearchBar searching={searching} noSearchInput={() => setNoSearchInput(true)} closeSearching={() => setSearching(false)} openSearching={() => setSearching(true)}/> :
                     <>

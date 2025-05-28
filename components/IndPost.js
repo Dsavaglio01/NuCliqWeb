@@ -174,7 +174,8 @@ function IndPost({item, user, pfp, username, notificationToken, followers, follo
         <RepostModal repostModal={repostModal} closeRepostModal={() => setRepostModal(false)} user={user} username={username} notificationToken={notificationToken}
             blockedUsers={blockedUsers} forSale={forSale} background={background} pfp={pfp} repostItem={repostItem} ableToShare={ableToShare}/>
         <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={false} post={true} video={false}/>
-        <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} video={false} theme={false} post={true} user={user} followers={followers} following={following}/>
+        <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} video={false} theme={false} post={true} user={user} 
+        followers={followers ? followers : []} following={following ? following : []}/>
     </div>
   )
 }

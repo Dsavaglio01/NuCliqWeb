@@ -175,32 +175,20 @@ const MessageItem = ({item, index}) => (
               }
                 
                  <div style={{paddingLeft: 7.5, width: '75%'}}>
-                    <p className='numberofLines1' style={{color: '#fff', fontSize: 15.36,
-        paddingTop: 5,
-        fontWeight: '700'}}>{item.firstName} {item.lastName}</p>
-                    {filteredGroup.length > 0 ? <p numberOfLines={1} style={{color: '#fff', fontSize: 15.36,
-        paddingBottom: 5,}}>{item.userName}</p> : 
-                    <p className='numberofLines1' style={{color: '#fff', fontSize: 15.36,
-        paddingBottom: 5,}}>{item.lastMessage == undefined ? 'Start the Conversation!' : item.lastMessage.userSent != undefined ?
+                    <p className='numberofLines1' style={{color: '#fff', fontSize: 15.36, paddingTop: 5, fontWeight: '700'}}>{item.firstName} {item.lastName}</p>
+                    {filteredGroup.length > 0 ? <p numberOfLines={1} style={styles.messageContainer}>{item.userName}</p> : 
+                    <p className='numberofLines1' style={styles.messageContainer}>{item.lastMessage == undefined ? 'Start the Conversation!' : item.lastMessage.userSent != undefined ?
                     `Sent a profile`: item.lastMessage.post != undefined ? item.lastMessage.post.group != undefined ? 'Sent a Cliq' : `Sent a post by ${item.lastMessage.userName}` 
                     :  item.lastMessage.theme != undefined ? `Sent a theme` :
                      item.lastMessage.image != undefined ? 'Sent a photo' : 
                     item.lastMessage.image && item.lastMessage.text.length > 0 ? item.lastMessage.text : item.lastMessage.text}</p>}
                 </div>
-                <div style={{flexDirection: 'column', marginLeft: 'auto', width: 100}}>
-                  <p style={{fontSize: 12.29, paddingBottom: 5, color: '#fff'}}>{getDateAndTime(item.lastMessageTimestamp)}</p>
+                <div>
+                  <p style={{fontSize: 12.29, paddingBottom: 5, color: '#fff', marginLeft: 'auto'}}>{getDateAndTime(item.lastMessageTimestamp)}</p>
                 {
                   messageNotifications.length > 0 ?
                   messageNotifications.filter((element) => element.id == item.messageId).length > 0 ? 
-                  <div>
-                    <ChatBubbleLeftRightIcon className='btn ml-10'/>
-                </div> : 
-                 <div>
-                 <ChatBubbleLeftIcon className='btn ml-10'/>
-                </div> :
-                <div>
-                 <ChatBubbleLeftIcon className='btn ml-10'/>
-                </div> 
+                    <ChatBubbleLeftRightIcon className='btn ml-auto'/> : <ChatBubbleLeftIcon className='btn ml-auto'/> : <ChatBubbleLeftIcon className='btn ml-auto'/>
                 }
                 </div>
                 
@@ -233,7 +221,7 @@ const SendingMessageItem = ({item, index}) => (
            </div>
 )
   return (
-    <div className='flex-row flex'>
+    <div>
     <div>
       <div>
       {loading && completeMessages.length == 0 ?  <div style={{alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'center'}}>
@@ -241,26 +229,24 @@ const SendingMessageItem = ({item, index}) => (
         </div> : friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ?
       <>
       {friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ? 
-          <div style={{marginVertical: '5%', marginLeft: '11%', width: '100%'}}>
-            <div className='cursor-pointer' style={{width: '100%', marginTop: '2.5%', marginBottom: '2.5%', zIndex: 0}}>
-            <UserSearchBar searching={searching} noSearchInput={() => setSearching(false)} openSearching={() => setSearching(true)} closeSearching={() => setSearching(false)}/>     
-            </div>
-              
+          <div style={{marginVertical: '5%', alignItems: 'center', display: 'flex', justifyContent: 'center'}}>
+            <div className='cursor-pointer mb-5'>
+              <UserSearchBar searching={searching} noSearchInput={() => setSearching(false)} openSearching={() => setSearching(true)} closeSearching={() => setSearching(false)}/>     
+            </div> 
           </div>
       : null}
         {!searching ? <div style={focusedItem ? {width: '123.25%'} : {width: '100%'}}>
             {filteredGroup.length > 0 ? 
-            <ul style={{height: '50%'}}
-                  > 
-                  {filteredGroup.map((item, index) => {
-                    return (
-          !routeSending ? 
-            <MessageItem index={index} item={item}/>
-          : 
-           <SendingMessageItem index={index} item={item}/>
-        )
-                  })}
-                  </ul> :
+            <ul style={{height: '50%'}}> 
+              {filteredGroup.map((item, index) => {
+                return (
+                  !routeSending ? 
+                    <MessageItem index={index} item={item}/>
+                  : 
+                  <SendingMessageItem index={index} item={item}/>
+                )
+              })}
+            </ul> :
             completeMessages.length > 0 ?
             <ul
                   > 

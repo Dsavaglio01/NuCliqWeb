@@ -74,11 +74,12 @@ span {
 .small-side-footer {
   width: 100px; /* Adjust width as needed */
  /* Example background */
-  padding: 10px;
   position: sticky; /* Keep the footer visible on scroll */
-  top: 0;
   border-right: 0.5px solid #fafafa;         
   height: 100vh; 
+  align-items: center;
+  flex-direction: column;
+  display: flex;
 }
 .side-theme-footer {
   width: 500px; /* Adjust width as needed */
@@ -239,7 +240,6 @@ textarea {
 .sidebar-nav {
   list-style: none;
   padding: 0;
-  margin-right: 16px;
 }
 
 .drawer-content {
@@ -386,4 +386,46 @@ input[type="checkbox"] {
 .reportList {
   list-style-type: none;
   cursor: pointer;
+}
+.homeContainer {
+  display: flex; /* Makes the children flex items */
+  width: 150%;    /* Ensures the container takes full width */
+  min-height: 200px;
+  border: 1px solid #ccc;
+  gap: 20px; /* Adds space between columns */
+}
+.column {
+  padding: 20px;
+  box-sizing: border-box; /* Includes padding and border in the element's total width/height */
+}
+
+/* Example: Equal columns (1:1 ratio) */
+.column-left {
+  flex: 2; /* Takes 2 part of the available space */
+}
+
+.column-right {
+  flex: 1; /* Takes 1 part of the available space */
+}
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Stacks columns vertically on smaller screens */
+  }
+
+  .column {
+    flex: none; /* Reset flex for stacking */
+    width: 100%; /* Make them full width when stacked */
+  }
+}
+.smallLogoWrapper {
+  /* Define the dimensions of your image container */
+  width: 100%; /* Or fixed width like 300px */
+  height: 125px; /* Or fixed height like 200px */
+  /* Or use aspect-ratio for flexible height based on width */
+  /* aspect-ratio: 16 / 9; */
+
+  position: relative; /* Crucial for `fill` prop */
+  overflow: hidden; /* Important if using object-fit: cover to hide cropping */
+  /* Apply padding/margin to THIS wrapper if you want space *around* the image */
+  padding: 25px; /* Example: adds 20px space inside the wrapper, around the image */
 }

@@ -134,16 +134,10 @@ postHeader: {
     paddingRight: 7.5, 
     fontSize: 12.29
   },
-  searchIcon: {
-    alignSelf: 'center', 
-    paddingLeft: 10
-  },
   searchInput: {
     fontSize: 15.36, 
     color: "#fff", 
     backgroundColor: "#121212",
-    fontWeight: '600', 
-    borderWidth: 0, 
     paddingLeft: 10
   },
   sendText: {
@@ -375,7 +369,7 @@ postHeader: {
       borderRadius: 5,
       flexDirection: 'row',
       display: 'flex',
-      width: '200%',
+      width: '100%',
       marginBottom: 5,
       padding: 5,
       alignItems: 'center',
@@ -1264,5 +1258,16 @@ postHeader: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  continueText: {
+    marginLeft: 'auto', 
+    fontSize: 19.20, 
+    color: "#fafafa", 
+    cursor: true
+  },
+  messageContainer: {
+    color: '#fff', 
+    fontSize: 15.36,
+    paddingBottom: 5,
   }
 }

@@ -35,12 +35,12 @@ function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}
   }
   const SearchItem = ({item, index}) => (
     <div key={index}>
-      <div className='cursor-pointer w-full' style={styles.categoriesContainer} onClick={() => {setFilteredGroup([item]); handleClose()}}>
+      <div className='cursor-pointer' style={styles.categoriesContainer} onClick={() => {setFilteredGroup([item]); handleClose()}}>
         {item.pfp ? 
           <img src={item.pfp} style={styles.searchPfp}/> :
           <UserCircleIcon className='btn' style={styles.searchPfp}/>}
         <p numberOfLines={1} style={styles.categories}>@{item.username != undefined ? item.username : item.userName}</p>
-        <ArrowUpLeftIcon className='btn'/>
+        <ArrowUpLeftIcon className='btn ml-auto'/>
       </div>
     </div>
   )
@@ -158,8 +158,8 @@ function UserSearchBar({searching, openSearching, closeSearching, noSearchInput}
     }
   }
   return (
-    <div className='flex flex-col w-72'>    
-      <div className='mt-10 mb-3' style={{display: 'flex'}}>
+    <div className='w-96'>    
+      <div className='mt-10 mb-3'>
         <SearchInput width={'100%'} value={specificSearch} icon={'magnify'} placeholder={'Search'} onFocus={() => handleOpen()} iconStyle={styles.homeIcon}
         containerStyle={!searching ? {borderWidth: 1, borderColor: '#fff', width: '100%'} : {borderWidth: 1, borderColor: '#fff', width: '150%'}} text={searching ? true : false} onChangeText={specificSearchFunction} 
         onClick={() => {setSpecificSearch(''); openSearching()}}/>

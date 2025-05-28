@@ -41,14 +41,15 @@ export default function Sidebar({onStateChange}) {
                 width={150}
               />
             </div> : 
-            <div className='relative hidden lg:inline-grid h-24 w-24 mt-5 cursor-pointer'>
-              <Image
-                src={require('../assets/logo.png')} // Make sure this path is correct
-                alt="Your logo description"
-                height={40}
-                width={40}
-              />
-            </div>}
+            <div className='smallLogoWrapper'>
+                <Image
+                  src={require('../assets/logo.png')} // Make sure this path is correct
+                  alt="Your logo description"
+                  height={50}
+                  width={50}
+                />
+            </div>
+              }
           <ul className='sidebar-nav'>
             <div className='flex flex-row mb-12 mt-5 cursor-pointer' onClick={() => {router.push('/'); setExpanded(false); setSidebarValue(false)}}>
               <HomeIcon className='navBtn' color='#fafafa' style={{height: 35}}/>
