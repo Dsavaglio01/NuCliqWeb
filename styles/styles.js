@@ -1,3 +1,5 @@
+import FullTheme from "@/components/FullTheme";
+
 export const styles = {
     name: {
       fontSize: 15.36,
@@ -1319,5 +1321,9 @@ postHeader: {
     display: 'flex', 
     alignItems: 'center', 
     marginLeft: '5%'
+  },
+  fullTheme: {
+    width: '100%',
+    height: '90%'
   }
 }

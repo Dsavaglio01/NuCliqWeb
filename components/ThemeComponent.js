@@ -4,10 +4,11 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 function ThemeComponent({item, user, index, get, free, my, purchased, ref, myThemes, setMyThemes, purchasedThemes, setPurchasedThemes, freeTempPosts, setFreeTempPosts,
   specificThemeStateTrue, specificThemeId, specificState, specificUsername, reportedThemes}) {
     const [chosenTheme, setChosenTheme] = useState(null);
-    const handleSpecificThemeState = () => {
-        specificThemeStateTrue();
+    const handleSpecificThemeState = (item) => {
+        specificThemeStateTrue(item);
     }
     const handleSpecificId = (id) => {
+      console.log('id' + id)
         specificThemeId(id)
     }
     const handleSpecificState = (state) => {
@@ -54,10 +55,10 @@ function ThemeComponent({item, user, index, get, free, my, purchased, ref, myThe
   }
   return (
       <div ref={ref} key={item.id} style={styles.themeContainer} className='max-w-full'>
-      <div className='cursor-pointer' onClick={get ? () => {handleSpecificThemeState(); handleSpecificId(item.id); handleSpecificState('get'); handleSpecificUsername(item.username)} :
-       free ? () => {handleSpecificThemeState(); handleSpecificId(item.id); handleSpecificState('free'); handleSpecificUsername(item.username)} 
-      : my ? () => {handleSpecificThemeState(); handleSpecificId(item.id); handleSpecificState('my'); handleSpecificUsername(item.username)} :
-      purchased ? () => {handleSpecificThemeState(); handleSpecificId(item.id); handleSpecificState('purchased'); handleSpecificUsername(item.username)} : null}>
+      <div className='cursor-pointer' onClick={get ? () => {handleSpecificThemeState(item); handleSpecificId(item.id); handleSpecificState('get'); handleSpecificUsername(item.username)} :
+       free ? () => {handleSpecificThemeState(item); handleSpecificId(item.id); handleSpecificState('free'); handleSpecificUsername(item.username)} 
+      : my ? () => {handleSpecificThemeState(item); handleSpecificId(item.id); handleSpecificState('my'); handleSpecificUsername(item.username)} :
+      purchased ? () => {handleSpecificThemeState(item); handleSpecificId(item.id); handleSpecificState('purchased'); handleSpecificUsername(item.username)} : null}>
         <img src={item.images[0]} style={styles.specificTheme}/>
       </div>
       <div style={styles.closeSend}>
@@ -78,7 +79,7 @@ function ThemeComponent({item, user, index, get, free, my, purchased, ref, myThe
           </div>
           <div style={styles.themeOptionsContainer}>
             {free || get ? 
-            <div className='cursor-pointer' style={styles.applyContainer} onClick={() => {handleSpecificThemeState(); handleSpecificId(item.id); handleSpecificState('free'); handleSpecificUsername(item.username)}}>
+            <div className='cursor-pointer' style={styles.applyContainer} onClick={() => {handleSpecificThemeState(item); handleSpecificId(item.id); handleSpecificState('free'); handleSpecificUsername(item.username)}}>
                 <p style={styles.applyText}>Get Theme</p>
               </div> : null}
               <div className='cursor-pointer' style={styles.applyContainer} onClick={() => setSendingModal(true)}>

@@ -101,7 +101,7 @@ function UploadGuidelines ({handleStateChange}) {
             
         </div>
         <div style={{width: '90%', marginLeft: '5%', marginTop: '2.5%'}}>
-
+            <PreviewThemeFooter text={"CONTINUE"} onClickCancel={() => {console.log('I wsa pressed')}} onFileSelected={(file) => handleFileSelected(file)}/>
         </div>
     </div>
   )

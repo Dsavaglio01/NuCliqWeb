@@ -5,6 +5,7 @@ import {PhotoIcon} from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import useStore from './store';
 import NewPostModal from './NewPostModal';
+import {HiOutlineUserGroup} from 'react-icons/hi2'
 const Chat = React.lazy(() => import ('../pages/Chat'))
 const Notifications = React.lazy(() => import ('../pages/Notifications'))
 import {Montserrat} from 'next/font/google'
@@ -75,6 +76,11 @@ export default function Sidebar({onStateChange}) {
               <PlusCircleIcon className='navBtn' color='#fafafa' style={{height: 35}}/>
               {expanded || notificationsExpanded  ? null : 
               <li className={'text-white pl-5 self-center'}>New Post</li>}
+            </div>
+            <div className='flex flex-row  my-12 cursor-pointer' onClick={() => {router.push('/Groups/GroupPage'); setExpanded(false); setSidebarValue(false)}}>
+              <HiOutlineUserGroup className='navBtn' color='#fafafa' size={35}/>
+              {expanded || notificationsExpanded  ? null : 
+              <li className={'text-white pl-5 self-center w-0'}>Cliqs</li>}
             </div>
             <div className='flex flex-row  my-12 cursor-pointer' onClick={() => {router.push('/Vidz'); setExpanded(false); setSidebarValue(false)}}>
               <VideoCameraIcon className='navBtn' color='#fafafa' style={{height: 35}}/>

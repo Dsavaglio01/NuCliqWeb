@@ -428,3 +428,10 @@ input[type="checkbox"] {
   /* Apply padding/margin to THIS wrapper if you want space *around* the image */
   padding: 25px; /* Example: adds 20px space inside the wrapper, around the image */
 }
+.sidebarContainer {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 12;
+  cursor: pointer;
+  margin-top: 5;
+}

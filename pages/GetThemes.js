@@ -24,6 +24,8 @@ import SendingModal from '@/components/SendingModal';
 import { styles } from '@/styles/styles';
 import { fetchFreeThemes, fetchMoreFreeThemes, fetchMorePurchasedThemes, fetchMyThemes, fetchPurchasedThemes, fetchReportedThemes, fetchThemeSearches } from '@/firebaseUtils';
 import ProfileContext from '@/context/ProfileContext';
+import FullTheme from '@/components/FullTheme';
+console.log('Imported FullTheme:', FullTheme);
 import ThemeComponent from '@/components/ThemeComponent';
 function GetThemes () {
   const profile = useContext(ProfileContext);
@@ -40,6 +42,7 @@ function GetThemes () {
   const [uploadGuidelines, setUploadGuidelines] = useState(false);
   const [applyLoading, setApplyLoading] = useState(false);
   const [free, setFree] = useState(true);
+  const [fullTheme, setFullTheme] = useState(null);
   const [specificId, setSpecificId] = useState(null);
   const [file, setFile] = useState(null);
   const [sendingModal, setSendingModal] = useState(false);
@@ -1210,6 +1213,7 @@ function GetThemes () {
   function setSpecificSearchFunction(event) {
     setSpecificSearch(event.target.value)
   }
+  console.log(fullTheme)
   return (
     <ProtectedRoute>
         <Head>
@@ -1253,7 +1257,7 @@ function GetThemes () {
          <div style={styles.themeMainContainer} className=''>
           
 
-          {!createTheme && !uploadGuidelines && !preview && !successTheme && !priceSummary &&!addCard && !specificThemeState && !homePreview ? 
+          {!createTheme && !uploadGuidelines && !preview && !successTheme && !priceSummary &&!addCard && !specificThemeState && !homePreview && !fullTheme ? 
           <div>
             {searching ? <div className='flex justify-end m-10 mr-20' style={{display: 'flex'}}>
                   <SearchInput width={'40%'} autoFocus={true} value={specificSearch} icon={'magnify'} placeholder={get ? 'Search Themes to Buy' : free ? 'Search Themes to Get' : my ? 'Search My Themes' : purchased ? 'Search Collected Themes' 
@@ -1317,14 +1321,15 @@ function GetThemes () {
             if (tempPosts.length === index + 1) {
               return (
                 <ThemeComponent item={item} user={user} ref={lastElementRef} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} reportedThemes={reportedThemes}
-                 index={index} get={get} free={free} purchased={purchased} my={my}/>
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} reportedThemes={reportedThemes} specificThemeId={(id) => setSpecificId(id)}
+                specificThemeStateTrue={(item) => setFullTheme([item])} index={index} get={get} free={free} purchased={purchased} my={my} 
+                specificState={(state) => setSpecificState(state)} specificUsername={(username) => setSpecificUsername(username)}/>
             )
             }
             else {
               return (
-                <ThemeComponent item={item} user={user} ref={null} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes} reportedThemes={reportedThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} index={index} get={get} free={free} purchased={purchased} my={my}/>
+                <ThemeComponent item={item} user={user} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} ref={null} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes} reportedThemes={reportedThemes} specificThemeId={(id) => setSpecificId(id)}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} index={index} get={get} free={free} purchased={purchased} my={my}/>
               )
             }
           }) :
@@ -1333,14 +1338,14 @@ function GetThemes () {
           freeTempPosts.map((item, index) => {
             if (freeTempPosts.length === index + 1) {      
             return (
-                <ThemeComponent user={user} ref={lastElementRef} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent user={user} ref={lastElementRef} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} specificThemeId={(id) => setSpecificId(id)} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-                 <ThemeComponent user={user} ref={null} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                 <ThemeComponent user={user} ref={null} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} specificThemeId={(id) => setSpecificId(id)} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
@@ -1348,14 +1353,14 @@ function GetThemes () {
          myThemes.map((item, index) => {
             if (myThemes.length === index + 1) {      
             return (
-               <ThemeComponent user={user} ref={lastElementRef} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+               <ThemeComponent user={user} ref={lastElementRef} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} specificThemeId={(id) => setSpecificId(id)} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-               <ThemeComponent user={user} ref={null} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+               <ThemeComponent user={user} ref={null} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} specificThemeId={(id) => setSpecificId(id)} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
@@ -1363,14 +1368,14 @@ function GetThemes () {
           purchasedThemes.map((item, index) => {
             if (purchasedThemes.length === index + 1) {      
             return (
-                <ThemeComponent user={user} ref={lastElementRef} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent user={user} ref={lastElementRef} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} specificThemeId={(id) => setSpecificId(id)} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-                <ThemeComponent user={user} ref={null} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent user={user} ref={null} specificUsername={(username) => setSpecificUsername(username)} specificState={(state) => setSpecificState(state)} specificThemeId={(id) => setSpecificId(id)} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} specificThemeStateTrue={(item) => setFullTheme([item])} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
@@ -1383,12 +1388,13 @@ function GetThemes () {
           </div> : null}
            </div> 
            </div>
-           : createTheme && !uploadGuidelines && !preview && !successTheme && !priceSummary &&!addCard && !specificThemeState && !homePreview ? <CreateTheme onStateChange={handleCreateChange}/> : uploadGuidelines && !preview && !successTheme  && !specificThemeState
-           ? <UploadGuidelines handleStateChange={handleUploadChange}/> : preview && !successTheme && !priceSummary &&!addCard && !homePreview && !specificThemeState ? <Preview file={file} onStateChange={handlePreviewChange} changeImageData={handleChangeImage}/> 
-           : successTheme && !priceSummary &&!addCard && !homePreview && !specificThemeState ? <SuccessTheme  post={file} handleStateChange={handleSuccessThemeChange}/> : priceSummary &&!addCard && !homePreview && !specificThemeState ?
+           : createTheme && !uploadGuidelines && !preview && !successTheme && !priceSummary &&!addCard && !specificThemeState && !fullTheme && !homePreview ? <CreateTheme onStateChange={handleCreateChange}/> : uploadGuidelines && !preview && !successTheme  && !specificThemeState
+           ? <UploadGuidelines handleStateChange={handleUploadChange}/> : preview && !successTheme && !priceSummary &&!addCard && !homePreview && !specificThemeState && !fullTheme ? <Preview file={file} onStateChange={handlePreviewChange} changeImageData={handleChangeImage}/> 
+           : successTheme && !priceSummary &&!addCard && !homePreview && !specificThemeState && !fullTheme ? <SuccessTheme  post={file} handleStateChange={handleSuccessThemeChange}/> : priceSummary &&!addCard && !homePreview && !specificThemeState ?
             <PriceSummary handleStateChange={handlePriceSummaryChange} name={themeName} theme={file} keywords={keywords} stripeId={stripeId} price={price} notificationToken={notificationToken} profileChecked={profileChecked} postChecked={postChecked} /> :
-            addCard && !homePreview && !specificThemeState ? <AddCard /> :
-           specificThemeState && !homePreview ? <SpecificTheme onStateChange={handlePostThemeChange} specificId={specificId} specificUsername={specificUsername} specificState={specificState}/> : homePreview ? <HomeScreenPreview /> : null}
+            addCard && !homePreview && !specificThemeState && !fullTheme ? <AddCard /> :
+           specificThemeState && !homePreview && !fullTheme ? <SpecificTheme onStateChange={handlePostThemeChange} specificId={specificId} specificUsername={specificUsername} specificState={specificState}/> : homePreview && !fullTheme ? <HomeScreenPreview />
+           : fullTheme ? <FullTheme theme={fullTheme}/> : null}
          </div>
       </div>}
     </ProtectedRoute>
