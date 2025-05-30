@@ -445,55 +445,55 @@ function Settings() {
         <div className='flex flex-col justify-center items-center'>
         <span style={headerText}>We will help you as soon as we can if you can describe the problem below!</span>
         <div style={{flexDirection: 'row', display: 'flex', marginLeft: '2.5%', width: '90%', marginBottom: '5%', flexWrap: 'wrap'}}>
-            <div className='cursor-pointer ml-9 pt-10' onClick={() => {setBugChecked(!bugChecked)}} style={styles.reportContainer}>
+            <div className='cursor-pointer ml-9 pt-10' onClick={() => {setBugChecked(!bugChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={bugChecked} checked={bugChecked} onChange={() => {setBugChecked(!bugChecked)}} color={bugChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Bugs/Errors</span>
             </div>
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setUxChecked(!uxChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setUxChecked(!uxChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={uxChecked} checked={uxChecked} onChange={() => {setUxChecked(!uxChecked)}} color={uxChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>User Experience</span>
             </div>   
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setSecurityChecked(!securityChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setSecurityChecked(!securityChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={securityChecked} checked={securityChecked} onChange={() => {setSecurityChecked(!securityChecked)}} color={securityChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Security</span>
             </div>  
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setMessagesChecked(!messagesChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setMessagesChecked(!messagesChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={messagesChecked} checked={messagesChecked} onChange={() => {setMessagesChecked(!messagesChecked)}} color={messagesChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Messages</span>
             </div> 
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setNotificationsChecked(!notificationsChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setNotificationsChecked(!notificationsChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={notificationsChecked} checked={notificationsChecked} onChange={() => {setNotificationsChecked(!notificationsChecked)}} color={notificationsChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Notifications</span>
             </div> 
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setThemesChecked(!themesChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setThemesChecked(!themesChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={themesChecked} checked={themesChecked} onChange={() => {setThemesChecked(!themesChecked)}} color={themesChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Themes</span>
             </div>   
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setPostingChecked(!postingChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setPostingChecked(!postingChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={postingChecked} checked={postingChecked} onChange={() => {setPostingChecked(!postingChecked)}} color={postingChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Posting (Images, Videos, Vibes)</span>
             </div>
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setAddingChecked(!addingChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setAddingChecked(!addingChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={addingChecked} checked={addingChecked} onChange={() => {setAddingChecked(!addingChecked)}} color={addingChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
                <span style={styles.numberCommentText}>Adding/Removing Friends</span>
             </div>
-                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setOthersChecked(!othersChecked)}} style={styles.reportContainer}>
+                <div className='cursor-pointer ml-9 pt-10' onClick={() => {setOthersChecked(!othersChecked)}} style={styles.settingsReportContainer}>
                 <label>
                     <input type='checkbox' value={othersChecked} checked={othersChecked} onChange={() => {setOthersChecked(!othersChecked)}} color={othersChecked ? "#9EDAFF" : '#fafafa'}/>
                 </label>
