@@ -119,7 +119,7 @@ function CreateTheme({onStateChange}) {
       <div style={{marginLeft: '10%', marginRight: '10%'}}>
       
       
-      <PreviewFooter text={"CONTINUE"} onClickCancel={() => router.back()} onClick={handleClick}/>
+      <PreviewFooter text={"CONTINUE"} onClickCancel={() => router.push('All', {name: null})} onClick={handleClick}/>
         </div>
     </div>
   )

@@ -371,7 +371,8 @@ postHeader: {
       borderRadius: 5,
       flexDirection: 'row',
       display: 'flex',
-      width: '100%',
+      width: '65%',
+      marginLeft: '15%',
       marginBottom: 5,
       padding: 5,
       alignItems: 'center',
@@ -522,7 +523,7 @@ postHeader: {
     flexDirection: 'row',
       display: 'flex',
       flexWrap: 'wrap',
-      marginLeft: '5%'
+      marginLeft: '5%',
   },
   closeSend: {
     display: 'flex', 
@@ -565,8 +566,9 @@ postHeader: {
   },
   applyText: {
     fontSize: 15.36,
-      padding: 7.5,
-      textAlign: 'center'
+    padding: 7.5,
+    textAlign: 'center',
+    color: "#fafafa"
   },
   toggleView: {
     borderWidth: 2,
@@ -1152,9 +1154,9 @@ postHeader: {
   themeMainContainer: {
     display: 'grid', 
     flex: 1, 
-    overflow: 'hidden', 
+    overflowY: 'scroll',
     height: '100vh', 
-    gridTemplateColumns: '20vw 1fr'
+    gridTemplateColumns: '60vw 1fr'
   },
   optionHeader: {
     marginLeft: '5%', 
@@ -1199,7 +1201,7 @@ postHeader: {
     borderBottomWidth: 1,
     borderBottomColor: "#d3d3d3",
     padding: 10,
-    flexDirection: 'row',
+    display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '105%',
@@ -1304,5 +1306,18 @@ postHeader: {
     color: "#fafafa", 
     margin: '5%',
     textAlign: 'right'
+  },
+  settingsAddText: {
+    fontSize: 15.36,
+    color: "#fafafa",
+    padding: 7.5,
+    paddingLeft: 15,
+    maxWidth: '75%'
+  },
+  settingsReportContainer: {
+    flexDirection: 'row', 
+    display: 'flex', 
+    alignItems: 'center', 
+    marginLeft: '5%'
   }
 }

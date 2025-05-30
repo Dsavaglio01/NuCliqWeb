@@ -293,6 +293,8 @@ textarea {
 }
 .themeSidebar {
   width: 20vw;
+  position: sticky;
+  overflow: hidden;
    border-right: 0.5px solid #fafafa;  
 }
 .vidContainer {
@@ -307,7 +309,6 @@ textarea {
   align-items: center;
   justify-content: center;
   height: 80vh;
-  margin-top: 5%;
   scroll-snap-align: start;
 }
 
@@ -348,9 +349,9 @@ input[type="checkbox"] {
   background-color: transparent;
 }
 .recentThemes {
-  width: 50vw;
+  width: auto;
   align-items: center;
-  margin-left: 5vw;
+  margin-left: 27.5vw;
 }
 .activeDot {
   width: 10px;

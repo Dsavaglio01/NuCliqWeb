@@ -982,30 +982,6 @@ function GetThemes () {
     updatedThemes[objectIndex].transparent = false
     setTempPosts(updatedThemes)
   }
-  function itemToTransparent(item) {
-    const updatedMyThemes = [...myThemes];
-    const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
-    updatedMyThemes[objectIndex].transparent = true
-    setMyThemes(updatedMyThemes)
-  }
-  function itemPurchaseToTransparent(item) {
-    const updatedMyThemes = [...purchasedThemes];
-    const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
-    updatedMyThemes[objectIndex].transparent = true
-    setPurchasedThemes(updatedMyThemes)
-  }
-  function itemPurchaseNotToTransparent(item) {
-    const updatedMyThemes = [...purchasedThemes];
-    const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
-    updatedMyThemes[objectIndex].transparent = false
-    setPurchasedThemes(updatedMyThemes)
-  }
-  function itemNotToTransparent(item) {
-    const updatedMyThemes = [...myThemes];
-    const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
-    updatedMyThemes[objectIndex].transparent = false
-    setMyThemes(updatedMyThemes)
-  }
   async function applyToPosts() {
     console.log(chosenTheme.item.selling)
     //console.log(chosenTheme.item)
@@ -1248,8 +1224,7 @@ function GetThemes () {
           <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} 
           followers={profile ? profile.followers : []} following={profile ? profile.following : []}/>
       <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={true} post={false} video={false}/>
-         <div style={styles.themeMainContainer}>
-          <div className='themeSidebar'>
+         <div className='themeSidebar'>
               <div style={styles.themeHeader}>
                   
                   <p style={styles.headerText}>Themes</p>
@@ -1275,11 +1250,13 @@ function GetThemes () {
                   
               </div>
           </div>
+         <div style={styles.themeMainContainer} className=''>
+          
 
           {!createTheme && !uploadGuidelines && !preview && !successTheme && !priceSummary &&!addCard && !specificThemeState && !homePreview ? 
           <div>
             {searching ? <div className='flex justify-end m-10 mr-20' style={{display: 'flex'}}>
-                  <SearchInput width={'100%'} autoFocus={true} value={specificSearch} icon={'magnify'} placeholder={get ? 'Search Themes to Buy' : free ? 'Search Themes to Get' : my ? 'Search My Themes' : purchased ? 'Search Collected Themes' 
+                  <SearchInput width={'40%'} autoFocus={true} value={specificSearch} icon={'magnify'} placeholder={get ? 'Search Themes to Buy' : free ? 'Search Themes to Get' : my ? 'Search My Themes' : purchased ? 'Search Collected Themes' 
                   : null} onFocus={() => {setRecentSearches(true); setSearching(true)}} iconStyle={styles.postIcon}
                   containerStyle={{borderWidth: 1, borderColor: "#fafafa"}} onSubmitEditing={() => {setRecentSearches(false) }} text={searching ? true : false} onChangeText={setSpecificSearchFunction} 
                   onClick={() => {setSpecificSearch(''); setRecentSearches(true); setSearching(true)}}/>
@@ -1316,9 +1293,9 @@ function GetThemes () {
                         </div>
                     )
                   })}
-                  <div>
+                  <div className='flex justify-end'>
                   {
-                    recentSearches && searching ?
+                    recentSearches && searching && tempSearches.filter((obj, index, self) => index === self.findIndex((o) => o.searchId === obj.searchId)).reverse().length > 0 ?
                     
                     <RecentSearches data={tempSearches.filter((obj, index, self) => index === self.findIndex((o) => o.searchId === obj.searchId)).reverse()} 
                     get={get} free={free} my={my} purchased={purchased}
@@ -1330,7 +1307,7 @@ function GetThemes () {
                   </div>
                   </div>
         : null}
-           <div style={styles.main} className='overflow-x-auto'>
+           <div style={styles.main} className='overflow-x-auto overflow-scroll'>
             
 
               {!searching ? filteredGroup != null ? 
@@ -1339,12 +1316,15 @@ function GetThemes () {
           get == true && name == null && tempPosts.length > 0 ? tempPosts.map((item, index) => {
             if (tempPosts.length === index + 1) {
               return (
-                <ThemeComponent item={item} ref={lastElementRef} index={index} get={get} free={free} purchased={purchased} my={my}/>
+                <ThemeComponent item={item} user={user} ref={lastElementRef} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} reportedThemes={reportedThemes}
+                 index={index} get={get} free={free} purchased={purchased} my={my}/>
             )
             }
             else {
               return (
-                <ThemeComponent item={item} ref={null} index={index} get={get} free={free} purchased={purchased} my={my}/>
+                <ThemeComponent item={item} user={user} ref={null} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes} reportedThemes={reportedThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} index={index} get={get} free={free} purchased={purchased} my={my}/>
               )
             }
           }) :
@@ -1353,38 +1333,44 @@ function GetThemes () {
           freeTempPosts.map((item, index) => {
             if (freeTempPosts.length === index + 1) {      
             return (
-                <ThemeComponent ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent user={user} ref={lastElementRef} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-                 <ThemeComponent ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                 <ThemeComponent user={user} ref={null} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
-          : my && myThemes.length > 0 ? 
+          : my && myThemes && myThemes.length > 0 ? 
          myThemes.map((item, index) => {
             if (myThemes.length === index + 1) {      
             return (
-               <ThemeComponent ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+               <ThemeComponent user={user} ref={lastElementRef} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-               <ThemeComponent ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+               <ThemeComponent user={user} ref={null} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })
-          : purchased && purchasedThemes.length > 0 ?
+          : purchased && purchasedThemes && purchasedThemes.length > 0 ?
           purchasedThemes.map((item, index) => {
             if (purchasedThemes.length === index + 1) {      
             return (
-                <ThemeComponent ref={lastElementRef} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent user={user} ref={lastElementRef} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
             ) 
             }
             else {
               return (
-                <ThemeComponent ref={null} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
+                <ThemeComponent user={user} ref={null} reportedThemes={reportedThemes} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
+                setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} item={item} index={index} get={get} free={free} my={my} purchased={purchased}/>
               )
             }
           })

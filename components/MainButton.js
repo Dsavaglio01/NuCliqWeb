@@ -13,6 +13,7 @@ const MainButton = ({text, onClick}) => {
         fontWeight: '700',
         paddingLeft: 25,
         paddingRight: 25,
+        paddingTop: 15,
         textAlign: 'center'
     }
   return (

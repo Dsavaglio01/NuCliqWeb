@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { styles } from '@/styles/styles';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
-function ThemeComponent({item, index, get, free, my, purchased, ref, specificThemeStateTrue, specificThemeId, specificState, specificUsername}) {
+function ThemeComponent({item, user, index, get, free, my, purchased, ref, myThemes, setMyThemes, purchasedThemes, setPurchasedThemes, freeTempPosts, setFreeTempPosts,
+  specificThemeStateTrue, specificThemeId, specificState, specificUsername, reportedThemes}) {
+    const [chosenTheme, setChosenTheme] = useState(null);
     const handleSpecificThemeState = () => {
         specificThemeStateTrue();
     }
@@ -14,6 +16,42 @@ function ThemeComponent({item, index, get, free, my, purchased, ref, specificThe
     const handleSpecificUsername = (username) => {
         specificUsername();
     }
+    function itemToTransparent(item) {
+        const updatedMyThemes = [...myThemes];
+        const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
+        updatedMyThemes[objectIndex].transparent = true
+        setMyThemes(updatedMyThemes)
+      }
+    function itemPurchaseToTransparent(item) {
+      const updatedMyThemes = [...purchasedThemes];
+      const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
+      updatedMyThemes[objectIndex].transparent = true
+      setPurchasedThemes(updatedMyThemes)
+    }
+    function itemPurchaseNotToTransparent(item) {
+      const updatedMyThemes = [...purchasedThemes];
+      const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
+      updatedMyThemes[objectIndex].transparent = false
+      setPurchasedThemes(updatedMyThemes)
+    }
+    function itemNotToTransparent(item) {
+      const updatedMyThemes = [...myThemes];
+      const objectIndex = updatedMyThemes.findIndex(obj => obj.id === item.id)
+      updatedMyThemes[objectIndex].transparent = false
+      setMyThemes(updatedMyThemes)
+    }
+    function itemFreeToTransparent(item) {
+    const updatedThemes = [...freeTempPosts];
+    const objectIndex = updatedThemes.findIndex(obj => obj.id === item.id)
+    updatedThemes[objectIndex].transparent = true
+    setFreeTempPosts(updatedThemes)
+  }
+  function itemFreeNotToTransparent(item) {
+    const updatedThemes = [...freeTempPosts];
+    const objectIndex = updatedThemes.findIndex(obj => obj.id === item.id)
+    updatedThemes[objectIndex].transparent = false
+    setFreeTempPosts(updatedThemes)
+  }
   return (
       <div ref={ref} key={item.id} style={styles.themeContainer} className='max-w-full'>
       <div className='cursor-pointer' onClick={get ? () => {handleSpecificThemeState(); handleSpecificId(item.id); handleSpecificState('get'); handleSpecificUsername(item.username)} :
@@ -36,7 +74,7 @@ function ThemeComponent({item, index, get, free, my, purchased, ref, specificThe
           onClick={get ? () =>{itemAllNotToTransparent(item); setChosenTheme(null)} : free ? () => {itemFreeNotToTransparent(item); setChosenTheme(null)} : my ?
             () => {itemNotToTransparent(item); setChosenTheme(null)} : purchased ? () => {itemPurchaseNotToTransparent(item); setChosenTheme(null)}: null}>
             <p style={styles.closeText}>Close</p>
-            <XMarkIcon className='navBtn'/>
+            <XMarkIcon className='navBtn' color='#fafafa'/>
           </div>
           <div style={styles.themeOptionsContainer}>
             {free || get ? 
@@ -46,11 +84,11 @@ function ThemeComponent({item, index, get, free, my, purchased, ref, specificThe
               <div className='cursor-pointer' style={styles.applyContainer} onClick={() => setSendingModal(true)}>
                 <p style={styles.applyText}>Share Theme</p>
               </div>
-              {!free ? item.stripe_metadata_userId && item.stripe_metadata_userId != user.uid && !reportedThemes.includes(item.item.id) ? 
+              {!free ? item.stripe_metadata_userId && item.stripe_metadata_userId != user.uid && !reportedThemes.includes(item.id) ? 
               <div className='cursor-pointer' style={styles.applyContainer} onClick={() => setReportModal(true)}>
                 <p style={styles.applyText}>Report Theme</p>
               </div>
-              : null : item.userId && item.userId != user.uid && !reportedThemes.includes(item.item.id) ? 
+              : null : item.userId && item.userId != user.uid && !reportedThemes.includes(item.id) ? 
               <div className='cursor-pointer' style={styles.applyContainer} onClick={() => setReportModal(true)}>
                 <p style={styles.applyText}>Report Theme</p>
               </div>
