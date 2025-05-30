@@ -441,11 +441,11 @@ postHeader: {
   },
   themeHeader: {
     flexDirection: 'row',
-        alignItems: 'center',
-        display: 'flex',
-        paddingTop: '8%',
-        marginLeft: '5%',
-        marginRight: '5%'
+    alignItems: 'center',
+    display: 'flex',
+    paddingTop: '8%',
+    marginLeft: '5%',
+    marginRight: '5%'
   },
   headerText: {
     fontSize: 24,
@@ -826,6 +826,8 @@ postHeader: {
   },
   videoContainer: {
     height: '100vh',
+    overflow: 'hidden',
+    marginTop: '4%',
     overflowY: 'auto'
   },
   sendingCheck: {
@@ -1269,8 +1271,38 @@ postHeader: {
     cursor: true
   },
   messageContainer: {
-    color: '#fff', 
+    color: '#fafafa', 
     fontSize: 15.36,
     paddingBottom: 5,
+  },
+  settingsPostContainer: {
+    borderRadius: 5, 
+    width: '18vw',
+    height: 300 / 1.015625
+  },
+  settingsPostTextContainer: {
+    borderRadius: 5, 
+    width: '18vw',
+    height: 300 / 1.015625,
+    backgroundColor: "#fafafa"
+  },
+  settingsBottomText: {
+    fontSize: 15.36,
+    padding: 10,
+    paddingLeft: 5,
+    color: "#fff"
+  },
+  tapToReceiveText: {
+    fontSize: 15.36,
+    padding: 5,
+    marginLeft: '10%',
+    paddingBottom: 10,
+    color: "#fff"
+  },
+  settingsEditText: {
+    fontSize: 15.36,
+    color: "#fafafa", 
+    margin: '5%',
+    textAlign: 'right'
   }
 }

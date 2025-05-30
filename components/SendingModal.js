@@ -70,7 +70,6 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
       const handleCaption = (event) => {
     setCaption(event.target.value)
 }
-console.log(friendsInfo)
   return (
     <ReactModal isOpen={sendingModal} style={{content: styles.modalContainer}}>
          <div className='flex flex-col'>

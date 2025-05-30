@@ -306,7 +306,8 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 90vh;
+  height: 80vh;
+  margin-top: 5%;
   scroll-snap-align: start;
 }
 

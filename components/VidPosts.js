@@ -102,6 +102,7 @@ function VidPosts({profile}) {
       loadPosts();
     }
   }, [meet, reloadPage, profile.blockedUsers]);
+  console.log(tempPosts.length)
     useEffect(() => {
     if (bottomObserver.current) {
       const observer = new IntersectionObserver(entries => {

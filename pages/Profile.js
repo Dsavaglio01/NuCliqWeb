@@ -64,7 +64,7 @@ function Profile() {
   }, [user?.uid]);
   if (profile) {
      return (
-    <ProfileComponent viewing={false} profile={profile} person={user} preview={null} previewMade={null} />
+    <ProfileComponent viewing={false} profile={profile} person={profile} preview={null} previewMade={null} />
   )
   }
  

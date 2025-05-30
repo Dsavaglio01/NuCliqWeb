@@ -55,7 +55,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
 
     fetchPostExistence();
   }, [focusedItem]);
-  useEffect(() => {
+  /* useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
@@ -70,7 +70,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, []); */
   useEffect(() => {
     if (focusedItem != null) {
       setCommentModal(true)

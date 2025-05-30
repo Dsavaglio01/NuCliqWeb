@@ -24,8 +24,10 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
     const [numberOfPosts, setNumberOfPosts] = useState(0);
     const [numberOfReposts, setNumberOfReposts] = useState(0);
     const [reposts, setReposts] = useState([]);
-    const [following, setFollowing] = useState([]);
-    const [followers, setFollowers] = useState([]);
+    /* const [following, setFollowing] = useState(0);
+    const [followers, setFollowers] = useState(0); */
+    const [previewImage, setPreviewImage] = useState(null);
+    const [background, setBackground] = useState(null);
     const [lastVisible, setLastVisible] = useState(null);
     const [loading, setLoading] = useState(true);
     const [settingsShown, setSettingsShown] = useState(false);
@@ -154,7 +156,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                             </div> : 
                         null}
                         <div>
-                            <img src={!loading ? previewImage ? previewImage : background ? background : require('../assets/Default_theme.jpg') : null} 
+                            <img src={!loading ? previewImage ? previewImage : person.background ? person.background : require('../assets/Default_theme.jpg') : null} 
                             style={styles.profileHeaderContainer}/>
                             <div style={{display: 'flex'}}>
                                 <div style={{width: '77.5%'}}>
@@ -220,12 +222,12 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                                         <p style={styles.headerSupplementText}>{numberOfReposts == 1 ? 'Repost' : 'Reposts'}</p>
                                     </div>
                                     <div style={styles.noOfPosts} className='cursor-pointer'>
-                                        <p style={styles.profileHeaderText}>{following > 999 && following < 1000000 ? `${following / 1000}k` : following > 999999 ? `${following / 1000000}m` : following}</p>
+                                        <p style={styles.profileHeaderText}>{person.following.length > 999 && person.following.length < 1000000 ? `${person.following.length / 1000}k` : person.following.length > 999999 ? `${person.following.length / 1000000}m` : person.following.length}</p>
                                         <p style={styles.headerSupplementText}>{'Following'}</p>
                                     </div>
                                     <div style={styles.noOfPosts} className='cursor-pointer'>
-                                        <p style={styles.profileHeaderText}>{followers > 999 && followers < 1000000 ? `${followers / 1000}k` : followers > 999999 ? `${followers / 1000000}m` : followers}</p>
-                                        <p style={styles.headerSupplementText}>{followers == 1 ? 'Follower' : 'Followers'}</p>
+                                        <p style={styles.profileHeaderText}>{person.followers.length > 999 && person.followers.length < 1000000 ? `${person.followers.length / 1000}k` : person.followers.length > 999999 ? `${person.followers.length / 1000000}m` : person.followers.length}</p>
+                                        <p style={styles.headerSupplementText}>{person.followers.length == 1 ? 'Follower' : 'Followers'}</p>
                                     </div>
                                     
                                 </div>

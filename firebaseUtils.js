@@ -2,6 +2,8 @@ import { db } from '@/firebase'
 import { getDoc, doc, collection, where, onSnapshot, setDoc, getDocs, startAfter, arrayUnion, serverTimestamp, documentId, updateDoc, 
   arrayRemove, increment, orderBy, limit, startAt, endAt, query, getCountFromServer} from 'firebase/firestore';
 import { schedulePushLikeNotification } from './notificationFunctions';
+import { getAuth, signOut } from 'firebase/auth';
+const auth = getAuth();
 /**
  * Checks if a post can be shared
  * @param {string} itemId - The id of the post to check.
@@ -1733,4 +1735,13 @@ export const fetchRecentSearches = (actualRecentSearches) => {
   })
   return tempSearches;
 }
-
+export const logOut = async(userId) => {
+  if (!userId) {
+    throw new Error('userId is not defined')
+  }
+  await updateDoc(doc(db, 'profiles', userId),{
+    notificationToken: null
+  }).then(() => signOut(auth).catch((error) => {
+    throw error;
+  }))
+}

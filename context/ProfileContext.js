@@ -19,7 +19,6 @@ export const ProfileProvider = ({ children }) => {
         fetchProfileData();
     }
   }, [user?.uid]);
-  console.log(profile)
   return (
     <ProfileContext.Provider value={profile}>
       {children}
