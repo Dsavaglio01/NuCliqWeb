@@ -636,6 +636,7 @@ export const getProfileDetails = async(userId) => {
         lastName: data.lastName,
         postBackground: data.postBackground,
         background: data.background,
+        bannedFrom: data.bannedFrom,
         blockedUsers: data.blockedUsers,
         notificationToken: data.notificationToken,
       };
@@ -1744,4 +1745,34 @@ export const logOut = async(userId) => {
   }).then(() => signOut(auth).catch((error) => {
     throw error;
   }))
+}
+export const fetchCliqs = async(bannedFrom) => {
+  const posts = [];
+  let fetchedCount = 0;
+  try {
+    const q = query(collection(db, 'groups'), orderBy('timestamp', 'desc'), limit(10 - posts.length));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      if (!bannedFrom.includes(doc.id)) {
+        posts.push({ id: doc.id, transparent: false, ...doc.data() });
+      } else {
+        fetchedCount++;
+      }
+    });
+    // Fetch more posts if all initial ones are blocked
+    if (fetchedCount === 3 && posts.length === 0) {
+      const nextQuery = query(collection(db, 'groups'), orderBy('timestamp', 'desc'), 
+      startAfter(querySnapshot.docs[querySnapshot.docs.length - 1]), limit(10 - posts.length)
+      );
+      const nextSnapshot = await getDocs(nextQuery);
+      nextSnapshot.forEach((doc) => {
+        posts.push({ id: doc.id, transparent: false, ...doc.data() });
+      });
+    }
+
+    return { posts, lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1] };
+  }
+  catch (e) {
+    console.error(e)
+  }
 }

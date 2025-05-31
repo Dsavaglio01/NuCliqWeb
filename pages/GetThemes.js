@@ -1213,7 +1213,6 @@ function GetThemes () {
   function setSpecificSearchFunction(event) {
     setSpecificSearch(event.target.value)
   }
-  console.log(fullTheme)
   return (
     <ProtectedRoute>
         <Head>
