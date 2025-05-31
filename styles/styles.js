@@ -1325,5 +1325,43 @@ postHeader: {
   fullTheme: {
     width: '100%',
     height: '90%'
+  },
+  themeOverlay: {
+    position: 'relative',
+    bottom: '90%',
+    height: '90%',
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  previewButton: {
+    borderRadius: 8,
+    backgroundColor: "#121212",
+    marginBottom: 20,
+    alignItems: 'center',
+    padding: 10
+  },
+  previewText: {
+    color: "#9edaff",
+    fontSize: 15.36,
+    fontWeight: '700',
+    paddingVertical: 10
+  },
+  sorryNoThemeText: {
+    padding: 10,
+    color: "#fafafa",
+    fontSize: 19.20,
+    margin: 5,
+    fontWeigtht: '600',
+    textAlign: 'center',
+  },
+  purchaseButton: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '80%',
+    marginTop: '-2.5%'
   }
 }
