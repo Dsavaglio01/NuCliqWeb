@@ -363,7 +363,7 @@ function Settings() {
                 <p style={styles.bottomText}>Log Out</p>
             </div>
             <div className='cursor-pointer'>
-                <p style={[styles.bottomText, {color: 'red'}]}>Delete Account</p>
+                <p style={{...styles.bottomText, ...{color: 'red'}}}>Delete Account</p>
             </div>
         </div>
         

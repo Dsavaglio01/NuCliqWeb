@@ -77,11 +77,11 @@ const Login = () => {
       <div style={styles.signUpMain}>
         <div onClick={() => signInApple()} className={'flex items-center p-2 rounded-3xl mt-10 px-5 border w-64 cursor-pointer'}>
         <FaApple className='navBtn' style={{color: "#fafafa"}}/>
-        <span style={{marginLeft: 'auto', fontSize: 19.20, color: "#fafafa", cursor: true}}>Continue with Apple</span>
+        <span style={styles.continue}>Continue with Apple</span>
       </div>
         <div onClick={() => signInGoogle()} className={'flex items-center p-2 rounded-3xl mt-10 px-5 border w-64 cursor-pointer'}>
           <FaGoogle className='navBtn' style={{color: "#fafafa"}}/>
-          <span style={{marginLeft: 'auto', fontSize: 19.20, color: "#fafafa", cursor: true}}>Continue with Google</span>
+          <span style={styles.continue}>Continue with Google</span>
         </div>
     </div>
     <div className='mt-10'>

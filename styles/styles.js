@@ -1363,5 +1363,14 @@ postHeader: {
     alignItems: 'center',
     width: '80%',
     marginTop: '-2.5%'
+  },
+  bottomText: {
+
+  },
+  continue: {
+    marginLeft: 'auto', 
+    fontSize: 15.36, 
+    color: "#fafafa", 
+    cursor: true
   }
 }
