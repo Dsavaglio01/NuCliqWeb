@@ -166,9 +166,8 @@ function GroupPage() {
                   reg == true && tempPosts.length > 0 ? tempPosts.map((item, index) => {
                     if (tempPosts.length === index + 1) {
                       return (
-                        <GroupComponent item={item} user={user} ref={lastElementRef} freeTempPosts={freeTempPosts} setFreeTempPosts={setFreeTempPosts} myThemes={myThemes}
-                        setMyThemes={setMyThemes} purchasedThemes={purchasedThemes} setPurchasedThemes={setPurchasedThemes} reportedThemes={reportedThemes} specificThemeId={(id) => setSpecificId(id)}
-                        specificThemeStateTrue={(item) => setFullTheme([item])} index={index} get={get} free={free} purchased={purchased} my={my} 
+                        <GroupComponent item={item} user={user} ref={lastElementRef} tempPosts={tempPosts} specificThemeId={(id) => setSpecificId(id)}
+                        specificThemeStateTrue={(item) => setFullTheme([item])} index={index}
                         specificState={(state) => setSpecificState(state)} specificUsername={(username) => setSpecificUsername(username)}/>
                     )
                     }

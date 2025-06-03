@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from '@heroicons/react/24/solid'
 import React, { useState, useMemo, useContext } from 'react'
 import Switch from 'react-switch';
-import { updateDoc, doc, getDoc, query, addDoc, serverTimestamp, collection, arrayRemove, getDocs, orderBy, limit, startAfter} from 'firebase/firestore';
+import { doc, getDoc} from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/router';
@@ -10,7 +10,7 @@ import NextButton from '@/components/NextButton';
 import TransactionHistory from './TransactionHistory';
 import ProfileContext from '@/context/ProfileContext';
 import { styles } from '@/styles/styles';
-import { logOut } from '@/firebaseUtils';
+import { fetchSettingsContent, logOut, unBlock, sendReport, statusFunction, allowNotificationsFunction, privacyFunction } from '@/firebaseUtils';
 function Settings() {
   const profile = useContext(ProfileContext);
     const {user} = useAuth();
@@ -35,199 +35,37 @@ function Settings() {
     const [addingChecked, setAddingChecked] = useState(false);
     const [othersChecked, setOthersChecked] = useState(false);
     const router = useRouter();
-    async function unBlock(item) {
-      await updateDoc(doc(db, 'profiles', user.uid), {
-      blockedUsers: arrayRemove(item.id)
-    }).then(async() => await updateDoc(doc(db, 'profiles', item.id), {
-      usersThatBlocked: arrayRemove(user.uid)
-    })).then(() => setPosts(posts.filter((e) => e.id != item.id)))
-    }
-     useMemo(() => {
-
-    if (contentState == 'My Likes') {
+    useMemo(() => {
       setPosts([]);
-      const getLikes = async() => {
-        const first = query(collection(db, "profiles", user.uid, 'likes'), orderBy('timestamp', 'desc'), limit(10));
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        console.log(querySnapshot.docs.length)
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          if (document.data().video) {
-            const secondSnap = await getDoc(doc(db, 'videos', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-          }
-          else {
-            const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-          }
-          
-        });
-      }
-      
-      getLikes()
-      setTimeout(() => {
-            setLoading(false)
-          }, 1000);
-          
-    }
-    else  if (contentState == 'mentions') {
-          setPosts([]);
-      const getLikes = async() => {
-        const first = query(collection(db, "profiles", user.uid, 'mentions'), orderBy('timestamp', 'desc'), limit(10));
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          if (document.data().video) {
-            const secondSnap = await getDoc(doc(db, 'videos', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-          }
-          else {
-            const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-          }
-          
-        });
-      }
-      getLikes()
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000);
-        } 
-        else if (contentState == 'comments') {
-          const getLikes = async () => {
-    try {
-      setPosts([]);  // Clear posts only if you need to refresh the list
-      const first = query(collection(db, "profiles", user.uid, 'comments'), orderBy('timestamp', 'desc'), limit(10));
-      const querySnapshot = await getDocs(first);
-      
-      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      
-      // Use Promise.all to wait for all documents to be processed
-      const postPromises = querySnapshot.docs.map(document => {
-        return { id: document.id, ...document.data() };
-      });
-      
-      const resolvedPosts = await Promise.all(postPromises);
-      setPosts(prevState => [...prevState, ...resolvedPosts]);  // Batch update once
-
-      // Delay to simulate loading or complete loading flag
-      setTimeout(() => setPostDone(true), 1000);
-    } catch (error) {
-      console.error("Error fetching posts: ", error);
-    }
-  };
-
-  getLikes();
-          
-        } else if (contentState == 'saves') {
-                setPosts([]);
-                new Promise(resolve => {
-      const getLikes = async() => {
-        
-        const first = query(collection(db, "profiles", user.uid, 'saves'), orderBy('timestamp', 'desc'), limit(10));
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        querySnapshot.forEach(async(document) => {
-          //console.log(document.id)
-          //console.log(doc.id)
-          if (document.data().video) {
-            const secondSnap = await getDoc(doc(db, 'videos', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-          }
-          else {
-            const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-          }
-        });
-        
-      
-      }
-      getLikes()
-      resolve()
-      }).finally(() => setLoading(false))
-      
+      if (contentState == 'My Likes') {
+        const getLikes = async() => {
+          const {posts, lastVisible} = await fetchSettingsContent(user.uid, 'likes')
+          setPosts(posts)
+          setLastVisible(lastVisible)
         }
-        else if (contentState == 'cards') {
-          const getCards = async() => {
-            const docSnap = await getDoc(doc(db, 'profiles', user.uid))
-            if (docSnap.exists()) {
-              //console.log(docSnap.data().paymentMethodLast4)
-              setEditedCards(docSnap.data().paymentMethodLast4)
-            }
-            /* if (docSnap.exists()) {
-              setEditedCards(docSnap)
-            } */
-            
-          }
-          getCards()
-        }
-        else if (contentState == 'blocked') {
-          const getUsers = async() => {
-            let blockedUsers = (await getDoc(doc(db, 'profiles', user.uid))).data().blockedUsers
-            blockedUsers.forEach(async(item) => {
-              let user = await getDoc(doc(db, 'profiles', item))
-              setPosts(prevState => [...prevState, {id: user.id, ...user.data()}])
-            })
-            
-            //setPosts(blockedUsers)
-          } 
-          getUsers()
-          //await getDoc(doc(db, ))
-          //etPosts(await getDoc(doc(db, profiles)))
-        }
-    }, [contentState])
-     const sendReport = () => {
-    addDoc(collection(db, 'feedback'), {
-      userId: user.uid,
-      timestamp: serverTimestamp(),
-      category: bugChecked ? 'Bugs/Errors' : uxChecked ? 'User Experience' : securityChecked ? 'Security' : messagesChecked ? 'Messages' : notificationsChecked ? 'Notifications' : themesChecked ? 'Themes' : postingChecked ? 'Posting(Images, Videos, Vibes)' : addingChecked ? 'Adding/Removing Friends' : othersChecked ? 'Other' : null,
-      feedback: report
-    }).then(() => setSentReport(true))
-  }
-    function fetchMoreData() {
-      //console.log('b')
-      if (lastVisible != undefined) {
-          setLoading(true)
-           const getLikes = async() => {
-            const first = query(collection(db, "profiles", user.uid, 'likes'), orderBy('timestamp', 'desc'), startAfter(lastVisible), limit(10))
-        const querySnapshot = await getDocs(first);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1])
-        querySnapshot.forEach(async(document) => {
-          //console.log(doc.id)
-          const secondSnap = await getDoc(doc(db, 'posts', document.id));
-                  if (secondSnap.exists()) {
-                    setPosts(prevState => [...prevState, {id: secondSnap.id, ...secondSnap.data()}])
-                    // Render the new post here using the data from secondSnap
-                  }
-        });
+        getLikes()
       }
-          //console.log(tempPosts)
-          getLikes();
-          setTimeout(() => {
-                    setLoading(false)
-                  }, 1000);
-                }
-    }
+      else if (contentState == 'mentions') {
+        const getMentions = async() => {
+          const {posts, lastVisible} = await fetchSettingsContent(user.uid, 'mentions')
+          setPosts(posts)
+          setLastVisible(lastVisible)
+        }
+        getMentions()
+      } 
+      else if (contentState == 'saves') {
+        const getSaves = async() => {
+          const {posts, lastVisible} = await fetchSettingsContent(user.uid, 'saves')
+          setPosts(posts)
+          setLastVisible(lastVisible)
+        }
+        getSaves()
+      }
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000);
+    
+    }, [contentState]) // still need to modularize comments, card info and blocked users as well as fetch more data
     useMemo(() => {
       if (postDone && contentState == 'comments') {
     const processPosts = async () => {
@@ -262,33 +100,10 @@ function Settings() {
     processPosts();
   }
     }, [postDone, posts, contentState])
-    async function activeFunction() {
-        await updateDoc(doc(db, 'profiles', user.uid), {
-            showStatus: !activityEnabled
-        }).then(() => setActivityEnabled(previousState => !previousState))
-    }
-    async function notificationFunction() {
-        if (profile.notificationToken != null) {
-            await updateDoc(doc(db, 'profiles', user.uid), {
-            allowNotifications: !isEnabled
-        }).then(() => setIsEnabled(previousState => !previousState))
-        }
-        else {
-            console.log('first')
-            getData();
-        }
-        
-    }
     const handleReport = (inputText) => {
     const sanitizedText = inputText.replace(/\n/g, ''); // Remove all new line characters
     setReport(sanitizedText);
   }
-    async function privateFunction() {
-        //console.log('first')
-        await updateDoc(doc(db, 'profiles', user.uid), {
-            private: !privacyEnabled
-        }).then(() => setPrivacyEnabled(previousState => !previousState))
-    }
   return (
      <div className='flex flex-row'>
     <div className='settingsSidebar'>
@@ -329,18 +144,21 @@ function Settings() {
              <div className='cursor-pointer' style={styles.sections}>
                 <p style={styles.pushNotiText}>Show Active Status</p>
                 <Switch checked={activityEnabled} checkedIcon={false} uncheckedIcon={false}
-                 onColor={'#005278'} offColor='#767577' onHandleColor='#f4f3f4' offHandleColor='#f4f3f4' onChange={activeFunction} value={activityEnabled}/>
+                 onColor={'#005278'} offColor='#767577' onHandleColor='#f4f3f4' offHandleColor='#f4f3f4' 
+                 onChange={() => statusFunction(user.uid, activityEnabled, setActivityEnabled)} value={activityEnabled}/>
             </div>
             <div className='cursor-pointer' style={styles.sections}>
                 <p style={styles.pushNotiText}>Push Notifications</p>
                 <Switch checked={isEnabled} checkedIcon={false} uncheckedIcon={false}
-                 onColor={'#005278'} offColor='#767577' onHandleColor='#f4f3f4' offHandleColor='#f4f3f4' onChange={notificationFunction} value={isEnabled}/>
+                 onColor={'#005278'} offColor='#767577' onHandleColor='#f4f3f4' offHandleColor='#f4f3f4' onChange={() => allowNotificationsFunction(user.uid, isEnabled,
+                  profile.notificationToken, setIsEnabled)} value={isEnabled}/>
             </div>
             <p style={styles.tapToReceiveText}>Tap to Receive Notifications</p>
             <div className='cursor-pointer' style={styles.sections}>
                 <p style={styles.pushNotiText}>Private Account</p>
                 <Switch checked={privacyEnabled} checkedIcon={false} uncheckedIcon={false}
-                 onColor={'#005278'} offColor='#767577' onHandleColor='#f4f3f4' offHandleColor='#f4f3f4' onChange={privateFunction} value={privacyEnabled}/>
+                 onColor={'#005278'} offColor='#767577' onHandleColor='#f4f3f4' offHandleColor='#f4f3f4' 
+                 onChange={() => privacyFunction(user.uid, privacyEnabled, setPrivacyEnabled)} value={privacyEnabled}/>
             </div>
             <p style={styles.tapToReceiveText}>Tap to Make Account Private</p>
              <div className='cursor-pointer' style={styles.sections}>
@@ -428,7 +246,7 @@ function Settings() {
                 </button>
                 </div>
               <div style={{ marginLeft: 'auto', marginRight: '1%'}}>
-                <NextButton text={"Un-Block"} textStyle={{fontSize: 12.29}} onClick={() => unBlock(item)}/>
+                <NextButton text={"Un-Block"} textStyle={{fontSize: 12.29}} onClick={() => unBlock(item.id, user.uid, posts, setPosts)}/>
               </div>
             </div>
           </div> 
@@ -503,7 +321,9 @@ function Settings() {
             <textarea maxLength={200} style={{width: '50%', backgroundColor: "#121212", color: "#fafafa", borderWidth: 1, borderRadius: 5, alignSelf: 'center', padding: 5}} placeholder='Add Comment Here...' value={report} onChange={(e) => handleReport(e.target.value)}/>
         <span style={styles.editText}>{report.length}/200</span>
         <div style={{margin: '5%', marginTop: 0}}>
-            <NextButton text={"Send Report"} onClick={report.length > 0 && (bugChecked || uxChecked || addingChecked || othersChecked || themesChecked || postingChecked || messagesChecked || securityChecked || notificationsChecked) ? () => sendReport() : null}/>
+            <NextButton text={"Send Report"} onClick={report.length > 0 && (bugChecked || uxChecked || addingChecked || othersChecked || themesChecked || postingChecked || messagesChecked || securityChecked || notificationsChecked) 
+              ? () => sendReport(user.uid, bugChecked, uxChecked, securityChecked, messagesChecked, notificationsChecked, themesChecked, postingChecked, addingChecked,
+                othersChecked, report, setSentReport) : null}/>
         </div>
         
         </div>}

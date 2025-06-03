@@ -1,9 +1,73 @@
 import { db } from '@/firebase'
 import { getDoc, doc, collection, where, onSnapshot, setDoc, getDocs, startAfter, arrayUnion, serverTimestamp, documentId, updateDoc, 
-  arrayRemove, increment, orderBy, limit, startAt, endAt, query, getCountFromServer} from 'firebase/firestore';
+  arrayRemove, increment, orderBy, limit, startAt, endAt, query, getCountFromServer, addDoc,
+  writeBatch} from 'firebase/firestore';
 import { schedulePushLikeNotification } from './notificationFunctions';
 import { getAuth, signOut } from 'firebase/auth';
 const auth = getAuth();
+export const allowNotificationsFunction = async(userId, isEnabled, notificationToken, setIsEnabled) => {
+  if (notificationToken != null) {
+    await updateDoc(doc(db, 'profiles', userId), {
+      allowNotifications: !isEnabled
+    }).then(() => setIsEnabled(previousState => !previousState))
+  }
+}
+export const statusFunction = async(userId, activityEnabled, setActivityEnabled) => {
+  await updateDoc(doc(db, 'profiles', userId), {
+    showStatus: !activityEnabled
+  }).then(() => setActivityEnabled(previousState => !previousState))
+}
+export const sendReport = (userId, bugChecked, uxChecked, securityChecked, messagesChecked, notificationsChecked, themesChecked, postingChecked, 
+  addingChecked, othersChecked, report, setSentReport) => {
+  addDoc(collection(db, 'feedback'), {
+    userId: userId,
+    timestamp: serverTimestamp(),
+    category: bugChecked ? 'Bugs/Errors' : uxChecked ? 'User Experience' : securityChecked ? 'Security' : messagesChecked ? 'Messages' 
+    : notificationsChecked ? 'Notifications' : themesChecked ? 'Themes' : postingChecked ? 'Posting(Images, Videos, Vibes)' 
+    : addingChecked ? 'Adding/Removing Friends' : othersChecked ? 'Other' : null,
+    feedback: report
+  }).then(() => setSentReport(true))
+}
+export const fetchSettingsContent = async(userId, collectionName) => {
+  if (!userId) {
+    throw new Error("Error: 'userId' or 'collectionName' is undefined.")
+  }
+  const first = query(collection(db, "profiles", userId, collectionName), orderBy('timestamp', 'desc'), limit(10));
+  const querySnapshot = await getDocs(first);
+  const posts = []
+  querySnapshot.forEach(async(document) => {
+    if (document.data().video) {
+      const secondSnap = await getDoc(doc(db, 'videos', document.id));
+      if (secondSnap.exists()) {
+        posts.push({id: secondSnap.id, ...secondSnap.data()})
+      }
+    }
+    else {
+      const secondSnap = await getDoc(doc(db, 'posts', document.id));
+      if (secondSnap.exists()) {
+        posts.push({id: secondSnap.id, ...secondSnap.data()})
+      }
+    }
+  });
+  return {posts: posts, lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
+}
+export const unBlock = async(itemId, userId, posts, setPosts) => {
+  if (!itemId || !userId) {
+    throw new Error("Error: 'userId' or 'itemId' is undefined.")
+  }
+  try {
+    const batch = writeBatch(db);
+    const userRef = doc(db, 'profiles', userId);
+    const itemRef = doc(db, 'profiles', itemId);
+    batch.update(userRef, {blockedUsers: arrayRemove(itemId)})
+    batch.update(itemRef, {usersThatBlocked: arrayRemove(userId)})
+    await batch.commit();
+    setPosts(posts.filter((e) => e.id != itemId))
+  }
+  catch (error) {
+    console.error(error)
+  }
+} 
 /**
  * Checks if a post can be shared
  * @param {string} itemId - The id of the post to check.

@@ -5,10 +5,11 @@ import RequestedIcon from '../RequestedIcon';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { FaUserPlus } from "react-icons/fa";
 import { FaC, FaCheck } from "react-icons/fa6";
-function GroupComponent({item, user, groupsJoined, ref}) {
+function GroupComponent({item, user, groupsJoined, ref, index, tempPosts}) {
     const requests = [] // change this later
     const [chosenClique, setChosenClique] = useState(null);
   return (
+
     <div style={styles.posting} ref={ref}>
       <button style={{alignItems: 'flex-start', flexDirection: 'row'}}>
         <Image source={item.banner} style={{height: 50, width: 50, borderRadius: 10, marginTop: 5}}/>
