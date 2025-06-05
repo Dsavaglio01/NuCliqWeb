@@ -1366,9 +1366,6 @@ postHeader: {
     width: '80%',
     marginTop: '-2.5%'
   },
-  bottomText: {
-
-  },
   continue: {
     marginLeft: 'auto', 
     fontSize: 15.36, 

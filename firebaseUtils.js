@@ -7,15 +7,23 @@ import { getAuth, signOut } from 'firebase/auth';
 import { linkUsernameAlert, profanityUsernameAlert } from './lib/alert';
 import { schedulePushCommentNotification } from './notificationFunctions';
 const auth = getAuth();
+/**
+ * Applies theme to a user's Posts, Profiles or Both
+ * @param {string} posts - If Posts is true, apply to Posts.
+ * @param {string} profile - If Profile is true, apply to Profile.
+ * @param {string} both - If Both is true, apply to Both.
+ * @param {string} userId - The id of the user.
+ * @param {Object} chosenTheme - The Theme being applied.
+*/
 export const applyUseTheme = async(posts, profile, both, userId, chosenTheme, setApplyLoading, setUseThemeModalLoading, setPostDoneApplying, setProfileDoneApplying, 
-  setBothDoneApplying, setChosenTheme) => {
+  setBothDoneApplying) => {
     if (posts) {
       await updateDoc(doc(db, 'profiles', userId), {
         postBackground: chosenTheme.images[0],
         postBought: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
         postBought: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
       }).then(() => {setTimeout(() => {
-        setApplyLoading(false); setUseThemeModalLoading(false); setPostDoneApplying(true); setChosenTheme(null);
+        setApplyLoading(false); setUseThemeModalLoading(false); setPostDoneApplying(true);
       }, 1000); 
       })
     }
@@ -24,7 +32,7 @@ export const applyUseTheme = async(posts, profile, both, userId, chosenTheme, se
         background: chosenTheme.images[0],
         forSale: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
       }).then(() => { setTimeout(() => {
-        setApplyLoading(false); setUseThemeModalLoading(false); setProfileDoneApplying(true); setChosenTheme(null);
+        setApplyLoading(false); setUseThemeModalLoading(false); setProfileDoneApplying(true)
       }, 1000);
       })
     }
@@ -34,13 +42,21 @@ export const applyUseTheme = async(posts, profile, both, userId, chosenTheme, se
         postBackground: chosenTheme.images[0],
         postBought: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
       }).then(() => {setTimeout(() => {
-        setApplyLoading(false); setUseThemeModalLoading(false); setBothDoneApplying(true); setChosenTheme(null); 
+        setApplyLoading(false); setUseThemeModalLoading(false); setBothDoneApplying(true)
       }, 1000);
       })
     }
-    
 }
+/**
+ * Determines if user is active
+ * @param {string} personId - id of user.
+ * @returns {Promise<DocumentData>} - the data document of the user id to determine activity.
+ * @throws {Error} - If `personId` is not provided.
+*/
 export const activePerson = async(personId) => {
+  if (!personId) {
+    throw new Error("personId is undefined")
+  }
   const docSnap = await getDoc(doc(db, 'profiles', personId))
   return docSnap.data()
 }
