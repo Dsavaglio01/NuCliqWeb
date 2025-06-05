@@ -1391,6 +1391,8 @@ postHeader: {
   useThemeLoadingContainer: {
     alignItems: 'flex-end', 
     flex: 1,
+    marginTop: '15%',
+    marginLeft: '5%',
     justifyContent: 'flex-end'
   }
 }

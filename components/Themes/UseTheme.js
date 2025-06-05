@@ -86,7 +86,7 @@ function UseTheme({actualTheme, appliedThemeModal, closeModal, userId}) {
                     <NextButton text={profileDoneApplying || postDoneApplying || bothDoneApplying ? "OK" : "CONTINUE"} button={{width: '45%'}} 
                     onPress={profileDoneApplying || postDoneApplying || bothDoneApplying ? 
                         () => {handleClose(); setProfileDoneApplying(false); setBothDoneApplying(false); setPostDoneApplying(false)} 
-                        : applyToUser()}/>
+                        : () => applyToUser()}/>
                     }
                 </div>
             </div>
