@@ -1393,7 +1393,7 @@ function GetThemes () {
             <PriceSummary handleStateChange={handlePriceSummaryChange} name={themeName} theme={file} keywords={keywords} stripeId={stripeId} price={price} notificationToken={notificationToken} profileChecked={profileChecked} postChecked={postChecked} /> :
             addCard && !homePreview && !specificThemeState && !fullTheme ? <AddCard /> :
            specificThemeState && !homePreview && !fullTheme ? <SpecificTheme onStateChange={handlePostThemeChange} specificId={specificId} specificUsername={specificUsername} specificState={specificState}/> : homePreview && !fullTheme ? <HomeScreenPreview />
-           : fullTheme ? <FullTheme theme={fullTheme} profile={profile}/> : null}
+           : fullTheme ? <FullTheme theme={fullTheme} userId={user.uid} profile={profile}/> : null}
          </div>
       </div>}
     </ProtectedRoute>

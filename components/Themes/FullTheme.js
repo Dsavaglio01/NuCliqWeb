@@ -5,19 +5,13 @@ import NextButton from '../NextButton';
 import ReactModal from 'react-modal';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import UseTheme from './UseTheme';
-function FullTheme({theme, profile}) {
+function FullTheme({theme, profile, userId}) {
     const actualTheme = theme[0]
     const [themeLoading, setThemeLoading] = useState(false);
     const [appliedThemeModal, setAppliedThemeModal] = useState(false);
-    const [profileDoneApplying, setProfileDoneApplying] = useState(false);
-    const [postDoneApplying, setPostDoneApplying] = useState(false);
-    const [bothDoneApplying, setBothDoneApplying] = useState(false);
-    const [useThemeModalLoading, setUseThemeModalLoading] = useState(false);
-    const [current, setCurrent] = useState('')
-    const [applyLoading, setApplyLoading]= useState(false);
   return (
     <div className='flex flex-col items-center' style={{flexDirection: 'column'}}>
-        <UseTheme actualTheme={actualTheme} appliedThemeModal={appliedThemeModal} closeModal={() => setAppliedThemeModal(false)}/>
+        <UseTheme actualTheme={actualTheme} appliedThemeModal={appliedThemeModal} userId={userId} closeModal={() => setAppliedThemeModal(false)}/>
         <div className='mt-10'>
             <span className='text-white text-2xl'>{actualTheme.name}</span>
         </div>

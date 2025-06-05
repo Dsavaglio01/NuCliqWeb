@@ -4,7 +4,8 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { styles } from '@/styles/styles';
 import NextButton from '../NextButton';
 import { BeatLoader } from 'react-spinners';
-function UseTheme({actualTheme, appliedThemeModal, closeModal}) {
+import { applyUseTheme } from '@/firebaseUtils';
+function UseTheme({actualTheme, appliedThemeModal, closeModal, userId}) {
     const [profileDoneApplying, setProfileDoneApplying] = useState(false);
     const [postDoneApplying, setPostDoneApplying] = useState(false);
     const [bothDoneApplying, setBothDoneApplying] = useState(false);
@@ -14,44 +15,10 @@ function UseTheme({actualTheme, appliedThemeModal, closeModal}) {
     const handleClose = () => {
         closeModal()
     }
-    async function applyToPosts() {
+    async function applyToUser() {
       setApplyLoading(true);
-      await updateDoc(doc(db, 'profiles', user.uid), {
-            postBackground: chosenTheme.item.images[0],
-            postBought: chosenTheme.item.selling != undefined && chosenTheme.item.selling == true ? true : chosenTheme.item.forSale != undefined && chosenTheme.item.forSale == true ? true : false,
-            postBought: chosenTheme.item.selling != undefined && chosenTheme.item.selling == true ? true : chosenTheme.item.forSale != undefined && chosenTheme.item.forSale == true ? true : false,
-        }).then(() => {setTimeout(() => {
-          setApplyLoading(false)
-          setUseThemeModalLoading(false); setPostDoneApplying(true); setChosenTheme(null);
-        }, 1000); })
-    //setUseThemeModalLoading(true)
-    
-    }
-    async function applyToProfile() {
-    // setUseThemeModalLoading(true)
-    setApplyLoading(true)
-        await updateDoc(doc(db, 'profiles', user.uid), {
-                background: chosenTheme.item.images[0],
-                forSale: chosenTheme.item.selling != undefined && chosenTheme.item.selling == true ? true : chosenTheme.item.forSale != undefined && chosenTheme.item.forSale == true ? true : false,
-            }).then(() => { setTimeout(() => {
-            setApplyLoading(false)
-            setUseThemeModalLoading(false); setProfileDoneApplying(true); setChosenTheme(null);
-            }, 1000);})
-    }
-    async function applyToBoth() {
-        setApplyLoading(true)
-    //console.log(chosenTheme.item.images[0])
-        await updateDoc(doc(db, 'profiles', user.uid), {
-                background: chosenTheme.item.images[0],
-                postBackground: chosenTheme.item.images[0],
-                postBought: chosenTheme.item.selling != undefined && chosenTheme.item.selling == true ? true : chosenTheme.item.forSale != undefined && chosenTheme.item.forSale == true ? true : false,
-            }).then(() => {
-            setTimeout(() => {
-            setApplyLoading(false)
-            setUseThemeModalLoading(false); 
-            setBothDoneApplying(true); 
-            setChosenTheme(null); 
-            }, 1000);})
+      applyUseTheme(current === 'Posts', current === 'Profile', current === 'Both', userId, actualTheme, setApplyLoading, setUseThemeModalLoading, setPostDoneApplying,
+        setProfileDoneApplying, setBothDoneApplying)
     }
   return (
     <ReactModal isOpen={appliedThemeModal} style={{content: {
@@ -119,8 +86,7 @@ function UseTheme({actualTheme, appliedThemeModal, closeModal}) {
                     <NextButton text={profileDoneApplying || postDoneApplying || bothDoneApplying ? "OK" : "CONTINUE"} button={{width: '45%'}} 
                     onPress={profileDoneApplying || postDoneApplying || bothDoneApplying ? 
                         () => {handleClose(); setProfileDoneApplying(false); setBothDoneApplying(false); setPostDoneApplying(false)} 
-                        : current == 'Posts' ? () => applyToPosts() : current == 'Profile' ? () => applyToProfile()
-                    : current == 'Both' ? () => applyToBoth() : null}/>
+                        : applyToUser()}/>
                     }
                 </div>
             </div>

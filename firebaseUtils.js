@@ -7,6 +7,39 @@ import { getAuth, signOut } from 'firebase/auth';
 import { linkUsernameAlert, profanityUsernameAlert } from './lib/alert';
 import { schedulePushCommentNotification } from './notificationFunctions';
 const auth = getAuth();
+export const applyUseTheme = async(posts, profile, both, userId, chosenTheme, setApplyLoading, setUseThemeModalLoading, setPostDoneApplying, setProfileDoneApplying, 
+  setBothDoneApplying, setChosenTheme) => {
+    if (posts) {
+      await updateDoc(doc(db, 'profiles', userId), {
+        postBackground: chosenTheme.images[0],
+        postBought: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
+        postBought: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
+      }).then(() => {setTimeout(() => {
+        setApplyLoading(false); setUseThemeModalLoading(false); setPostDoneApplying(true); setChosenTheme(null);
+      }, 1000); 
+      })
+    }
+    else if (profile) {
+      await updateDoc(doc(db, 'profiles', userId), {
+        background: chosenTheme.images[0],
+        forSale: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
+      }).then(() => { setTimeout(() => {
+        setApplyLoading(false); setUseThemeModalLoading(false); setProfileDoneApplying(true); setChosenTheme(null);
+      }, 1000);
+      })
+    }
+    else if (both) {
+      await updateDoc(doc(db, 'profiles', userId), {
+        background: chosenTheme.images[0],
+        postBackground: chosenTheme.images[0],
+        postBought: chosenTheme.selling != undefined && chosenTheme.selling == true ? true : chosenTheme.forSale != undefined && chosenTheme.forSale == true ? true : false,
+      }).then(() => {setTimeout(() => {
+        setApplyLoading(false); setUseThemeModalLoading(false); setBothDoneApplying(true); setChosenTheme(null); 
+      }, 1000);
+      })
+    }
+    
+}
 export const activePerson = async(personId) => {
   const docSnap = await getDoc(doc(db, 'profiles', personId))
   return docSnap.data()
