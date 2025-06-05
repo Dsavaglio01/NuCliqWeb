@@ -1,4 +1,4 @@
-import FullTheme from "@/components/FullTheme";
+import FullTheme from "@/components/Themes/FullTheme";
 
 export const styles = {
     name: {
@@ -493,7 +493,7 @@ postHeader: {
     borderRadius: 8,
     borderWidth: 2,
     marginTop: 7.5,
-    borderColor: "#fafafa",
+    borderColor: "#005278",
   },
   nameAge: {
     fontSize: 19.20,
@@ -701,8 +701,8 @@ postHeader: {
     width: 50
   },
   sendingFriendPfp: {
-    height: 55, 
-    width: 55, 
+    height: 110, 
+    width: 110, 
     borderRadius: 55, 
     alignSelf: 'center'
   },
@@ -767,7 +767,7 @@ postHeader: {
     marginLeft: '35%'
   },
   usernameTextSending: {
-    fontSize: 12.29,
+    fontSize: 15.36,
     color: "#fafafa",
     alignSelf: 'center',
     padding: 5
@@ -816,7 +816,7 @@ postHeader: {
     display: 'flex'
   },
   usernameTextSendingChecked: {
-    fontSize: 12.29,
+    fontSize: 15.36,
     color: "#fafafa",
     marginTop: -27.5,
     alignSelf: 'center',
@@ -1175,13 +1175,15 @@ postHeader: {
   profileHeaderContainer: {
     width: '100%', 
     height: typeof window !== 'undefined' ? window.innerHeight * 0.25 : 0, 
-    objectFit: 'cover'
+    objectFit: 'cover',
+    zIndex: -1
   },
   profileLoader: {
     marginTop: '-7.5%', 
     alignItems: 'flex-end', 
     marginLeft: '2.5%', 
-    flex: 1
+    flex: 1,
+    zIndex: 3
   },
   friendsHeaderTwo: {
     paddingLeft: 80, 
@@ -1372,5 +1374,23 @@ postHeader: {
     fontSize: 15.36, 
     color: "#fafafa", 
     cursor: true
+  },
+  questionText: {
+    fontSize: 15.36,
+    padding: 10,
+    paddingTop: 0,
+    color: "#fafafa"
+  },
+  postText: {
+    fontSize: 15.36,
+    padding: 10,
+    paddingTop: 0,
+    color: "#fafafa",
+    fontWeight: '600'
+  },
+  useThemeLoadingContainer: {
+    alignItems: 'flex-end', 
+    flex: 1,
+    justifyContent: 'flex-end'
   }
 }

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import ThemeHeader from '@/components/ThemeHeader';
+import ThemeHeader from '@/components/Themes/ThemeHeader';
 import { useAuth } from '@/context/AuthContext';
 import PreviewFooter from '@/components/PreviewFooter';
 import { useRouter } from 'next/router';

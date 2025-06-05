@@ -8,13 +8,15 @@ import { useSwipeable } from 'react-swipeable';
 import getDateAndTime from '@/lib/getDateAndTime';
 import FollowButtons from './FollowButtons';
 import { styles } from '@/styles/styles';
-import { fetchComments, fetchMoreComments, addCommentLike, removeCommentLike} from '@/firebaseUtils';
-function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blockedUsers }) {
+import { fetchComments, fetchMoreComments, addCommentLike, removeCommentLike, addNewCommentFunction} from '@/firebaseUtils';
+function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blockedUsers, ableToShare, videoStyling, username, notificationToken, actualData, 
+    handleData }) {
     const router = useRouter();
     const [replyToReplyFocus, setReplyToReplyFocus] = useState(false);
     const [tempReplyName, setTempReplyName] = useState();
     const [comments, setComments] = useState([]);
     const [replyFocus, setReplyFocus] = useState(false);
+    const [singleCommentLoading, setSingleCommentLoading] = useState(false);
     const [tempReplyId, setTempReplyId] = useState('');
     const [usernames, setUsernames] = useState([]);
     const [reportComment, setReportComment] = useState('');
@@ -97,6 +99,10 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     //     setLastCommentVisible(newLastVisible);
     //   }
     // }
+    const handleNewComment = (inputText) => {
+      const sanitizedText = inputText.target.value.replace(/\n/g, ''); // Remove all new line characters
+      setComment(sanitizedText);
+    }
     async function removeLike(item) {
       await removeCommentLike(item, user, setComments, comments, focusedItem)
     }
@@ -177,11 +183,65 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       onSwipedRight: handleSwipe('right'), */
       trackMouse: true, // Enables mouse tracking for desktop swipes
     })
-    const handleComment = (event) => {
-      setComment(event.target.value)
-    }
     const handleReply = (event) => {
       setReply(event.targe.value)
+    }
+    async function addNewComment(){
+      if (!ableToShare) {
+        window.alert('Unavailable to comment.')
+        setComment('')
+        setReply('')
+        setReplyFocus(false)
+      }
+      else {
+        console.log('at least here')
+        setSingleCommentLoading(true)
+        if (!videoStyling) {
+          console.log(username, focusedItem.username)
+          if (username == focusedItem.username) {
+            try {
+              addNewCommentFunction('newCommentUsername', username, comment, blockedUsers, pfp, notificationToken, user.uid, focusedItem, setComment, 
+                setSingleCommentLoading, setReply, setComments, comments, actualData, handleData
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+          else {
+            try {
+              addNewCommentFunction('newComment', username, comment, blockedUsers, pfp, notificationToken, user.uid, focusedItem, setComment, 
+                setSingleCommentLoading, setReply, setComments, comments, actualData, handleData
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+        }
+        else {
+          if (username == focusedItem.username) {
+            try {
+              addNewCommentFunction('newCommentVideoUsername', username, comment, blockedUsers, pfp, notificationToken, user.uid, focusedItem, setComment, 
+                setSingleCommentLoading, setReply, setComments, comments, actualData, handleData
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+          else {
+            try {
+              addNewCommentFunction('newCommentVideo', username, comment, blockedUsers, pfp, notificationToken, user.uid, focusedItem, setComment, 
+                setSingleCommentLoading, setReply, setComments, comments, actualData, handleData
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+        }
+      }
     }
   return (
     <ReactModal isOpen={commentModal} style={{content: styles.commentModalContainer}} preventScroll={true} onRequestClose={() => {handleClose(); setComments([])}}>
@@ -393,13 +453,16 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : replyFocus ? 
           <textarea value={reply} maxLength={200}
             onChange={handleReply}
-          className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : <textarea value={comment}
-            onChange={handleComment} maxLength={200}
+          className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : 
+          <textarea value={comment}
+            onChange={handleNewComment} maxLength={200}
           className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
           <div className='justify-end flex items-end ml-10'>
-            <button style={styles.sendButton}>
+            {!singleCommentLoading ? 
+            <button style={styles.sendButton} onClick={() => addNewComment()}>
               <p style={styles.sendText}>Send</p>
-            </button>
+            </button> : 
+            <BeatLoader color='#9edaff'/>}
           </div>
         </div>
       </div>

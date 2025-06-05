@@ -168,7 +168,8 @@ function IndPost({item, user, pfp, username, notificationToken, followers, follo
             </p>
         </div>
         <div className='arrow' />
-        <Comments commentModal={commentModal} focusedItem={focusedItem} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
+        <Comments commentModal={commentModal} ableToShare={ableToShare} videoStyling={false} username={username} notificationToken={notificationToken} actualData={tempPosts}
+        focusedItem={focusedItem} handleData={setTempPosts} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
         {/* <ViewLikes likesModal={likesModal} closeLikesModal={() => setLikesModal(false)} focusedLikedItem={focusedLikedItem} user={user}/> */}
         <RepostModal repostModal={repostModal} closeRepostModal={() => setRepostModal(false)} user={user} username={username} notificationToken={notificationToken}
             blockedUsers={blockedUsers} forSale={forSale} background={background} pfp={pfp} repostItem={repostItem} ableToShare={ableToShare}/>

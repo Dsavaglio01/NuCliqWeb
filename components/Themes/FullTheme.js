@@ -1,33 +1,23 @@
 import React, {useState} from 'react'
 import { styles } from '@/styles/styles';
 import { BeatLoader } from 'react-spinners';
-import NextButton from './NextButton';
+import NextButton from '../NextButton';
 import ReactModal from 'react-modal';
 import { XMarkIcon } from '@heroicons/react/24/solid';
+import UseTheme from './UseTheme';
 function FullTheme({theme, profile}) {
     const actualTheme = theme[0]
     const [themeLoading, setThemeLoading] = useState(false);
     const [appliedThemeModal, setAppliedThemeModal] = useState(false);
+    const [profileDoneApplying, setProfileDoneApplying] = useState(false);
+    const [postDoneApplying, setPostDoneApplying] = useState(false);
+    const [bothDoneApplying, setBothDoneApplying] = useState(false);
+    const [useThemeModalLoading, setUseThemeModalLoading] = useState(false);
+    const [current, setCurrent] = useState('')
+    const [applyLoading, setApplyLoading]= useState(false);
   return (
     <div className='flex flex-col items-center' style={{flexDirection: 'column'}}>
-        <ReactModal isOpen={appliedThemeModal} style={{content: {
-            width: '20%',
-            left: '68%',
-            marginTop: '5%',
-            right: 'auto',
-            borderRadius: 10,
-            height: '40%',
-            transform: 'translate(-50%, 0)',
-            backgroundColor: "#121212",
-            marginRight: '-50%',}}}>
-            <div className='flex flex-row'>
-                <span className='text-white'>Use Theme</span>
-                <button className="close-button" onClick={() => setAppliedThemeModal(false)}>
-                    <XMarkIcon className='btn'/>
-                </button>
-            </div>
-           
-        </ReactModal>
+        <UseTheme actualTheme={actualTheme} appliedThemeModal={appliedThemeModal} closeModal={() => setAppliedThemeModal(false)}/>
         <div className='mt-10'>
             <span className='text-white text-2xl'>{actualTheme.name}</span>
         </div>
@@ -52,7 +42,6 @@ function FullTheme({theme, profile}) {
                     </button>
                 </div>
             </div>
-            
         </div>
         {themeLoading ? <BeatLoader color={"#9EDAFF"} style={{alignItems: 'center'}}/> : 
             profile.themeIds && (profile.themeIds.includes(productId) || profile.themeIds.includes(myId)) ? <span style={styles.sorryNoThemeText}>You have this theme!</span> 

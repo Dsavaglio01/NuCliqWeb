@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
-import ThemeHeader from '@/components/ThemeHeader';
+import ThemeHeader from '@/components/Themes/ThemeHeader';
 import { doc, getDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import InputBox from '@/components/InputBox';

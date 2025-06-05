@@ -16,9 +16,10 @@ const SearchInput = ({text, onChangeText, width, containerStyle, value, onClick,
         <MagnifyingGlassIcon className='btn' style={{alignSelf: 'center', paddingLeft: 5, height: 20}}/>
         <input ref={textInputRef} value={text == true ? value : ''} onChange={onChangeText} style={styles.searchInput} type='text' 
         autoFocus={autoFocus} placeholder={placeholder} onFocus={onFocus} onSubmit={onSubmitEditing}/>
+        {value.length > 0 ? 
         <div className='flex justify-center ml-auto p-1 pr-2'>
           <IoIosCloseCircleOutline className='btn' size={20} style={{alignSelf: 'center'}} onClick={onXClick}/>
-        </div>
+        </div> : <></>}
         
         
     </div>

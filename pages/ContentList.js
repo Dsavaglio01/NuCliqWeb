@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '@/context/AuthContext';
 import { FaceFrownIcon } from '@heroicons/react/24/outline';
-import ThemeHeader from '@/components/ThemeHeader';
+import ThemeHeader from '@/components/Themes/ThemeHeader';
 import { db } from '@/firebase';
 import { useRouter } from 'next/router';
 import { BeatLoader } from 'react-spinners';

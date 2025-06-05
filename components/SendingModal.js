@@ -13,11 +13,13 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
     const [actuallySending, setActuallySending] = useState(false);
     const [friendsInfo, setFriendsInfo] = useState([]);
     const [caption, setCaption] = useState('');
+    console.log(following, followers)
     useMemo(()=> {
       setFriends([])
       let unsub;
       const fetchCards = async () => {
         unsub = onSnapshot(query(collection(db, 'profiles', user.uid, 'friends'), where('actualFriend', '==', true), orderBy('lastMessageTimestamp', 'desc'), limit(20)), (snapshot) => {
+          console.log(snapshot.docs.length)
           setFriends(snapshot.docs.filter((doc => followers.includes(doc.id) && following.includes(doc.id))).map((doc)=> ( {
             id: doc.id,
             ...doc.data()
@@ -28,6 +30,7 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
       fetchCards();
       return unsub;
     }, [followers, following]);
+    console.log(friends.length)
     useMemo(() => {
       if (friends.length > 0) {
         Promise.all(friends.map(async(item) => await getDoc(doc(db, 'profiles', item.id))))
@@ -91,7 +94,11 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
                 </div>
               </div>
             )
-          }) : <p>No friends to send to yet!</p>}
+          }) :
+          <div className='items-center justify-center flex align-middle'>
+            <p className='text-white self-center'>No friends to send to yet!</p>
+          </div>
+          }
         </div>
       {actuallySending ?
       <div style={styles.addCommentSecondContainer} className='bg-black flex flex-col items-center absolute bottom-0 w-full'>

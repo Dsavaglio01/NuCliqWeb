@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react'
-import ThemeHeader from '../components/ThemeHeader'
-import PreviewThemeFooter from '../components/PreviewThemeFooter';
+import ThemeHeader from '../components/Themes/ThemeHeader'
+import PreviewThemeFooter from '../components/Themes/PreviewThemeFooter';
 import { useRouter } from 'next/router';
 
 function UploadGuidelines ({handleStateChange}) {

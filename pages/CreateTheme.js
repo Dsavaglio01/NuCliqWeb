@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react'
-import ThemeHeader from '../components/ThemeHeader';
+import ThemeHeader from '../components/Themes/ThemeHeader';
 import PreviewFooter from '@/components/PreviewFooter';
 import { useRouter } from 'next/router';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';

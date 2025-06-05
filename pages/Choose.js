@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
-import ThemeHeader from '@/components/ThemeHeader'
+import ThemeHeader from '@/components/Themes/ThemeHeader'
 import NextButton from '@/components/NextButton'
 import { doc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'

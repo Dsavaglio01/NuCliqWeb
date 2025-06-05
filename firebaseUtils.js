@@ -1,16 +1,74 @@
 import { db } from '@/firebase'
 import { getDoc, doc, collection, where, onSnapshot, setDoc, getDocs, startAfter, arrayUnion, serverTimestamp, documentId, updateDoc, 
-  arrayRemove, increment, orderBy, limit, startAt, endAt, query, getCountFromServer, addDoc,
+  arrayRemove, increment, orderBy, limit, startAt, endAt, query, getCountFromServer, addDoc, Timestamp,
   writeBatch} from 'firebase/firestore';
 import { schedulePushLikeNotification } from './notificationFunctions';
 import { getAuth, signOut } from 'firebase/auth';
+import { linkUsernameAlert, profanityUsernameAlert } from './lib/alert';
+import { schedulePushCommentNotification } from './notificationFunctions';
 const auth = getAuth();
+export const activePerson = async(personId) => {
+  const docSnap = await getDoc(doc(db, 'profiles', personId))
+  return docSnap.data()
+}
+export const addNewCommentFunction = async(endpoint, username, comment, blockedUsers, pfp, notificationToken, userId, focusedPost, setComment, setSingleCommentLoading, 
+  setReply, setComments, comments, actualData, handleData) => {
+    console.log(endpoint)
+   const response = await fetch(`http://10.0.0.225:4000/api/${endpoint}`, {
+    method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
+    headers: {
+      'Content-Type': 'application/json', // Set content type as needed
+    },
+    body: JSON.stringify({ data: {newComment: comment, textModerationURL: process.env.TEXT_MODERATION_URL, blockedUsers: blockedUsers, pfp: pfp, 
+      notificationToken: notificationToken, user: userId, focusedPost: focusedPost, username: username}}), // Send data as needed
+  })
+  const data = await response.json();
+  if (data.link) {
+    linkUsernameAlert('Comment', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
+  }
+  else if (data.profanity) {
+    profanityUsernameAlert('Comment', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
+  }
+  else if (data.done) {
+    setComments([...comments, {id: data.docRef, comment: comment, showReply: false, loading: false,
+      pfp: pfp,
+      notificationToken: notificationToken,
+      username: username,
+      timestamp: Timestamp.fromDate(new Date()),
+      likedBy: [],
+      replies: [],
+      user: userId,
+      postId: focusedPost.id}])
+    const updatedObject = { ...focusedPost };
+    // Update the array in the copied object
+    updatedObject.comments = updatedObject.comments + 1;
+    const objectIndex = actualData.findIndex(obj => obj.id === focusedPost.id);
+    if (objectIndex !== -1) {
+      // Create a new array with the replaced object
+      const updatedData = [...actualData];
+      updatedData[objectIndex] = updatedObject;
+      // Set the new array as the state
+      handleData(updatedData);
+    }
+    setComment('')
+    setSingleCommentLoading(false)
+    if (username != focusedPost.username) {
+      schedulePushCommentNotification(focusedPost.userId, username, focusedPost.notificationToken, comment)
+    }
+    
+  }
+}
 export const allowNotificationsFunction = async(userId, isEnabled, notificationToken, setIsEnabled) => {
   if (notificationToken != null) {
     await updateDoc(doc(db, 'profiles', userId), {
       allowNotifications: !isEnabled
     }).then(() => setIsEnabled(previousState => !previousState))
   }
+}
+export const privacyFunction = async(userId, privacyEnabled, setPrivacyEnabled) => {
+  await updateDoc(doc(db, 'profiles', userId), {
+    private: !privacyEnabled
+  }).then(() => setPrivacyEnabled(previousState => !previousState))
 }
 export const statusFunction = async(userId, activityEnabled, setActivityEnabled) => {
   await updateDoc(doc(db, 'profiles', userId), {
@@ -721,23 +779,15 @@ export const getProfileDetails = async(userId) => {
  * Each profile object includes the document ID, profile data, and a `loading` property.
  * @throws {Error} - If the Firestore query fails.
 */
-export const fetchNewFriendsList = async () => {
+export const fetchNewFriendsList = async() => {
   try {
-    // Fetch up to 10 profiles from the "profiles" collection, ordered by document ID.
     const docSnap = await getDocs(query(collection(db, 'profiles'), orderBy(documentId()), limit(10)));
-
-    // Temporary array to store the fetched profiles.
     const tempList = [];
-
-    // Iterate through each document in the snapshot and add it to the tempList.
     docSnap.forEach((item) => {
-        tempList.push({ id: item.id, ...item.data(), loading: false });
+      tempList.push({ id: item.id, ...item.data(), loading: false });
     });
-
-    // Return the tempList wrapped in an object.
     return { tempList };
   } catch (error) {
-    // Log an error message if the Firestore query fails.
     console.error("Error fetching data:", error);
   }
 };

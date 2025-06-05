@@ -3,8 +3,8 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import { styles } from '@/styles/styles';
 import Head from 'next/head';
 import Sidebar from './Sidebar';
-import ThemeMadeProgression from './ThemeMadeProgression';
-import ThemeHeader from './ThemeHeader';
+import ThemeMadeProgression from './Themes/ThemeMadeProgression';
+import ThemeHeader from './Themes/ThemeHeader';
 import { BeatLoader } from 'react-spinners';
 import MiniPost from './MiniPost';
 import Settings from '@/pages/Settings';
@@ -156,7 +156,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                             </div> : 
                         null}
                         <div>
-                            <img src={!loading ? previewImage ? previewImage : person.background ? person.background : require('../assets/Default_theme.jpg') : null} 
+                            <img src={!loading ? previewImage ? previewImage : person.background ? person.background : '/Default_theme.jpg' : null} 
                             style={styles.profileHeaderContainer}/>
                             <div style={{display: 'flex'}}>
                                 <div style={{width: '77.5%'}}>
@@ -169,7 +169,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                                 <div style={styles.profileLoader}>
                                     {loading ? <BeatLoader color="#9edaff" /> : profile.pfp ?
                                     <img src={profile.pfp} className='cursor-pointer' style={styles.profileCircle}/>
-                                    : <UserCircleIcon className='userBtn' style={styles.profileCircle}/>}
+                                    : <UserCircleIcon color='#005278' style={styles.profileCircle}/>}
                                 </div>
                             </div>
                             {/* {bio.length > 0 ? 

@@ -39,21 +39,31 @@ export default function Home() {
 
   }, []);
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (listDone && list.length != 0) {
-        const fetchFilteredList = async () => {
-          try {
-            const newList = await filterPotentialFriends(list, user);
-            setActualList(newList);
-          } 
-          catch (error) {
-            console.error('Error fetching filtered list:', error);
-          }
-        };
-        fetchFilteredList();
+      const fetchFilteredList = async () => {
+        try {
+          const newList = filterPotentialFriends(list);
+          setActualList(newList);
+        } 
+        catch (error) {
+          console.error('Error fetching filtered list:', error);
+        }
+      };
+      fetchFilteredList();
     }
-  }, [listDone, list]) */
+  }, [listDone, list])
 
+const filterPotentialFriends = (list) => {
+  const tempList = []
+  list.map((item) => {
+    if (!profile.following.includes(item.id)) {
+      tempList.push(item)
+    }
+  })
+  return tempList
+}
+  
 const handleStateChange = (newState) => {
   setChangeWidth(!newState)
 }
@@ -64,7 +74,7 @@ const FriendItem = ({item, index}) => (
       <div className='cursor-pointer' style={styles.friendsContainer} onClick={() => router.push({pathname: '/ViewingProfile', query: {name: item.id, viewing: true}})}>
         {item.pfp ? 
           <img src={item.pfp} style={styles.searchPfp}/> :
-          <UserCircleIcon style={styles.searchPfp}/>
+          <UserCircleIcon style={styles.searchPfp} color='#fafafa'/>
         }
         <div style={styles.searchInfo}>
           <p className='numberofLines1' style={styles.userTitle}>{item.firstName} {item.lastName}</p>
@@ -82,6 +92,7 @@ const FriendItem = ({item, index}) => (
     </div>
   </div>
 )
+console.log(actualList)
   return (
     <ProtectedRoute>
       <div className='app-container'>

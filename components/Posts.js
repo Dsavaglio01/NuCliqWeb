@@ -100,19 +100,19 @@ function Posts({changeWidth}) {
     <body className={changeWidth ? marginClassOne : marginClassTwo} ref={dropdownRef}>
     <div className='flex-grow' style={styles.homeContainer}>
       {tempPosts.map((e, index) => {
-        if (tempPosts.length === index + 1) {      
+        if (tempPosts.length === index + 1 && profile) {      
             return (
           <div ref={lastElementRef} key={e.id}>
-            <IndPost user={user} item={e} pfp={profile.pfp} tempPosts={tempPosts} setTempPosts={setTempPosts} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
+            <IndPost user={user} item={e} pfp={profile.pfp} tempPosts={tempPosts} setTempPosts={setTempPosts} blockedUsers={profile.blockedUsers} followers={profile.followers} following={profile.following} 
             forSale={profile.forSale} background={profile.postBackground} username={profile.username} notificationToken={profile.notificationToken} dropdownRef={dropdownRef}/>
           </div>
             )
           
           }
-          else {
+          else if (profile) {
             return (
             <div key={e.id}>
-              <IndPost user={user} item={e} pfp={profile.pfp} tempPosts={tempPosts} setTempPosts={setTempPosts} blockedUsers={profile.blockedUsers} followers={profile.followers} following={following} 
+              <IndPost user={user} item={e} pfp={profile.pfp} tempPosts={tempPosts} setTempPosts={setTempPosts} blockedUsers={profile.blockedUsers} followers={profile.followers} following={profile.following} 
               forSale={profile.forSale} background={profile.postBackground} username={profile.username} notificationToken={profile.notificationToken} dropdownRef={dropdownRef}/>
             </div>
             )

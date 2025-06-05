@@ -24,9 +24,9 @@ import SendingModal from '@/components/SendingModal';
 import { styles } from '@/styles/styles';
 import { fetchFreeThemes, fetchMoreFreeThemes, fetchMorePurchasedThemes, fetchMyThemes, fetchPurchasedThemes, fetchReportedThemes, fetchThemeSearches } from '@/firebaseUtils';
 import ProfileContext from '@/context/ProfileContext';
-import FullTheme from '@/components/FullTheme';
+import FullTheme from '@/components/Themes/FullTheme';
 console.log('Imported FullTheme:', FullTheme);
-import ThemeComponent from '@/components/ThemeComponent';
+import ThemeComponent from '@/components/Themes/ThemeComponent';
 function GetThemes () {
   const profile = useContext(ProfileContext);
   const BACKEND_URL = process.env.BACKEND_URL

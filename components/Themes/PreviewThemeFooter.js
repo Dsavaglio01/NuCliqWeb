@@ -1,6 +1,6 @@
 import React from 'react'
-import MainButton from './MainButton'
-import NextButton from './NextButton'
+import MainButton from '../MainButton'
+import NextButton from '../NextButton'
 import PickTheme from './PickTheme'
 
 

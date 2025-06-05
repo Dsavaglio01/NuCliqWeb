@@ -435,3 +435,10 @@ input[type="checkbox"] {
   cursor: pointer;
   margin-top: 5;
 }
+.options {
+  color: white;
+  margin: 8px;
+}
+.optionLabel {
+  padding-left: 10px;
+}
