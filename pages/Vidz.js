@@ -18,18 +18,25 @@ export default function Vidz() {
           <link rel="icon" href='/favicon.icon' />
         </Head>
         <div style={styles.pageContainer}>
-          <div className='flex'>
-            <Sidebar />
-            <div className=''>  
-              {sidebarValue ? null :
-                <div className='flex flex-row'>
-                  <section className=''>
-                    {profile ? <VidPosts profile={profile}/> : <></>}
-                  </section>
-                </div>}
-            </div>
-            
-          </div>
+          <div className='flex h-screen w-screen'> {/* Main Layout Container - A */}
+
+      {/* Left Column (simulating Sidebar) - B */}
+      <Sidebar />
+
+      {/* Right Column (Main Content Area) - C */}
+      <div className='flex flex-col flex-grow overflow-y-auto'>
+        
+        {/* Placeholder for your actual video list content */}
+        <div className="flex justify-center p-4"> {/* This is where your VidPosts would go, or a container for it */}
+             <div className="flex justify-center items-center">
+              <section>  
+                {profile ? <VidPosts profile={profile}/> : null}
+              </section> 
+             </div>
+        </div>
+
+      </div>
+    </div>
         </div>
       </div>
     </ProtectedRoute>

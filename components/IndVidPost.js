@@ -12,7 +12,7 @@ import Comments from './Comments';
 import SendingModal from './SendingModal';
 import { addHomeLikeVideoFunction, removeLikeVideoFunction, addHomeSaveVideoFunction, removeHomeSaveVideoFunction, 
     ableToShareVideoFunction} from '@/firebaseUtils';
-function IndVidPost({item, user, dropdownRef, pfp, followers, following, username, reportedPosts}) {
+function IndVidPost({item, user, dropdownRef, pfp, followers, following, username, reportedPosts, tempPosts, setTempPosts}) {
   const videoRef = useRef(null);
   const router = useRouter();
   const [focusedLikedItem, setFocusedLikedItem] = useState(null);
@@ -120,7 +120,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
 
   return (
     <div className='flex'>
-      <div className="border-rounded-sm relative flex flex-col justify-center" style={styles.videoItemContainer}>
+      <div>
         <div style={styles.videoItem} className="bg-black items-center flex">
           {!item.post ? (
             <BeatLoader color="#9edaff" />
@@ -155,7 +155,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
         </div>
           
       </div>
-        <div style={styles.videoButtonContainer}>
+        {/* <div style={styles.videoButtonContainer}>
             <div className='flex flex-col mb-5'>
                 <LikeButton key={item.id} video={true} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
             </div>
@@ -176,7 +176,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
             <div className='flex flex-col mb-5'>
                 <EllipsisHorizontalIcon className='btn' />
             </div>
-        </div>
+        </div> */}
         <Comments commentModal={commentModal} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
         {/* <ViewLikes likesModal={likesModal} closeLikesModal={() => setLikesModal(false)} focusedLikedItem={focusedLikedItem} user={user}/> */}
         <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={false} post={true} video={false}/>

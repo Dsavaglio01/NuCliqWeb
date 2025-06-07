@@ -866,10 +866,6 @@ postHeader: {
     height: '100%', 
     overflow: 'hidden'
   },
-  videoItem: {
-    height: '100%',
-    width: '100%'
-  },
   video: { 
     width: '100%', 
     height: '100%', 

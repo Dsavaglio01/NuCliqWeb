@@ -919,7 +919,7 @@ export const fetchPublicPostsExcludingBlockedUsersVideo = async (blockedUsers) =
         posts.push({ id: doc.id, loading: false, ...doc.data() });
       });
     }
-
+    console.log(`Posts: ${posts}`)
     return { posts, lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1] };
   }
   catch (e) {

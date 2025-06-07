@@ -124,16 +124,17 @@ function VidPosts({profile}) {
     }
     }
   return (
-    <body className='flex justify-center' style={{marginLeft: '22.5vw'}} ref={dropdownRef}>
-      <div style={styles.videoContainer} className='vidContainer' ref={containerRef}>
-        {tempPosts.map((e, index) => (
-          <div key={e.id} className="video-item">
-            <IndVidPost item={e} user={user} dropdownRef={dropdownRef} followers={profile.followers} following={profile.following} username={profile.username} reportedPosts={reportedPosts}
-              blockedUsers={profile.blockedUsers} notificationToken={profile.notificationToken} pfp={profile.pfp} forSale={profile.forSale}/>
-          </div>
-        ))}
+    <main ref={dropdownRef}>
+      <div ref={containerRef}>
+          {tempPosts.map((e, index) => (
+            <div key={e.id} className="video-item">
+              <IndVidPost item={e} user={user} tempPosts={tempPosts} setTempPosts={setTempPosts} dropdownRef={dropdownRef} followers={profile.followers} following={profile.following} username={profile.username} reportedPosts={reportedPosts}
+                blockedUsers={profile.blockedUsers} notificationToken={profile.notificationToken} pfp={profile.pfp} forSale={profile.forSale}/>
+            </div>
+          ))}
+        
       </div>
-    </body>
+    </main>
   )
 }
 
