@@ -8,7 +8,7 @@ import ThemeHeader from './Themes/ThemeHeader';
 import { BeatLoader } from 'react-spinners';
 import MiniPost from './MiniPost';
 import Settings from '@/pages/Settings';
-import { LockClosedIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { LockClosedIcon, UserCircleIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import Edit from '@/pages/Edit';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
@@ -22,6 +22,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
     const [postSetting, setPostSetting] = useState(true);
     const [repostSetting, setRepostSetting] = useState(false);
     const [posts, setPosts] = useState([]);
+    const [additionalInfoMode, setAdditionalInfoMode] = useState(false);
     const [privacy, setPrivacy] = useState(false);
     const [numberOfPosts, setNumberOfPosts] = useState(0);
     const [numberOfReposts, setNumberOfReposts] = useState(0);
@@ -180,7 +181,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                                     : <UserCircleIcon color='#005278' style={styles.profileCircle}/>}
                                 </div>
                             </div>
-                            {/* {bio.length > 0 ? 
+                            {profile && profile.bio.length > 0 ? 
                                 <div style={{flexDirection: 'row', display: 'flex'}}>
                                     <hr className="custom-divider"/>
                                     {additionalInfoMode ? <ChevronUpIcon className='btn' onClick={() => setAdditionalInfoMode(!additionalInfoMode)}/> : 
@@ -188,9 +189,9 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                                     <hr className="custom-divider"/>
                                 </div> 
                                 : null}
-                            {(bio != undefined || null) && additionalInfoMode ? 
-                            <p style={[bioText]}>{bio != undefined || null ? bio : null}</p> 
-                                : null} */}
+                            {(profile && profile.bio != undefined || null) && additionalInfoMode ? 
+                            <p style={styles.bioText}>{profile.bio != undefined || null ? profile.bio : null}</p> 
+                                : null}
                             <div className='justify-center items-center self-center flex flex-col'>
                                 <div style={styles.profileFriendsContainer}>
                                     {viewing ? <div className='cursor-pointer items-center flex justify-center' style={styles.friendsHeaderTwo} 
@@ -266,7 +267,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                 </div> :
                 <div className='flex flex-row'>
                     <section>
-                        <Edit firstName={profile.firstName} lastName={profile.lastName} bio={bio}/>
+                        <Edit firstName={profile.firstName} lastName={profile.lastName} bio={profile.bio}/>
                     </section>
                 </div> }
             </div>

@@ -12,8 +12,7 @@ function MiniPost({item, index, repost, onClick}) {
          <p className='chatBubbleText text-ellipsis' style={styles.miniPostText}>{item.post.post[0].value}</p> 
         </div>
         <div className='miniArrow'/>
-      </div> :
-    item.post[0].image ? 
+      </div> : item.post[0].image ? 
       <div style={styles.miniPostContainer} className='cursor-pointer'>
         <img src={item.post[0].post} style={styles.miniImage}/>
       </div> : item.post[0].video ? 

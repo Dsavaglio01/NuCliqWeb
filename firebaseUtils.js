@@ -799,6 +799,7 @@ export const getProfileDetails = async(userId) => {
       return {
         username: data.userName,
         pfp: data.pfp,
+        bio: data.bio,
         id: docSnap.id,
         followers: data.followers,
         following: data.following,

@@ -105,6 +105,7 @@ function Settings() {
     const sanitizedText = inputText.replace(/\n/g, ''); // Remove all new line characters
     setReport(sanitizedText);
   }
+  console.log(completePosts.length)
   return (
      <div className='flex flex-row'>
     <div className='settingsSidebar'>

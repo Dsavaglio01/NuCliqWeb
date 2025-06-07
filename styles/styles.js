@@ -772,6 +772,7 @@ postHeader: {
   userTitle: {
     fontSize: 15.36,
     color: "#fff",
+    width: '10vw',
     fontWeight: '700'
   },
   seeMoreResultsText: {

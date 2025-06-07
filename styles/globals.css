@@ -130,7 +130,7 @@ html, body {
   box-shadow: -2px -4px 1px rgba(23, 23, 23, 0.5);
 }
 .numberofLines1 {
-   overflow: hidden;
+  overflow: hidden;
   display: -webkit-box; /* Safari */
   -webkit-line-clamp: 1; /* Safari */
   -webkit-box-orient: vertical; /* Safari */
@@ -482,4 +482,8 @@ input[type="checkbox"] {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.chatBubbleText {
+  color: #121212;
+  overflow: hidden;
 }

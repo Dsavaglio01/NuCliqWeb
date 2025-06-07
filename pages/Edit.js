@@ -897,15 +897,13 @@ const EditScreen = ({firstName, lastName, bio, username}) => {
       </> : 
       <>
       <p style={titleText}>Bio</p>
-      <div style={{marginLeft: '5%', marginRight: '5%'}}>
-        <NextButton text={"+ Add Bio"} onClick={addBio}/>
-      </div>
+      <NextButton text={"+ Add Bio"} onClick={addBio}/>
       </>
       }
       </div>
 }
       <div style={{marginLeft: '5%', marginRight: '5%', marginTop: '5%', marginBottom: '5%'}}>
-        <PreviewFooter containerStyle={{ marginTop: '5%'}} text={"SAVE"} onClickCancel={() => router.back()} 
+        <PreviewFooter containerStyle={{ marginTop: '5%'}} text={"SAVE"} onClickCancel={() => router.push('Profile')} 
         onClick={editedFirstName.length == 0 ? () => alertUser() : editedFirstName != firstName && lastName == editedLastName && editedBio == bio ? () => updateDBFirst() :
         editedFirstName == firstName && lastName != editedLastName && editedBio == bio ? () => updateDBLast() : editedFirstName == firstName && lastName == editedLastName && editedBio != bio ? 
       () => updateDBBio() : editedFirstName != firstName && lastName != editedLastName && editedBio == bio ? () => updateDBFirstLast() : editedFirstName == firstName && lastName != editedLastName && editedBio != bio ?
