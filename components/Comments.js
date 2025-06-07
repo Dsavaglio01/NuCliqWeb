@@ -197,7 +197,6 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
         console.log('at least here')
         setSingleCommentLoading(true)
         if (!videoStyling) {
-          console.log(username, focusedItem.username)
           if (username == focusedItem.username) {
             try {
               addNewCommentFunction('newCommentUsername', username, comment, blockedUsers, pfp, notificationToken, user.uid, focusedItem, setComment, 
@@ -244,9 +243,9 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       }
     }
   return (
-    <ReactModal isOpen={commentModal} style={{content: styles.commentModalContainer}} preventScroll={true} onRequestClose={() => {handleClose(); setComments([])}}>
+    <ReactModal isOpen={commentModal} style={{content: videoStyling ? styles.videoCommmentModalContainer : styles.commentModalContainer}} preventScroll={true} onRequestClose={() => {handleClose(); setComments([])}}>
         <div className='swipe-container' {...swipeHandlers} style={styles.swipeContainer}>
-            {focusedItem != null && focusedItem.post != null && Array.isArray(focusedItem.post) ?
+            {focusedItem != null && focusedItem.post != null && !videoStyling && Array.isArray(focusedItem.post) ?
     <div className='border-rounded-sm' style={{ 
     backgroundColor: "#121212",
     backgroundImage: `url(${focusedItem.background})`, // Add background image URL here
@@ -445,6 +444,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       })}
       <div style={styles.commentInputContainer}>
         <div style={styles.commentInput}>
+        <div className='flex items-center'>
         {pfp != undefined ? <img src={pfp} style={styles.inputPfp}/> :
           <UserCircleIcon className='userBtn' style={styles.inputPfp}/>}
           {replyToReplyFocus ? 
@@ -457,7 +457,8 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           <textarea value={comment}
             onChange={handleNewComment} maxLength={200}
           className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
-          <div className='justify-end flex items-end ml-10'>
+          </div>
+          <div className='justify-end flex items-end mr-5'>
             {!singleCommentLoading ? 
             <button style={styles.sendButton} onClick={() => addNewComment()}>
               <p style={styles.sendText}>Send</p>

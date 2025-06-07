@@ -7,7 +7,6 @@ import { fetchMorePublicPostsExcludingBlockedUsersVideo, fetchPublicPostsExcludi
 import { styles } from '@/styles/styles'
 import IndVidPost from './IndVidPost'
 function VidPosts({profile}) {
-  console.log(profile)
   const [meet, setMeet] = useState(true);
   const [reloadPage, setReloadPage] = useState(true);
   const [tempPosts, setTempPosts] = useState([]);
@@ -25,34 +24,34 @@ function VidPosts({profile}) {
   const dropdownRef = useRef(null);
   // useEffect to handle the initial fast scroll
   useEffect(() => {
-  const container = containerRef.current;
-  if (!container) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-  const handleWheel = (event) => {
-    event.preventDefault();
+    const handleWheel = (event) => {
+      event.preventDefault();
 
-    if (!isScrolling) {
-      setIsScrolling(true);
-      const delta = Math.sign(event.deltaY);
-      setScrollDirection(delta);
+      if (!isScrolling) {
+        setIsScrolling(true);
+        const delta = Math.sign(event.deltaY);
+        setScrollDirection(delta);
 
-      // Calculate and set the targetIndex
-      let newIndex = activeIndex + delta; // Use delta to determine direction
-      newIndex = Math.max(0, Math.min(newIndex, 2));
+        // Calculate and set the targetIndex
+        let newIndex = activeIndex + delta; // Use delta to determine direction
+        newIndex = Math.max(0, Math.min(newIndex, 2));
 
-      container.scrollTo({
-        top: newIndex * container.offsetHeight,
-        behavior: "smooth",
-      });
-      setTimeout(() => {
-        setIsScrolling(false);
-        setActiveIndex(newIndex);
-      }, 1500);
-    }
-  };
+        container.scrollTo({
+          top: newIndex * container.offsetHeight,
+          behavior: "smooth",
+        });
+        setTimeout(() => {
+          setIsScrolling(false);
+          setActiveIndex(newIndex);
+        }, 1500);
+      }
+    };
 
-  container.addEventListener("wheel", handleWheel);
-  return () => container.removeEventListener("wheel", handleWheel);
+    container.addEventListener("wheel", handleWheel);
+    return () => container.removeEventListener("wheel", handleWheel);
 }, [activeIndex, isScrolling, scrollDirection]);
   const [{ scrollY }, set] = useSpring(() => ({ scrollY: 0, 
     config: {clamp: true, mass: 1, tension: 180, friction: 12},
@@ -102,7 +101,6 @@ function VidPosts({profile}) {
       loadPosts();
     }
   }, [meet, reloadPage, profile.blockedUsers]);
-  console.log(tempPosts.length)
     useEffect(() => {
     if (bottomObserver.current) {
       const observer = new IntersectionObserver(entries => {
@@ -125,7 +123,7 @@ function VidPosts({profile}) {
     }
   return (
     <main ref={dropdownRef}>
-      <div ref={containerRef}>
+      <div ref={containerRef} className='vidContainer' style={styles.videoContainer}>
           {tempPosts.map((e, index) => (
             <div key={e.id} className="video-item">
               <IndVidPost item={e} user={user} tempPosts={tempPosts} setTempPosts={setTempPosts} dropdownRef={dropdownRef} followers={profile.followers} following={profile.following} username={profile.username} reportedPosts={reportedPosts}

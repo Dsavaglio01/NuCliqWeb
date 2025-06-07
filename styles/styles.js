@@ -228,6 +228,16 @@ postHeader: {
     backgroundColor: "#121212",
     marginRight: '-50%'
   },
+  videoCommmentModalContainer: {
+    width: '20%',
+    left: '84%',
+    right: 'auto',
+    padding: 0,
+    borderRadius: 10,
+    transform: 'translate(-50%, 0)',
+    backgroundColor: "#121212",
+    marginRight: '-50%'
+  },
   modalContainer: {
     width: '40%',
     left: '50%',
@@ -320,6 +330,7 @@ postHeader: {
     commentInput: {
       display: 'flex', 
       alignItems: 'center', 
+      justifyContent: 'space-between',
       flexDirection: 'row',
       borderTopWidth: 1, 
       borderColor: "#fafafa"
@@ -615,7 +626,7 @@ postHeader: {
   commentInputContainer: {
     position: 'absolute', 
     bottom: 30, 
-    width: '87.5%'
+    width: '100%'
   },
   personalChatInput: {
     height: 40,

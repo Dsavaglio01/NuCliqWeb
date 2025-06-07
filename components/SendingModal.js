@@ -13,7 +13,6 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
     const [actuallySending, setActuallySending] = useState(false);
     const [friendsInfo, setFriendsInfo] = useState([]);
     const [caption, setCaption] = useState('');
-    console.log(following, followers)
     useMemo(()=> {
       setFriends([])
       let unsub;
@@ -30,7 +29,6 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
       fetchCards();
       return unsub;
     }, [followers, following]);
-    console.log(friends.length)
     useMemo(() => {
       if (friends.length > 0) {
         Promise.all(friends.map(async(item) => await getDoc(doc(db, 'profiles', item.id))))

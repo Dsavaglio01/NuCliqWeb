@@ -90,6 +90,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
 
     const handleCanPlay = () => {
       if (video) {
+        console.log(`Video: ${video}`)
         video.play(); // Play only when video is ready
       }
     };
@@ -121,7 +122,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
   return (
     <div className='flex'>
       <div>
-        <div style={styles.videoItem} className="bg-black items-center flex">
+        <div style={{height: '90vh', width: '25vw'}}>
           {!item.post ? (
             <BeatLoader color="#9edaff" />
           ) : (
@@ -155,7 +156,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
         </div>
           
       </div>
-        {/* <div style={styles.videoButtonContainer}>
+        <div style={styles.videoButtonContainer}>
             <div className='flex flex-col mb-5'>
                 <LikeButton key={item.id} video={true} item={item} user={user} updateTempPostsAddLike={addHomeLike} updateTempPostsRemoveLike={removeHomeLike} updateTempPostsFocusedLike={setFocusedLikedItem}/>
             </div>
@@ -176,8 +177,8 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
             <div className='flex flex-col mb-5'>
                 <EllipsisHorizontalIcon className='btn' />
             </div>
-        </div> */}
-        <Comments commentModal={commentModal} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
+        </div>
+        <Comments commentModal={commentModal} videoStyling={true} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
         {/* <ViewLikes likesModal={likesModal} closeLikesModal={() => setLikesModal(false)} focusedLikedItem={focusedLikedItem} user={user}/> */}
         <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={false} post={true} video={false}/>
         <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} video={false} theme={false} post={true} user={user} followers={followers} following={following}/>
