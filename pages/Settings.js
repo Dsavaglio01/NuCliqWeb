@@ -11,6 +11,7 @@ import TransactionHistory from './TransactionHistory';
 import ProfileContext from '@/context/ProfileContext';
 import { styles } from '@/styles/styles';
 import { fetchSettingsContent, logOut, unBlock, sendReport, statusFunction, allowNotificationsFunction, privacyFunction } from '@/firebaseUtils';
+import MiniPost from '@/components/MiniPost';
 function Settings() {
   const profile = useContext(ProfileContext);
     const {user} = useAuth();
@@ -162,49 +163,35 @@ function Settings() {
             </div>
             <p style={styles.tapToReceiveText}>Tap to Make Account Private</p>
              <div className='cursor-pointer' style={styles.sections}>
-                <p style={styles.bottomText}>Data Usage Policy</p>
+                <p style={styles.settingsBottomText}>Data Usage Policy</p>
                 <ChevronRightIcon className='btn'/>
             </div>
             <div className='cursor-pointer' style={styles.sections}>
-                <p style={styles.bottomText}>Data Retention Policy</p>
+                <p style={styles.settingsBottomText}>Data Retention Policy</p>
                 <ChevronRightIcon className='btn'/>
             </div>
             <div className='cursor-pointer' style={styles.sections}>
-                <p style={styles.bottomText}>Privacy Policy</p>
+                <p style={styles.settingsBottomText}>Privacy Policy</p>
                 <ChevronRightIcon className='btn'/>
             </div>
             <div className='cursor-pointer' style={styles.sections}>
-                <p style={styles.bottomText}>Terms and Conditions</p>
+                <p style={styles.settingsBottomText}>Terms and Conditions</p>
                 <ChevronRightIcon className='btn'/>
             </div>
             <div className='cursor-pointer' onClick={() => logOut(user?.uid)}>
-                <p style={styles.bottomText}>Log Out</p>
+                <p style={styles.settingsBottomText}>Log Out</p>
             </div>
             <div className='cursor-pointer'>
-                <p style={{...styles.bottomText, ...{color: 'red'}}}>Delete Account</p>
+                <p style={{...styles.settingsBottomText, ...{color: 'red'}}}>Delete Account</p>
             </div>
         </div>
         
         </div>
         <div style={contentState != 'My Likes' && contentState != 'saves' && contentState != 'mentions' ? { marginLeft: 0, marginTop: 10
-        } : {display: 'grid', flex: 1, gridTemplateColumns: '1fr 1fr 1fr', gap: 20, marginTop: 10, marginLeft: '2.5%'}}>
+        } : styles.contentContainer}>
         {(contentState == 'My Likes' || contentState == 'saves' || contentState == 'mentions') && !loading ? posts.map((item, index) => (
-            !item.repost && item.post[0].image ? 
-      <button style={styles.settingsPostContainer} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}>
-        <img src={item.post[0].post} style={styles.settingsPostContainer}/>
-      </button> : item.repost && item.post.post[0].image ? 
-      <button style={styles.settingsPostContainer} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}>
-        <img src={item.post.post[0].post} style={styles.settingsPostContainer}/>
-      </button> : !item.repost && item.post[0].video ? <button style={styles.settingsPostContainer} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}>
-        <img src={item.post[0].thumbnail} style={styles.settingsPostContainer}/>
-      </button> : item.repost && item.post.post[0].video ? <button style={styles.settingsPostContainer} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}>
-        <img src={item.post.post[0].thumbnail} style={styles.settingsPostContainer}/>
-      </button> : !item.repost ?
-      <button style={styles.settingsPostTextContainer} onClick={!item.repost ? () => router.push('Post', {post: item.id, requests: requests, name: item.userId, groupId: null, video: false}) : () =>  router.push('Repost', {post: item.id, requests: requests, name: item.userId, groupId: null})}>
-        <p style={styles.settingsPostContainer}>{item.post[0].value}</p>
-      </button> : <button style={styles.settingsPostTextContainer} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}>
-        <p style={styles.settingsPostContainer}>{item.post.post[0].value}</p>
-      </button>
+            !item.repost ? <MiniPost item={item} index={index} repost={false} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}/> 
+            : item.repost ? <MiniPost item={item} index={index} repost={true} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}/> : null
         )) : contentState == 'comments' ? completePosts.map((item, index) => (
         <div style={{margin: '2.5%', width: '63vw', flexDirection: 'row', display: 'flex', borderBottomWidth: 1, borderBottomColor: "#d3d3d3", paddingBottom: 10}}>
         <div style={{flexDirection: 'row', display: 'flex', alignItems: 'center', width: '92.5%', marginLeft: '2.5%'}}>

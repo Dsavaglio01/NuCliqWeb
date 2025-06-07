@@ -12,8 +12,10 @@ import { LockClosedIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import Edit from '@/pages/Edit';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
-import { fetchPosts, fetchReposts } from '@/firebaseUtils';
+import { fetchPosts, fetchReposts, fetchCount} from '@/firebaseUtils';
+import { where } from 'firebase/firestore';
 function ProfileComponent({person, viewing, friendId, profile, preview, previewMade, ableToMessage}) {
+    console.log(person)
     const name = person.id;
     const router = useRouter();
     const {user} = useAuth();
@@ -32,7 +34,6 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
     const [loading, setLoading] = useState(true);
     const [settingsShown, setSettingsShown] = useState(false);
     const [edit, setEdit] = useState(false);
-    console.log(person)
     useEffect(() => {
         let unsubscribe;
         if (user.uid && postSetting) {
@@ -55,6 +56,13 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
         };
     }, [user?.uid, postSetting, person, profile.blockedUsers]);
     useEffect(() => {
+      if (name) {
+        fetchCount(name, 'posts', [where('repost', '==', false)], setNumberOfPosts);
+        fetchCount(name, 'posts', [where('repost', '==', true)], setNumberOfReposts);
+      }
+    }, [name]);
+    console.log(name)
+    useEffect(() => {
         let unsubscribe;
         if (user.uid && repostSetting) {
             // Call the utility function and pass state setters as callbacks
@@ -76,10 +84,10 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
         };
     }, [user?.uid, repostSetting, person, profile.blockedUsers]);
     const Posts = ({index, item}) => (
-        <MiniPost item={item} index={index} repost={false}/>
+        <MiniPost item={item} index={index} repost={false} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}/>
     )
     const Reposts = ({index, item}) => (
-        <MiniPost item={item} index={index} repost={true}/>
+        <MiniPost item={item} index={index} repost={true} onClick={() => router.push({pathname: 'Post', query: {post: item.id}})}/> // need to adjust for reposts
     )
     async function unBlockUser() {
         try {

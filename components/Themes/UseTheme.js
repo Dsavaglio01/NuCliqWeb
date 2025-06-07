@@ -5,7 +5,8 @@ import { styles } from '@/styles/styles';
 import NextButton from '../NextButton';
 import { BeatLoader } from 'react-spinners';
 import { applyUseTheme } from '@/firebaseUtils';
-function UseTheme({actualTheme, appliedThemeModal, closeModal, userId}) {
+import MainButton from '../MainButton';
+function UseTheme({actualTheme, appliedThemeModal, closeModal, userId, profiles, posts, both}) {
     const [profileDoneApplying, setProfileDoneApplying] = useState(false);
     const [postDoneApplying, setPostDoneApplying] = useState(false);
     const [bothDoneApplying, setBothDoneApplying] = useState(false);
@@ -24,10 +25,10 @@ function UseTheme({actualTheme, appliedThemeModal, closeModal, userId}) {
     <ReactModal isOpen={appliedThemeModal} style={{content: {
         width: '20%',
         left: '68%',
-        marginTop: '5%',
+        marginTop: '15%',
         right: 'auto',
         borderRadius: 10,
-        height: '40%',
+        height: '30%',
         transform: 'translate(-50%, 0)',
         backgroundColor: "#121212",
         marginRight: '-50%',}}}>
@@ -39,7 +40,8 @@ function UseTheme({actualTheme, appliedThemeModal, closeModal, userId}) {
         </div>
         <div className='divider'/>
         {profileDoneApplying || postDoneApplying || bothDoneApplying ? null : 
-        <p style={styles.questionText}>Where do you want to apply the "{actualTheme != null ? actualTheme.name : null}" theme?</p>}
+        <p style={styles.questionText}>Do you want to apply the "{actualTheme != null ? actualTheme.name : null}" theme to <b>{profiles ? 'your Profile' : posts ? 'your Posts' :
+        both ? 'Both your Profile and Posts' : null}</b>?</p>}
         {useThemeModalLoading ? 
         <div style={{marginTop: '5%'}}> 
             <BeatLoader color={"#9EDAFF"}/> 
@@ -53,40 +55,16 @@ function UseTheme({actualTheme, appliedThemeModal, closeModal, userId}) {
             <div>
                 <span style={styles.postText}>Your profile and posts are now updated with this theme. You can check by going to your profile and clicking on your posts on your profile!</span>
             </div> : 
-            <div className='flex flex-col ml-20'>
-                <label className='options'>
-                    <input
-                        type="radio"
-                        value="Posts"
-                        checked={current === 'Posts'}
-                        onChange={(event) => setCurrent(event.target.value)}
-                    />
-                    <span className='optionLabel'>My Posts</span>
-                </label>
-                <label className='options'>
-                    <input
-                        type="radio"
-                        value="Profile"
-                        checked={current === 'Profile'}
-                        onChange={(event) => setCurrent(event.target.value)}
-                    />
-                    <span className='optionLabel'>My Profile Page</span>
-                </label>
-                <label className='options'>
-                    <input
-                        type="radio"
-                        value="Both"
-                        checked={current === 'Both'}
-                        onChange={(event) => setCurrent(event.target.value)}
-                    />
-                    <span className='optionLabel'>Both</span>
-                </label>
+            <div className='flex flex-col'>
                 <div style={styles.useThemeLoadingContainer}> 
                     {applyLoading ? <BeatLoader color={"#9EDAFF"}/> : 
-                    <NextButton text={profileDoneApplying || postDoneApplying || bothDoneApplying ? "OK" : "CONTINUE"} button={{width: '45%'}} 
-                    onPress={profileDoneApplying || postDoneApplying || bothDoneApplying ? 
+                    <div className='flex justify-evenly'>
+                        <MainButton text={"NO"} onClick={() => handleClose()}/>
+                        <NextButton text={"YES"} onPress={profileDoneApplying || postDoneApplying || bothDoneApplying ? 
                         () => {handleClose(); setProfileDoneApplying(false); setBothDoneApplying(false); setPostDoneApplying(false)} 
                         : () => applyToUser()}/>
+                    </div>
+                   
                     }
                 </div>
             </div>

@@ -204,8 +204,12 @@ postHeader: {
     fontSize: 12.29, 
     color: "#fafafa"
   },
+  miniImage: {
+    height: '100%',
+    width: typeof window !== 'undefined' ? (window.outerHeight / 4) * 1.01625 : 0
+  },
   image: {
-     height: typeof window !== 'undefined' ? window.outerHeight / 4 : 0,
+    height: typeof window !== 'undefined' ? window.outerHeight / 4 : 0,
     width: typeof window !== 'undefined' ? (window.outerHeight / 4) * 1.01625 : 0
   },
   postDoneContainer: {
@@ -1207,6 +1211,14 @@ postHeader: {
     paddingTop: 0, 
     fontSize: 15.36
   },
+  contentContainer: {
+    display: 'grid', 
+    gridTemplateColumns: '1fr 1fr 1fr 1fr', 
+    gap: 0, 
+    marginTop: 10, 
+    marginLeft: '2.5%',
+    gridAutoRows: 'min-content'
+  },
   contentListContainer: {
     borderRadius: 10,
     borderBottomWidth: 1,
@@ -1398,5 +1410,10 @@ postHeader: {
     marginTop: '15%',
     marginLeft: '5%',
     justifyContent: 'flex-end'
+  },
+  playBtn: {
+    position: 'relative',
+    left: '85%',
+    bottom: '85%'
   }
 }
