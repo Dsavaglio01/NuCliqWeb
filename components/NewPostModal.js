@@ -186,7 +186,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                         <div style={styles.postContainerButton}>
                         <div style={{alignSelf: 'center'}}>
                         {text.length > 0 ? <div className='mr-3 mt-3'>
-                        <MainButton text={initialText ? "FINISH EDIT" : "FINISH"} onPress={text.length > 0 ? initialText ? () => putKeys() : () => addToArray() : null} />
+                        <MainButton text={"FINISH"} onPress={text.length > 0 ? initialText ? () => putKeys() : () => addToArray() : null} />
                         </div> : null}
                         </div>
                         </div>

@@ -15,7 +15,6 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchPosts, fetchReposts, fetchCount} from '@/firebaseUtils';
 import { where } from 'firebase/firestore';
 function ProfileComponent({person, viewing, friendId, profile, preview, previewMade, ableToMessage}) {
-    console.log(person)
     const name = person.id;
     const router = useRouter();
     const {user} = useAuth();
