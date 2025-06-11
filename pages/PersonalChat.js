@@ -2,7 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import React from 'react'
 import {useState, useEffect, useRef} from 'react'
 import { BeatLoader } from 'react-spinners';
-import { onSnapshot, getDoc, doc, getDocs, updateDoc, query, collection, arrayUnion } from 'firebase/firestore';
+import { onSnapshot, getDoc, doc, getDocs, updateDoc, query, collection, arrayUnion, where, deleteDoc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import {HeartIcon as SolidHeart, UserCircleIcon } from '@heroicons/react/24/solid';
 import { PhotoIcon} from '@heroicons/react/24/outline';
@@ -246,9 +246,10 @@ function PersonalChat({firstName, lastName, pfp, friendId, id, notificationToken
               }
               getData()
             }
-            if (item.message.post.group == undefined) {
+            if (item.message.post.group == undefined && item.message.post) {
+              console.log(item.message.post)
               const getData = async() => {
-                const docSnap = await getDoc(doc(db, 'posts', item.message.post))
+                const docSnap = await getDoc(doc(db, 'posts', item.message.post.id))
                 if (docSnap.exists()) {
                   newArray[index].message.post = docSnap.data()
                   setNewMessages(newArray)
@@ -317,7 +318,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, id, notificationToken
                     pfp ? <img src={pfp} style={styles.profileImage} /> : <UserCircleIcon className='userBtn' style={styles.profileImage} />
                   )}
                   <div style={item.user == user.uid ? styles.userBubbleStyle : styles.bubbleStyle}>
-                    <p style={item.user == user.uid ? [styles.postUsername, {color: "#121212"}] : [styles.postUsername, {color: "#fafafa"}]}>Theme unavailable</p>
+                    <p style={item.user == user.uid ? {...styles.postUsername, ...{color: "#121212"}} : {...styles.postUsername, ...{color: "#fafafa"}}}>Theme unavailable</p>
                     <div style={item.user != user.uid ? {...styles.timestampContainer, ...styles.userTimestampContainer} : styles.timestampContainer}>
                       {getDateAndTime(item.timestamp) ?  <p style={item.user == user.uid ? styles.userTimestamp : styles.timestamp}>{getDateAndTime(item.timestamp)}</p> : null}
                     </div>
@@ -334,7 +335,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, id, notificationToken
                   <button onClick={() => handleThemePress(item)} onLongPress={() => toggleSaveToTrue(item)}>
                   <div style={styles.repostButtonContainer}>
                     <div style={styles.chatThemeName}>
-                      <p style={item.user == user.uid ? [styles.postUsername, {color: "#121212"}] : [styles.postUsername, {color: "#fafafa"}]}>Theme: {item.message.theme.name}</p>
+                      <p style={item.user == user.uid ? {...styles.postUsername, ...{color: "#121212"}} : {...styles.postUsername, ...{color: "#fafafa"}}}>Theme: {item.message.theme.name}</p>
                     </div>
                   </div>
                   <div style={{ marginTop: '5%'}}>
@@ -430,7 +431,7 @@ function PersonalChat({firstName, lastName, pfp, friendId, id, notificationToken
                   : <UserCircleIcon className='userBtn' style={styles.profileImage} />
                 )}
                 <div style={item.user == user.uid ? styles.userBubbleStyle : styles.bubbleStyle}>
-                  <p style={item.user == user.uid ? [styles.postUsername, {color: "#121212"}] : [styles.postUsername, {color: "#fafafa"}]}>Post unavailable</p>
+                  <p style={item.user == user.uid ? {...styles.postUsername, ...{color: "#121212"}} : {...styles.postUsername, ...{color: "#fafafa"}}}>Post unavailable</p>
                   <div style={item.user != user.uid ? {...styles.timestampContainer, ...styles.userTimestampContainer} : styles.timestampContainer}>
                     {getDateAndTime(item.timestamp) ? <p style={item.user == user.uid ? styles.userTimestamp : styles.timestamp}>{getDateAndTime(item.timestamp)}</p> : null}
                   </div>
@@ -448,20 +449,20 @@ function PersonalChat({firstName, lastName, pfp, friendId, id, notificationToken
                       {item.message.post.pfp ? <img src={item.message.post.pfp} style={styles.imagepfp}/> :
                         <UserCircleIcon className='userBtn' style={styles.imagepfp}/>
                       }
-                      <p style={item.user == user.uid ? [styles.postUsername, {color: "#121212"}] : [styles.postUsername, {color: "#fafafa"}]}>@{item.message.post.username}</p>
+                      <p style={item.user == user.uid ? {...styles.postUsername, ...{color: "#121212"}} : {...styles.postUsername, ...{color: "#fafafa"}}}>@{item.message.post.username}</p>
                     </div>
                     {item.message.post.post[0].image ?
                       <img src={item.message.post.post[0].post} style={styles.personalChatImage}/> : item.message.post.post[0].video ?
                       <img src={item.message.post.post[0].thumbnail} style={styles.personalChatImage}/> : 
                       <div style={{marginTop: -5}}>
-                        <ChatBubble bubbleColor='#fff' tailColor='#fff'>
+                        {/* <ChatBubble bubbleColor='#fff' tailColor='#fff'>
                           <p style={styles.personalChatImage}>{item.message.post.post[0].value}</p>
-                        </ChatBubble>
+                        </ChatBubble> */}
                       </div>}
                     {item.message.post.caption.length > 0 ? 
                       <div style={{width: '90%'}}>
-                        <p className='numberofLines1' style={item.user == user.uid ? [styles.captionText, {color: "#121212"}] 
-                          : [styles.captionText, {color: "#fafafa"}]}>{item.message.post.username} - {item.message.post.caption}</p> 
+                        <p className='numberofLines1' style={item.user == user.uid ? {...styles.captionText, ...{color: "#121212"}}
+                          : {...styles.captionText, ...{color: "#fafafa"}}}>{item.message.post.username} - {item.message.post.caption}</p> 
                       </div>
                     : null}
                   </button> 

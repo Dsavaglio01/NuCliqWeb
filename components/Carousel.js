@@ -20,12 +20,9 @@ const CustomDot = ({ onClick, post, ...rest }) => {
   // active is provided by this lib for checking if the item is active or not.
   return (
     <div className='justify-end flex items-end'>
-      <button
-      className={active ? "activeDot" : "inactiveDot"}
-    >
-      
-    </button>
+      <button className={active ? "activeDot" : "inactiveDot"} />
     </div>
+    
     
   );
 };

@@ -7,12 +7,16 @@ import { BeatLoader } from 'react-spinners';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import MainButton from './MainButton';
 import ProfileContext from '@/context/ProfileContext';
+import { useAuth } from '@/context/AuthContext';
 const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
     const profile = useContext(ProfileContext);
+    const {user} = useAuth();
     const fileInputRef = useRef(null);
+    const [finalMentions, setFinalMentions] = useState([]);
     const fileVideoInputRef = useRef(null);
     const [initialText, setInitialText] = useState({});
+    const [uploading, setUploading] = useState(false);
     const [text, setText] = useState('');
     const [data, setData] = useState([]);
     const [textOpen, setTextOpen] = useState(false);
@@ -90,6 +94,60 @@ function NewPostModal({newPostModal, closePostModal}) {
     const handleText = (event) => {
         setText(event.target.value)
     }
+    const postText = async() => {
+      //console.log(postArray)
+      console.log(text.length)
+      if (text.length > 0) {
+        setUploading(true)
+        const newPostArray = [{backgroundColor: 'white', textAlign: 'left', textSize: 15.36, textColor: 'black', value: text, id: '1', image: false, text: true, visible: true}]
+        try {
+          const response = await fetch(`http://10.0.0.225:4000/api/uploadPost`, {
+            method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
+            headers: {
+              'Content-Type': 'application/json', // Set content type as needed
+            },
+            body: JSON.stringify({ data: {caption: "", mood: null, blockedUsers: profile.blockedUsers, newPostArray: newPostArray, forSale: profile.forSale, value: text, finalMentions: [], pfp: profile.pfp, notificationToken: profile.notificationToken,
+              background: profile.postBackground, user: user.uid, username: profile.userName, value: profile.private}}), // Send data as needed
+          })
+          const data = await response.json();
+          if (data.done) {
+            if (finalMentions.length > 0) {
+              setUploading(false)
+              finalMentions.map(async(item) => {
+                await setDoc(doc(db, 'profiles', item.id, 'notifications', data.docRefId), {
+                  like: false,
+                  comment: false,
+                  friend: false,
+                  item: data.docRefId,
+                  request: false,
+                  postMention: true,
+                  video: false,
+                  acceptRequest: false,
+                  theme: false,
+                  postId: data.docRefId,
+                  report: false,
+                  requestUser: user.uid,
+                  requestNotificationToken: item.notificationToken,
+                  likedBy: profile.userName,
+                  timestamp: serverTimestamp()
+                }).then(async() => 
+                await setDoc(doc(db, 'profiles', item.id, 'mentions', data.docRefId), {
+                  id: data.docRefId,
+                  timestamp: serverTimestamp()
+                })).then(() => scheduleMentionNotification(item.id, profile.userName, item.notificationToken))})
+            } 
+            else {
+              setUploading(false)
+            }
+          }
+        } 
+        catch (error) {
+          console.error('Error:', error);
+        }
+        //navigation.navigate('NewPost', {postArray: [{id: count, image: false, visible: false, value: text, text: true, textSize: actualTextSize, textColor: textColor, textAlign: textAlign, backgroundColor: backgroundColor}], group:group, actualGroup: actualGroup, groupId: groupId, groupName: groupName})
+      }
+    }
+    console.log(text.length)
     return (
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
             <div>
@@ -184,11 +242,17 @@ function NewPostModal({newPostModal, closePostModal}) {
                         <p style={styles.postLength}>{text.length}/300</p>
                         </div>
                         <div style={styles.postContainerButton}>
-                        <div style={{alignSelf: 'center'}}>
-                        {text.length > 0 ? <div className='mr-3 mt-3'>
-                        <MainButton text={"FINISH"} onPress={text.length > 0 ? initialText ? () => putKeys() : () => addToArray() : null} />
-                        </div> : null}
-                        </div>
+                            <div style={{alignSelf: 'center'}}>
+                                {text.length > 0 && !uploading ? 
+                                    <div className='mr-3 mt-3'>
+                                        <MainButton text={"POST"} onClick={text.length > 0 ? () => postText() : () => addToArray()} />
+                                    </div> 
+                                : uploading ? 
+                                    <div className='mt-5 mr-3'>
+                                        <BeatLoader color='#9edaff'/> 
+                                    </div>
+                                : null}
+                            </div>
                         </div>
                     </>
                     </div>

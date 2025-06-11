@@ -177,7 +177,7 @@ function ProfileComponent({person, viewing, friendId, profile, preview, previewM
                                 <div style={styles.profileLoader}>
                                     {loading ? <BeatLoader color="#9edaff" /> : profile.pfp ?
                                     <img src={profile.pfp} className='cursor-pointer' style={styles.profileCircle}/>
-                                    : <UserCircleIcon color='#005278' style={styles.profileCircle}/>}
+                                    : <UserCircleIcon color='#9edaff' style={styles.profileCircle}/>}
                                 </div>
                             </div>
                             {profile && profile.bio.length > 0 ? 

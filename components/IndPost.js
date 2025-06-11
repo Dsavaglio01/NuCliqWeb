@@ -97,9 +97,9 @@ function IndPost({item, user, pfp, username, notificationToken, followers, follo
             <div className='bg-[#121212] rounded-xl m-5 pb-3'>
                 <div className='flex p-5 py-3 items-center border-rounded-sm'>
                     {item.pfp ? <img src={item.pfp} className='rounded-xl h-12 w-12 object-fill p-1 mr-3'/> : 
-                        <img src='../public/defaultpfp.jpg' height={44} width={44} style={styles.pfpBorder}/>
+                        <img src='defaultpfp.jpg' height={44} width={44} style={styles.pfpBorder}/>
                     }
-                    <p className='flex-1 font-bold' style={{color: "#fafafa"}}>{item.username}</p>
+                    <p className='flex-1 font-bold pl-5' style={{color: "#fafafa"}}>{item.username}</p>
                     <FollowButtons user={user} item={item}/>
                 </div>
                 {item.post != null && item.post.length > 1 ? <CarouselComponent itemPost={item.post}/> : item.post != null && 

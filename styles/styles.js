@@ -508,7 +508,7 @@ postHeader: {
     borderRadius: 8,
     borderWidth: 2,
     marginTop: 7.5,
-    borderColor: "#005278",
+    borderColor: "#9edaff",
   },
   nameAge: {
     fontSize: 19.20,
