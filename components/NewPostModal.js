@@ -4,10 +4,12 @@ import { styles } from '@/styles/styles';
 import NewPostHeader from './NewPostHeader';
 import { PhotoIcon, VideoCameraIcon, ChatBubbleBottomCenterTextIcon, EllipsisVerticalIcon, XMarkIcon} from '@heroicons/react/24/solid';
 import { BeatLoader } from 'react-spinners';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+//import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import MainButton from './MainButton';
 import ProfileContext from '@/context/ProfileContext';
 import { useAuth } from '@/context/AuthContext';
+import { Reorder, useMotionValue } from 'framer-motion';
+import { useRaisedShadow } from '@/styles/use-raised-shadow';
 const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
     const profile = useContext(ProfileContext);
@@ -147,7 +149,8 @@ function NewPostModal({newPostModal, closePostModal}) {
         //navigation.navigate('NewPost', {postArray: [{id: count, image: false, visible: false, value: text, text: true, textSize: actualTextSize, textColor: textColor, textAlign: textAlign, backgroundColor: backgroundColor}], group:group, actualGroup: actualGroup, groupId: groupId, groupName: groupName})
       }
     }
-    console.log(text.length)
+    const y = useMotionValue(0);
+    const boxShadow = useRaisedShadow(y);
     return (
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
             <div>
@@ -195,7 +198,14 @@ function NewPostModal({newPostModal, closePostModal}) {
                 <div style={styles.loadContainer}> 
                     <BeatLoader color='#9edaff'/>
                 </div> : data.length != 0 && !loading && !textOpen ? 
-                <DragDropContext onDragEnd={onDragEnd}>
+                <Reorder.Group axis='y' values={data} onReorder={setData}>
+                    {data.map((item, index) => (
+                        <Reorder.Item key={item} value={item} style={{ boxShadow, y, backgroundColor: "#fafafa"}}>
+                           <span>Post #{index + 1}</span>
+                        </Reorder.Item>
+                    ))}
+                </Reorder.Group>
+               /*  <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId="droppable">
                     {(provided, snapshot) => (
                         <div {...provided.droppableProps} ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
@@ -223,7 +233,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                         </div>
                     )}
                     </Droppable>
-                </DragDropContext>
+                </DragDropContext> */
                 : textOpen ? 
                 <div>
                     <div>

@@ -602,7 +602,7 @@ postHeader: {
     fontSize: typeof window !== 'undefined' ? window.innerHeight / 68.7 : 0,
     padding: 10,
     paddingTop: 0,
-    marginTop: '5%',
+    marginTop: '2.5%',
     color: "#fafafa",
     textAlign: 'center'
   },
@@ -670,6 +670,7 @@ postHeader: {
     padding: 10,
     paddingTop: 0,
     marginTop: 0,
+    marginBottom: '2.5%',
     color: "#fafafa",
     textAlign: 'center'
   },
