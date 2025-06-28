@@ -178,6 +178,12 @@ postHeader: {
     alignSelf: 'center', 
     paddingLeft: 5
   },
+  successText: {
+    fontSize: 19.20,
+    padding: 10,
+    textAlign: 'center',
+    color: "#9edaff"
+  },
   postUsername: {
     fontSize: 15.36,
     alignSelf: 'center',
@@ -198,9 +204,10 @@ postHeader: {
     padding: 5
   },
   captionBox: {
-    height: 100,
+    height: 120,
     padding: 5,
-    width: '100%'
+    marginLeft: '5%',
+    width: '90%'
   },
   reportPostText: {
     color: "#121212", 

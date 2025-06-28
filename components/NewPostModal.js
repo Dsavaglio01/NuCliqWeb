@@ -32,6 +32,9 @@ function NewPostModal({newPostModal, closePostModal}) {
     const handleClose = () => {
         closePostModal();
     }
+    const handleCaption = () => {
+
+    }
     const handleClick = () => {
         fileInputRef.current.click();
     }
@@ -158,7 +161,7 @@ function NewPostModal({newPostModal, closePostModal}) {
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
             <div style={{height: '90%'}}>
             {captionModal ? 
-            <CaptionModal profile={profile} data={data}/> : 
+            <CaptionModal data={data} user={user} profile={profile} closeCaptionModal={() => setCaptionModal(false)}/> : 
             <>
             <p className='text-white text-2xl'>New Post</p>
             <div className='divider'/>
@@ -267,7 +270,7 @@ function NewPostModal({newPostModal, closePostModal}) {
             </div>
             </>}
             </div>
-            
+            {!captionModal ? 
             <div style={{position: 'absolute', left: '85%'}}>   
                 <div style={styles.postContainerButton}>
                     {(text.length > 0 && !uploading) ? 
@@ -276,7 +279,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                         </div> 
                     : (data.length > 0 && !uploading) ? 
                       <div className='mr-3 mt-3'>
-                        <MainButton text={"NEXT"} onClick={() => setCaptionModal(true)} />
+                        <MainButton text={captionModal ? "POST" : "NEXT"} onClick={captionModal ? () => handleCaption() : () => setCaptionModal(true)} />
                     </div> :
                     uploading ? 
                         <div className='mt-5 mr-3'>
@@ -284,7 +287,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                         </div>
                     : null}
                 </div>
-            </div>
+            </div> : null}
             <button className="close-button self-center" onClick={() => {handleClose(); setData([])}}>
             <XMarkIcon className='btn self-center'/>
             </button>

@@ -1,7 +1,7 @@
 import React from 'react'
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-function CarouselComponent({itemPost}) {
+function CarouselComponent({itemPost, height}) {
     const responsive = {
   desktop: {
     breakpoint: { max: 3000, min: 0 },
@@ -35,7 +35,7 @@ const CustomDot = ({ onClick, post, ...rest }) => {
     transitionDuration={500}>
     {itemPost.map((e, index) => (
       <div key={index} className="px-5 pb-5">
-        <img src={e.post} className="object-cover w-full rounded-md" />
+        <img src={e.post} style={height ? {height: height} : null} className="object-cover w-full rounded-md" />
       </div>
     ))}
   </Carousel>
