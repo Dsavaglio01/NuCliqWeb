@@ -9,6 +9,7 @@ export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, set
   const storage = getStorage();
   // Upload Image to Firebase Storage
   const addImage = async (data) => {
+    console.log('image here')
     try {
       setDownloadLoading(true);
       const fileName = `posts/${user.uid}post${Date.now()}${data.id}.jpg`
@@ -24,6 +25,7 @@ export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, set
     }
   };
   const addVideo = async (data) => {
+    console.log('here')
     try {
     setDownloadLoading(true);
     const fileName = `videos/${user.uid}video${Date.now()}${data.id}.mp4`
@@ -44,13 +46,11 @@ export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, set
   };
   // Get Download URL from Firebase
   const getLink = async (post, item) => {
-    console.log(`Item: ${item}`)
+    console.log(post, item, caption, mood)
     try {
       const starsRef = ref(storage, post);
       const url = await getDownloadURL(starsRef);
-      await handleImageModeration({url: url, caption: caption, IMAGE_MODERATION_URL: process.env.IMAGE_MODERATION_URL, mood: mood, 
-        MODERATION_API_USER: process.env.MODERATION_API_USER, MODERATION_API_SECRET: process.env.MODERATION_API_SECRET, TEXT_MODERATION_URL: process.env.TEXT_MODERATION_URL,
-        actualPostArray: actualPostArray, setNewPostArray: setNewPostArray, reference: starsRef, item: item})
+      await handleImageModeration({url: url, caption: caption, mood: mood, actualPostArray: actualPostArray, setNewPostArray: setNewPostArray, reference: starsRef, item: item})
     } catch (error) {
       console.error("Error getting download URL:", error);
       setDownloadLoading(false);
@@ -62,9 +62,7 @@ export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, set
       const thumbnailRef = ref(storage, thumbnail)
       const url = await getDownloadURL(starsRef);
       const thumbnailUrl = await getDownloadURL(thumbnailRef)
-      await handleVideoContentModeration({url: url, thumbnail: thumbnailUrl, caption: caption, IMAGE_MODERATION_URL: process.env.IMAGE_MODERATION_URL, 
-        MODERATION_API_USER: process.env.MODERATION_API_USER, MODERATION_API_SECRET: process.env.MODERATION_API_SECRET, TEXT_MODERATION_URL: process.env.TEXT_MODERATION_URL,
-        actualPostArray: actualPostArray, setNewPostArray: setNewPostArray, reference: starsRef, item: item})
+      await handleVideoContentModeration({url: url, thumbnail: thumbnailUrl, caption: caption, actualPostArray: actualPostArray, setNewPostArray: setNewPostArray, reference: starsRef, item: item})
     } catch (error) {
       console.error("Error getting download URL:", error);
       setDownloadLoading(false);

@@ -77,7 +77,7 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
                 <div className="px-5 pb-5">
                     <img src={data[0].post} style={{height: 500}} className="w-full rounded-md" />
                 </div> : null
-                }
+            }
         </div>
         
         <div className='m-5'>
