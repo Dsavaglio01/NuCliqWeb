@@ -197,6 +197,13 @@ postHeader: {
     borderColor: "#fafafa", 
     padding: 5
   },
+  reportPostText: {
+    color: "#121212", 
+    fontSize: 12.29, 
+    borderWidth: 0.5, 
+    borderColor: "#121212", 
+    padding: 5
+  },
   pfpBorder: {
     borderRadius: 8
   },
@@ -705,7 +712,7 @@ postHeader: {
     display: 'flex', 
     flexDirection: 'row', 
     justifyContent: 'center', 
-    marginTop: '-2.5%'
+    marginTop: '-1.5%'
   },
   loadContainer: {
     flex: 1, 
@@ -723,14 +730,12 @@ postHeader: {
     alignSelf: 'center'
   },
   postContainerButton: {
-    flexDirection: 'row', 
-    display: 'flex', 
-    justifyContent: 'flex-end', 
-    marginHorizontal: '10%'
+    display: 'flex',
+    justifyContent: 'flex-end'
   },
   userTextMessage: {
     display: 'flex', 
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
   },
   typeMessageContainer: {
     flexDirection: 'row', 

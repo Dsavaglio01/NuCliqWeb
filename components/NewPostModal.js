@@ -9,6 +9,7 @@ import MainButton from './MainButton';
 import ProfileContext from '@/context/ProfileContext';
 import { useAuth } from '@/context/AuthContext';
 import { Reorder, useMotionValue } from 'framer-motion';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useRaisedShadow } from '@/styles/use-raised-shadow';
 const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
@@ -21,6 +22,7 @@ function NewPostModal({newPostModal, closePostModal}) {
     const [uploading, setUploading] = useState(false);
     const [text, setText] = useState('');
     const [data, setData] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
     const [textOpen, setTextOpen] = useState(false);
     const [loading, setLoading] = useState(false)
     const handleClose = () => {
@@ -53,11 +55,8 @@ function NewPostModal({newPostModal, closePostModal}) {
         result.splice(endIndex, 0, removed);
         return result;
     };
-    function addToArray() {
-        if (text.length > 0) {
-            setData({id: 1, image: false, visible: false, value: text, text: true, textSize: 15.36, textColor: "#fafafa", textAlign: 'left', backgroundColor: "#121212"})
-            setText('')
-        }
+    function postMedia() {
+        
     }
     function onDragEnd(result) {
         // dropped outside the list
@@ -151,10 +150,13 @@ function NewPostModal({newPostModal, closePostModal}) {
     }
     const y = useMotionValue(0);
     const boxShadow = useRaisedShadow(y);
+    const toggleOpen = () => {
+        setIsOpen(!isOpen);
+    };
     return (
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
-            <div>
-            <p className='text-white'>New Post</p>
+            <div style={{height: '90%'}}>
+            <p className='text-white text-2xl'>New Post</p>
             <div className='divider'/>
             <div>
                 <NewPostHeader group={false} data={data} pfp={profile.pfp}/>
@@ -198,22 +200,15 @@ function NewPostModal({newPostModal, closePostModal}) {
                 <div style={styles.loadContainer}> 
                     <BeatLoader color='#9edaff'/>
                 </div> : data.length != 0 && !loading && !textOpen ? 
-                <Reorder.Group axis='y' values={data} onReorder={setData}>
-                    {data.map((item, index) => (
-                        <Reorder.Item key={item} value={item} style={{ boxShadow, y, backgroundColor: "#fafafa"}}>
-                           <span>Post #{index + 1}</span>
-                        </Reorder.Item>
-                    ))}
-                </Reorder.Group>
-               /*  <DragDropContext onDragEnd={onDragEnd}>
+                <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId="droppable">
                     {(provided, snapshot) => (
-                        <div {...provided.droppableProps} ref={provided.innerRef} style={getListStyle(snapshot.isDraggingOver)}>
+                        <div {...provided.droppableProps} ref={provided.innerRef}>
                         {data.map((item, index) => (
                             <Draggable key={item.id} draggableId={item.id} index={index}>
                             {(provided, snapshot) => (
                                 <div
-                                    className='flex flex-row'
+                                    className='flex flex-row bg-white'
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
@@ -224,7 +219,16 @@ function NewPostModal({newPostModal, closePostModal}) {
                                 >
                                 <img src={item.post} style={styles.postImage}/>
                                 <p className='text-black self-center pl-6'>Post #{index + 1}</p>
-                                <EllipsisVerticalIcon className='postBtn' style={styles.threeDotIcon} color='#121212'/>
+                                 <label htmlFor="hero-select" style={styles.threeDotIcon}>
+                                    {!isOpen && (
+                                        <EllipsisVerticalIcon className='postBtn' color='#121212' onClick={toggleOpen}/>
+                                    )}
+                                </label>
+                                {isOpen && ( 
+                                    <ul className="dropdown-list">
+                                        <li className='reportList' style={styles.reportPostText} onClick={() => setReportModal(true)}>Delete</li>
+                                    </ul>
+                                )}
                                 </div>
                             )}
                             </Draggable>
@@ -233,7 +237,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                         </div>
                     )}
                     </Droppable>
-                </DragDropContext> */
+                </DragDropContext>
                 : textOpen ? 
                 <div>
                     <div>
@@ -251,28 +255,31 @@ function NewPostModal({newPostModal, closePostModal}) {
                         <textarea placeholder={initialText ? initialText.value : "What's Vibing?"} value={text} style={styles.input} onChange={handleText} maxLength={300} />
                         <p style={styles.postLength}>{text.length}/300</p>
                         </div>
-                        <div style={styles.postContainerButton}>
-                            <div style={{alignSelf: 'center'}}>
-                                {text.length > 0 && !uploading ? 
-                                    <div className='mr-3 mt-3'>
-                                        <MainButton text={"POST"} onClick={text.length > 0 ? () => postText() : () => addToArray()} />
-                                    </div> 
-                                : uploading ? 
-                                    <div className='mt-5 mr-3'>
-                                        <BeatLoader color='#9edaff'/> 
-                                    </div>
-                                : null}
-                            </div>
-                        </div>
                     </>
                     </div>
                 </div> 
                 : null}
             </div>
+            
             </div>
-            <button className="close-button" onClick={() => {handleClose(); setData([])}}>
-            <XMarkIcon className='btn'/>
+            
+                
+            <button className="close-button self-center" onClick={() => {handleClose(); setData([])}}>
+            <XMarkIcon className='btn self-center'/>
             </button>
+            <div style={{position: 'absolute', left: '85%'}}>   
+                <div style={styles.postContainerButton}>
+                    {(text.length > 0 && !uploading) || (data.length > 0 && !uploading) ? 
+                        <div className='mr-3 mt-3'>
+                            <MainButton text={"POST"} onClick={text.length > 0 ? () => postText() : () => postMedia()} />
+                        </div> 
+                    : uploading ? 
+                        <div className='mt-5 mr-3'>
+                            <BeatLoader color='#9edaff'/> 
+                        </div>
+                    : null}
+                </div>
+            </div>
         </ReactModal>
   )
 }
