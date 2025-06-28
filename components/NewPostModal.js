@@ -8,10 +8,11 @@ import { BeatLoader } from 'react-spinners';
 import MainButton from './MainButton';
 import ProfileContext from '@/context/ProfileContext';
 import { useAuth } from '@/context/AuthContext';
-import { Reorder, useMotionValue } from 'framer-motion';
+import { useMotionValue } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useRaisedShadow } from '@/styles/use-raised-shadow';
 import { useMultiDownloadImage } from '@/hooks/useMultiDownloadImage';
+import CaptionModal from './CaptionModal';
 const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
     const profile = useContext(ProfileContext);
@@ -25,8 +26,9 @@ function NewPostModal({newPostModal, closePostModal}) {
     const [data, setData] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [textOpen, setTextOpen] = useState(false);
+    const [captionModal, setCaptionModal] = useState(false);
     const [loading, setLoading] = useState(false);
-    const {addImage, addVideo} = useMultiDownloadImage({user: user, mood: '', caption: caption ?? '', actualPostArray: actualPostArray, setNewPostArray: setNewPostArray});
+    //const {addImage, addVideo} = useMultiDownloadImage({user: user, mood: '', caption: caption ?? '', actualPostArray: actualPostArray, setNewPostArray: setNewPostArray});
     const handleClose = () => {
         closePostModal();
     }
@@ -57,9 +59,6 @@ function NewPostModal({newPostModal, closePostModal}) {
         result.splice(endIndex, 0, removed);
         return result;
     };
-    function postMedia() {
-        
-    }
     function onDragEnd(result) {
         // dropped outside the list
         if (!result.destination) {
@@ -158,6 +157,9 @@ function NewPostModal({newPostModal, closePostModal}) {
     return (
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
             <div style={{height: '90%'}}>
+            {captionModal ? 
+            <CaptionModal profile={profile} data={data}/> : 
+            <>
             <p className='text-white text-2xl'>New Post</p>
             <div className='divider'/>
             <div>
@@ -207,6 +209,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                     {(provided, snapshot) => (
                         <div {...provided.droppableProps} ref={provided.innerRef}>
                         {data.map((item, index) => (
+                            console.log(item),
                             <Draggable key={item.id} draggableId={item.id} index={index}>
                             {(provided, snapshot) => (
                                 <div
@@ -262,26 +265,30 @@ function NewPostModal({newPostModal, closePostModal}) {
                 </div> 
                 : null}
             </div>
-            
+            </>}
             </div>
             
-                
-            <button className="close-button self-center" onClick={() => {handleClose(); setData([])}}>
-            <XMarkIcon className='btn self-center'/>
-            </button>
             <div style={{position: 'absolute', left: '85%'}}>   
                 <div style={styles.postContainerButton}>
-                    {(text.length > 0 && !uploading) || (data.length > 0 && !uploading) ? 
+                    {(text.length > 0 && !uploading) ? 
                         <div className='mr-3 mt-3'>
-                            <MainButton text={"POST"} onClick={text.length > 0 ? () => postText() : () => postMedia()} />
+                            <MainButton text={"POST"} onClick={() => postText()} />
                         </div> 
-                    : uploading ? 
+                    : (data.length > 0 && !uploading) ? 
+                      <div className='mr-3 mt-3'>
+                        <MainButton text={"NEXT"} onClick={() => setCaptionModal(true)} />
+                    </div> :
+                    uploading ? 
                         <div className='mt-5 mr-3'>
                             <BeatLoader color='#9edaff'/> 
                         </div>
                     : null}
                 </div>
             </div>
+            <button className="close-button self-center" onClick={() => {handleClose(); setData([])}}>
+            <XMarkIcon className='btn self-center'/>
+            </button>
+            
         </ReactModal>
   )
 }

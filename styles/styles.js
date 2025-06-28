@@ -197,6 +197,11 @@ postHeader: {
     borderColor: "#fafafa", 
     padding: 5
   },
+  captionBox: {
+    height: 100,
+    padding: 5,
+    width: '100%'
+  },
   reportPostText: {
     color: "#121212", 
     fontSize: 12.29, 
