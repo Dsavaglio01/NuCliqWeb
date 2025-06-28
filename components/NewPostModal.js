@@ -11,6 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Reorder, useMotionValue } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useRaisedShadow } from '@/styles/use-raised-shadow';
+import { useMultiDownloadImage } from '@/hooks/useMultiDownloadImage';
 const grid = 5
 function NewPostModal({newPostModal, closePostModal}) {
     const profile = useContext(ProfileContext);
@@ -24,7 +25,8 @@ function NewPostModal({newPostModal, closePostModal}) {
     const [data, setData] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [textOpen, setTextOpen] = useState(false);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const {addImage, addVideo} = useMultiDownloadImage({user: user, mood: '', caption: caption ?? '', actualPostArray: actualPostArray, setNewPostArray: setNewPostArray});
     const handleClose = () => {
         closePostModal();
     }
