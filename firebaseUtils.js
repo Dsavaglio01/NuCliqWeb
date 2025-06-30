@@ -1262,6 +1262,17 @@ export const fetchUsernames = async () => {
     return []; // Return an empty array if there's an error
   }
 }
+export const fetchLimitedFriendsInfo = async(friends) => {
+  const completeFriendsArray = [];
+  friends.map(async(item) => await getDoc(doc(db, 'friends', item.friendId))
+    .then(snapshot => {
+      completeFriendsArray.push({id: snapshot.id, ...snapshot.data()})
+    })
+    .catch(error => {
+      console.error(error)
+    }))
+  return completeFriendsArray;
+}
 /**
  * Gets first 20 mutual (first user follows and second user is a follower of the first user) friends of user by lastMessageTimestamp
  * @param {String} userId - The id of the user to check.

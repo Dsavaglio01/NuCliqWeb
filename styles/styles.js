@@ -143,7 +143,7 @@ postHeader: {
     paddingLeft: 10
   },
   sendText: {
-    fontSize: 12.29,
+    fontSize: 15.36,
     color: "#121212",
     padding: 6,
     paddingLeft: 12.5,
@@ -737,8 +737,8 @@ postHeader: {
     width: 50
   },
   sendingFriendPfp: {
-    height: 110, 
-    width: 110, 
+    height: 90, 
+    width: 90, 
     borderRadius: 55, 
     alignSelf: 'center'
   },
@@ -872,7 +872,7 @@ postHeader: {
   sendingCheck: {
     position: 'relative', 
     bottom: 20, 
-    left: 80
+    left: 50
   },
   videoItemContainer: {
     backgroundColor: "#121212",
@@ -1041,7 +1041,8 @@ postHeader: {
   sendingButton: {  
     borderRadius: 10, 
     borderWidth: 1, 
-    height: 40, 
+    height: 50, 
+    width: 100,
     borderColor: "#9EDAFF",
     marginTop: 10, 
     marginRight: 5, 

@@ -1224,7 +1224,7 @@ function GetThemes () {
          <div className='flex'>
           <Sidebar />
          </div>
-          <SendingModal sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} 
+          <SendingModal payload={chosenTheme} sendingModal={sendingModal} closeSendingModal={() => setSendingModal(false)} theme={true} post={false} video={false} user={user} 
           followers={profile ? profile.followers : []} following={profile ? profile.following : []}/>
       <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={true} post={false} video={false}/>
          <div className='themeSidebar'>

@@ -1,11 +1,14 @@
 import React, {useMemo, useState} from 'react'
 import ReactModal from 'react-modal'
 import { XMarkIcon, CheckIcon } from '@heroicons/react/24/solid'
-import { onSnapshot, query, collection, orderBy, where, limit, getDoc, doc } from 'firebase/firestore'
+import { onSnapshot, query, collection, orderBy, where, addDoc, limit, getDoc, doc, setDoc, updateDoc, serverTimestamp, arrayUnion } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { UserCircleIcon } from '@heroicons/react/24/outline'
 import { styles } from '@/styles/styles'
-function SendingModal({sendingModal, closeSendingModal, followers, following, user, post, video, theme}) {
+import { BeatLoader } from 'react-spinners'
+import { fetchLimitedFriendsInfo } from '@/firebaseUtils'
+function SendingModal({sendingModal, closeSendingModal, followers, following, user, payload,
+    payloadUsername, post, video, theme}) {
     const handleClose = () => {
         closeSendingModal()
     }
@@ -13,6 +16,10 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
     const [actuallySending, setActuallySending] = useState(false);
     const [friendsInfo, setFriendsInfo] = useState([]);
     const [caption, setCaption] = useState('');
+    const [alert, setAlert] = useState('');
+    const [ableToShare, setAbleToShare] = useState(true);
+    const [completeFriends, setCompleteFriends] = useState([]);
+    const [sendLoading, setSendLoading] = useState(false);
     useMemo(()=> {
       setFriends([])
       let unsub;
@@ -30,19 +37,131 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
       return unsub;
     }, [followers, following]);
     useMemo(() => {
+      const fetchFriends = async() => {
+        const completeFriendsArray = await fetchLimitedFriendsInfo(friends);
+        setCompleteFriends(completeFriendsArray)
+      } 
+      fetchFriends();
+    }, [friends])
+    useMemo(() => {
       if (friends.length > 0) {
         Promise.all(friends.map(async(item) => await getDoc(doc(db, 'profiles', item.id))))
       .then(snapshots => {
         setFriendsInfo(snapshots.map(snapshot => ({id: snapshot.id, ...snapshot.data(), checked: false})))
-        //console.log(snapshots.map(snapshot => snapshot.data()))
-        //const documents = snapshots.map(snapshot => snapshot.data());
-        // Process the fetched documents here
       })
       .catch(error => {
         // Handle errors
       });
       }
     }, [friends])
+    function sendMessage() { // add to firebaseUtils later
+      if (ableToShare) {
+        setSendLoading(true)
+        Promise.all(friendsInfo.map(async(item) => {
+        if (item.checked == true && payload && video && !theme) {
+          const friendId = completeFriends.filter((element) => element.id.includes(item.id))
+          const docRef = await addDoc(collection(db, 'friends', friendId[0].id, 'chats'), {
+        message: {post: payload, userName: payloadUsername, text: caption},
+        liked: false,
+        toUser: item.id,
+        user: user.uid,
+        firstName: item.firstName,
+        video: true,
+        lastName: item.lastName,
+        pfp: item.pfp,
+        indirectReply: false,
+        indirectReplyTo: "",
+        readBy: [],
+        timestamp: serverTimestamp()
+    })
+    addDoc(collection(db, 'friends', friendId[0].id, 'messageNotifications'), {
+      //message: true,
+      id: docRef.id,
+      readBy: [],
+      timestamp: serverTimestamp()
+    }).then(async() => await updateDoc(doc(db, 'profiles', item.id), {
+      messageNotifications: arrayUnion({id: docRef.id, user: user.uid})
+    })).then(async() => await updateDoc(doc(db, 'friends', friendId[0].id), {
+      lastMessage: {post: payload, userName: payloadUsername, text: caption},
+      messageId: docRef.id,
+      readBy: [],
+      video: true,
+      active: true,
+      lastMessageTimestamp: serverTimestamp()
+    }
+    )).then(() => setActuallySending(false)).then(() => setAlert(true)).then(() => setSendLoading(false)) // add notification later
+        } 
+        else if (item.checked == true && payload && !video && !theme) {
+          const friendId = completeFriends.filter((element) => element.id.includes(item.id))
+          const docRef = await addDoc(collection(db, 'friends', friendId[0].id, 'chats'), {
+        message: {post: payload, userName: payloadUsername, text: caption},
+        liked: false,
+        toUser: item.id,
+        user: user.uid,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        pfp: item.pfp,
+        indirectReply: false,
+        indirectReplyTo: "",
+        readBy: [],
+        timestamp: serverTimestamp()
+    })
+    addDoc(collection(db, 'friends', friendId[0].id, 'messageNotifications'), {
+      //message: true,
+      id: docRef.id,
+      readBy: [],
+      timestamp: serverTimestamp()
+    }).then(async() => await updateDoc(doc(db, 'profiles', item.id), {
+      messageNotifications: arrayUnion({id: docRef.id, user: user.uid})
+    })).then(async() => await updateDoc(doc(db, 'friends', friendId[0].id), {
+      lastMessage: {post: payload, userName: payloadUsername, text: caption},
+      messageId: docRef.id,
+      readBy: [],
+      active: true,
+      lastMessageTimestamp: serverTimestamp()
+    }
+    )).then(() => setActuallySending(false)).then(() => setAlert(true)).then(() => setSendLoading(false)) // add notification later
+        } 
+      else if (item.checked == true && theme && payload) {
+        const friendId = completeFriends.filter((element) => element.id.includes(item.id))
+          const docRef = await addDoc(collection(db, 'friends', friendId[0].id, 'chats'), {
+       message: {theme: payload, text: caption},
+        liked: false,
+        toUser: item.id,
+        user: user.uid,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        pfp: item.pfp,
+        indirectReply: false,
+        indirectReplyTo: "",
+        readBy: [],
+        timestamp: serverTimestamp()
+    })
+    addDoc(collection(db, 'friends', friendId[0].id, 'messageNotifications'), {
+      //message: true,
+      id: docRef.id,
+      toUser: item.id,
+      readBy: [],
+      timestamp: serverTimestamp()
+    }).then(async() => await updateDoc(doc(db, 'profiles', item.id), {
+      messageNotifications: arrayUnion({id: docRef.id, user: user.uid})
+    })).then(async() => await setDoc(doc(db, 'friends', friendId[0].id), {
+      lastMessage: {theme: theme, text: caption},
+      messageId: docRef.id,
+      readBy: [],
+      active: true,
+      lastMessageTimestamp: serverTimestamp()
+    }
+    )).then(() => setActuallySending(false)).then(() => setAlert(true)).then(() => setSendLoading(false)).then(() => schedulePushThemeNotification(person, friendId[0].id, profile.firstName, profile.lastName, person.notificationToken))
+      }
+      }))
+      
+      }
+      else {
+       window.alert('Post unavailable to share')
+      }
+      
+    }
     const renderChecked = (id) => {
 
         
@@ -74,6 +193,12 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
   return (
     <ReactModal isOpen={sendingModal} style={{content: styles.modalContainer}}>
          <div className='flex flex-col'>
+          {alert ? 
+          <div className='flex justify-center items-center'>
+            <span className='text-white text-3xl'>Your Message has been Sent!</span>
+          </div>  
+            :
+          <>
         <div style={styles.closeSend}>
             <p style={styles.header}>Send To: </p>
             <XMarkIcon className='btn' onClick={() => handleClose()}/>
@@ -101,11 +226,15 @@ function SendingModal({sendingModal, closeSendingModal, followers, following, us
       {actuallySending ?
       <div style={styles.addCommentSecondContainer} className='bg-black flex flex-col items-center absolute bottom-0 w-full'>
             <textarea style={styles.sendingInput} placeholder='Add Message...' className='text-white' maxLength={200} value={caption} onChange={handleCaption}/>
-          <button style={styles.sendingButton}>
+            {sendLoading ? <BeatLoader color={"#9edaff"} style={{alignSelf: 'center'}}/> :
+            <button style={styles.sendingButton} onClick={() => sendMessage()}>
               <p style={styles.sendText}>Send</p>
-          </button>
+          </button>}
           </div> : null}
+      </>
+    }
     </div>
+    
       </ReactModal>
   )
 }
