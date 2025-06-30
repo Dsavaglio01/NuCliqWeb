@@ -2,6 +2,7 @@ import React from 'react'
 import { styles } from '@/styles/styles'
 import { FaPlay } from "react-icons/fa6";
 function MiniPost({item, index, repost, onClick}) {
+  console.log(item)
 
   return (
     <div key={index} style={{height: 300}} onClick={onClick}>
@@ -20,7 +21,7 @@ function MiniPost({item, index, repost, onClick}) {
         <div style={styles.miniPostContainer} className='cursor-pointer'>
           <img src={item.post[0].thumbnail} style={styles.miniImage}/>
         </div>
-        <FaPlay className='userBtn' color='#005278' style={styles.playBtn}/>
+        <FaPlay className='userBtn' color='#121212' style={styles.playBtn}/>
       </>
       : 
         <div style={styles.miniPostContainer} className='chatBubbleContainer'>

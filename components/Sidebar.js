@@ -35,7 +35,7 @@ export default function Sidebar({onStateChange}) {
     });
   }, []);
     return (
-      <main className={montserrat.className}>
+      <main className={`flex ${montserrat.className}`}>
         {newPostModal ? <NewPostModal newPostModal={newPostModal} closePostModal={() => setNewPostModal(false)}/> : null}
         <aside className={`${expanded || notificationsExpanded ? 'small-side-footer' : 'side-footer'}`}>
           {!expanded && !notificationsExpanded ?

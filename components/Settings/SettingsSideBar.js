@@ -3,7 +3,7 @@ import { styles } from '@/styles/styles'
 import { ChevronRightIcon } from '@heroicons/react/24/solid'
 import Switch from 'react-switch';
 import { logOut, statusFunction, allowNotificationsFunction, privacyFunction  } from '@/firebaseUtils';
-function SettingsSideBar(setContentState) {
+function SettingsSideBar({setContentState}) {
     const [activityEnabled, setActivityEnabled] = useState(false);
     const [isEnabled, setIsEnabled] = useState(false); 
     const [privacyEnabled, setPrivacyEnabled] = useState(false);

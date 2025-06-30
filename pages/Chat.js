@@ -168,8 +168,8 @@ function Chat () {
       getData();
     } 
   }, [specificSearch])
-const MessageItem = ({item, index}) => (
-  <div className='cursor-pointer' style={styles.chatContainer} onClick={() => {deleteMessageNotifications(item); setFocusedItem(item)}}>
+  const MessageItem = ({item, index}) => (
+    <div className='cursor-pointer' style={styles.chatContainer} onClick={() => {deleteMessageNotifications(item); setFocusedItem(item)}}>
               {item.pfp ? <img src={item.pfp} style={{height: 45, width: 45, borderRadius: 8, borderWidth: 1.5}}/> :
              <UserCircleIcon className='userBtn' style={{height: 45, width: 45, borderRadius: 8, borderWidth: 1.5}}/>
               }
@@ -220,14 +220,14 @@ const SendingMessageItem = ({item, index}) => (
                 </div>}
            </div>
 )
-console.log(searching)
   return (
-    <div>
-    <div>
+    <div style={styles.chatHeight}>
       <div>
-      {loading && completeMessages.length == 0 ?  <div style={{alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'center'}}>
-         <BeatLoader color="#9edaff" />
-        </div> : friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ?
+        <div>
+          {loading && completeMessages.length == 0 ?  
+            <div style={{alignItems: 'center', flex: 1, display: 'flex', justifyContent: 'center'}}>
+              <BeatLoader color="#9edaff" />
+            </div> : friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ?
       <>
       {friendsInfo.filter(obj => completeMessages.some(otherObj => otherObj.id === obj.id)).length > 0 ? 
           <div style={{marginVertical: '5%', alignItems: 'center', display: 'flex', justifyContent: 'center'}}>
@@ -236,7 +236,7 @@ console.log(searching)
             </div> 
           </div>
       : null}
-        {!searching ? <div style={focusedItem ? {width: '123.25%'} : {width: '100%'}}>
+        {!searching ? <div style={focusedItem ? {width: '123.25%'} : {width: '100%', backgroundColor: 'red'}}>
             {filteredGroup.length > 0 ? 
             <ul style={{height: '50%'}}> 
               {filteredGroup.map((item, index) => {

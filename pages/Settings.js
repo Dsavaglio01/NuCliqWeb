@@ -18,7 +18,7 @@ function Settings() {
     const [lastVisible, setLastVisible] = useState(null);
     const [completePosts, setCompletePosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [contentState, setContentState] = useState('My Likes');
+    const [contentState, setContentState] = useState('saves');
     const [postDone, setPostDone] = useState(false);
     const [sentReport, setSentReport] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -34,7 +34,7 @@ function Settings() {
     const [othersChecked, setOthersChecked] = useState(false);
     const router = useRouter();
     useMemo(() => {
-      setPosts([]);
+      //setPosts([]);
       if (contentState == 'My Likes') {
         const getLikes = async() => {
           const {posts, lastVisible} = await fetchSettingsContent(user.uid, 'likes')
@@ -99,9 +99,9 @@ function Settings() {
   }
     }, [postDone, posts, contentState])
     const handleReport = (inputText) => {
-    const sanitizedText = inputText.replace(/\n/g, ''); // Remove all new line characters
-    setReport(sanitizedText);
-  }
+      const sanitizedText = inputText.replace(/\n/g, ''); // Remove all new line characters
+      setReport(sanitizedText);
+    }
   return (
      <div className='flex flex-row'>
     <div className='settingsSidebar'>

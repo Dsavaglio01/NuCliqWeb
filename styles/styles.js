@@ -225,7 +225,8 @@ postHeader: {
   },
   miniImage: {
     height: '100%',
-    width: typeof window !== 'undefined' ? (window.outerHeight / 4) * 1.01625 : 0
+    width: typeof window !== 'undefined' ? (window.outerHeight / 4) * 1.01625 : 0,
+    objectFit: 'cover'
   },
   image: {
     height: typeof window !== 'undefined' ? window.outerHeight / 4 : 0,
@@ -1161,6 +1162,10 @@ postHeader: {
     padding: 10,
     display: 'flex',
     alignItems: 'center'
+  },
+  chatHeight: {
+    height: '100%',
+    overflowY: 'auto'
   },
   specificTheme: {
     height: 240, 

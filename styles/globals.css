@@ -55,29 +55,30 @@ html, body {
   border-right: 0.5px solid #fafafa;         
   height: 100vh;  /* Match viewport height for full-length footer */
 }
-.side-chat {
-  width: 21vw; /* Adjust width as needed */
- /* Example background */
-  position: fixed;
-  position: sticky; /* Keep the footer visible on scroll */
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-right: 0.5px solid #fafafa;         
-  height: 100vh; 
-  z-index: 3;
-}
 .small-side-footer {
-  width: 100px; /* Adjust width as needed */
- /* Example background */
-  position: sticky; /* Keep the footer visible on scroll */
-  border-right: 0.5px solid #fafafa;         
-  height: 100vh; 
-  align-items: center;
-  flex-direction: column;
+  width: 100px;
+  position: fixed; /* not sticky */
+  top: 0;
+  left: 0;
+  height: 100vh;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 0.5px solid #fafafa;
+  z-index: 10;
 }
+
+.side-chat {
+  margin-left: 100px; /* Account for sidebar width */
+  width: 25vw;
+  height: 100vh;
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  position: fixed;
+  top: 0;
+  border-right: 0.5px solid #fafafa;
+  z-index: 9;
+}
+
 .side-theme-footer {
   width: 500px; /* Adjust width as needed */
  /* Example background */
