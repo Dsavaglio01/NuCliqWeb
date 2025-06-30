@@ -105,7 +105,7 @@ function IndPost({item, user, pfp, username, notificationToken, followers, follo
                 {item.post != null && item.post.length > 1 ? <CarouselComponent itemPost={item.post}/> : item.post != null && 
                 item.post.length == 1 ? item.post[0].image ? 
                 <div className='px-5 pb-5'>
-                    <img src={item.post[0].post} className='object-cover w-full rounded-md'/>
+                    <img src={item.post[0].post} style={{height: 304, width: 304}} className='object-cover w-full rounded-md'/>
                 </div> : item.post[0].text ?
                 <div style={{marginLeft: '5%'}}> 
                     <p style={styles.postText}>{item.post[0].value}</p>

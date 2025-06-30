@@ -23,6 +23,7 @@ function NewPostModal({newPostModal, closePostModal}) {
     const [initialText, setInitialText] = useState({});
     const [uploading, setUploading] = useState(false);
     const [text, setText] = useState('');
+    const [textDone, setTextDone] = useState(false);
     const [data, setData] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [textOpen, setTextOpen] = useState(false);
@@ -74,12 +75,6 @@ function NewPostModal({newPostModal, closePostModal}) {
         );
         setData(items)
     }
-    const getListStyle = isDraggingOver => ({
-        background: "#fafafa",
-        padding: grid,
-        paddingBottom: 0,
-        width: '100%'
-    });
     const getItemStyle = (draggableStyle) => ({
         // some basic styles to make the items look a bit nicer
         userSelect: "none",
@@ -100,8 +95,6 @@ function NewPostModal({newPostModal, closePostModal}) {
         setText(event.target.value)
     }
     const postText = async() => {
-      //console.log(postArray)
-      console.log(text.length)
       if (text.length > 0) {
         setUploading(true)
         const newPostArray = [{backgroundColor: 'white', textAlign: 'left', textSize: 15.36, textColor: 'black', value: text, id: '1', image: false, text: true, visible: true}]
@@ -142,6 +135,7 @@ function NewPostModal({newPostModal, closePostModal}) {
                 })).then(() => scheduleMentionNotification(item.id, profile.userName, item.notificationToken))})
             } 
             else {
+                setTextDone(true)
               setUploading(false)
             }
           }
@@ -152,8 +146,6 @@ function NewPostModal({newPostModal, closePostModal}) {
         //navigation.navigate('NewPost', {postArray: [{id: count, image: false, visible: false, value: text, text: true, textSize: actualTextSize, textColor: textColor, textAlign: textAlign, backgroundColor: backgroundColor}], group:group, actualGroup: actualGroup, groupId: groupId, groupName: groupName})
       }
     }
-    const y = useMotionValue(0);
-    const boxShadow = useRaisedShadow(y);
     const toggleOpen = () => {
         setIsOpen(!isOpen);
     };
@@ -161,7 +153,11 @@ function NewPostModal({newPostModal, closePostModal}) {
         <ReactModal isOpen={newPostModal} style={{content: styles.modalContainer}}>
             <div style={{height: '90%'}}>
             {captionModal ? 
-            <CaptionModal data={data} user={user} profile={profile} closeCaptionModal={() => setCaptionModal(false)}/> : 
+            <CaptionModal data={data} user={user} profile={profile} closeCaptionModal={() => setCaptionModal(false)}/>
+            : textDone ? 
+            <div className='flex justify-center items-center'>
+                <span style={styles.successText}>{'Your vibe is now uploaded on the home page!'}</span>
+            </div> : 
             <>
             <p className='text-white text-2xl'>New Post</p>
             <div className='divider'/>
