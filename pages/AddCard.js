@@ -9,7 +9,7 @@ function AddCard({}) {
         textAlign: 'center'
     }
     const addCard = async() => {
-        await fetch('http://10.0.0.225:4000/api/endpoint', {
+        await fetch('http://localhost:4000/api/endpoint', {
             method: 'POST',
       headers: {
         'Content-Type': 'application/json',

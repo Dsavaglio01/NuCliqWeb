@@ -7,7 +7,7 @@ function SignUp() {
   const actionCodeSettings = {
   // URL you want to redirect back to. The domain (www.example.com) for this
   // URL must be in the authorized domains list in the Firebase Console.
-  url: 'http://localhost/SignUp',
+  url: 'http://localhost:4000/SignUp',
   // This must be true.
   handleCodeInApp: true,
   iOS: {

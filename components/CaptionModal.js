@@ -28,17 +28,18 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
             }
         })
     }
+    console.log(`Newpostarray: ${newPostArray}`)
     useEffect(() => {
-        if (newPostArray.length > 0) {
+        if (newPostArray.length > 0 && profile) {
             if ((newPostArray.filter((item) => item.image == true).every(obj => obj['post'].includes('https://firebasestorage.googleapis.com')) && newPostArray.length == data.length) || (newPostArray.filter((item) => item.text).every(obj => obj['visible'] == true) && newPostArray.length == data.length)) {
             const doFunction = async() => {
                 try {
-                const response = await fetch(`http://10.0.0.225:4000/api/uploadPost`, {
+                const response = await fetch(`http://localhost:4000/api/uploadPost`, {
                     method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
                     headers: {
                     'Content-Type': 'application/json', // Set content type as needed
                     },
-                    body: JSON.stringify({ data: {caption: caption, mood: '', blockedUsers: profile.blockedUsers, newPostArray: newPostArray, forSale: profile.forSale, value: null, finalMentions: [], pfp: profile.pfp, notificationToken: profile.notificationToken,
+                    body: JSON.stringify({ data: {caption: caption, mood: '', blockedUsers: profile.blockedUsers, newPostArray: newPostArray, forSale: profile.forSale, finalMentions: [], pfp: profile.pfp, notificationToken: profile.notificationToken,
                     background: profile.postBackground, user: user.uid, username: profile.userName, value: profile.private}}), // Send data as needed
                 })
                 const data = await response.json();
@@ -55,7 +56,7 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
             doFunction()
             } 
         }
-        }, [newPostArray])
+        }, [newPostArray, profile])
   return (
     <>
         <div className='flex'>

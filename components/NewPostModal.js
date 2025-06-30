@@ -106,7 +106,7 @@ function NewPostModal({newPostModal, closePostModal}) {
         setUploading(true)
         const newPostArray = [{backgroundColor: 'white', textAlign: 'left', textSize: 15.36, textColor: 'black', value: text, id: '1', image: false, text: true, visible: true}]
         try {
-          const response = await fetch(`http://10.0.0.225:4000/api/uploadPost`, {
+          const response = await fetch(`http://localhost:4000/api/uploadPost`, {
             method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
             headers: {
               'Content-Type': 'application/json', // Set content type as needed

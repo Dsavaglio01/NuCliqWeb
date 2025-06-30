@@ -63,7 +63,7 @@ export const activePerson = async(personId) => {
 export const addNewCommentFunction = async(endpoint, username, comment, blockedUsers, pfp, notificationToken, userId, focusedPost, setComment, setSingleCommentLoading, 
   setReply, setComments, comments, actualData, handleData) => {
     console.log(endpoint)
-   const response = await fetch(`http://10.0.0.225:4000/api/${endpoint}`, {
+   const response = await fetch(`http://localhost:4000/api/${endpoint}`, {
     method: 'POST', // Use appropriate HTTP method (GET, POST, etc.)
     headers: {
       'Content-Type': 'application/json', // Set content type as needed
@@ -811,6 +811,8 @@ export const getProfileDetails = async(userId) => {
         background: data.background,
         bannedFrom: data.bannedFrom,
         blockedUsers: data.blockedUsers,
+        private: data.private,
+        userName: data.userName,
         notificationToken: data.notificationToken,
       };
     } else {
