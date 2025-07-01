@@ -169,6 +169,7 @@ function Chat () {
     } 
   }, [specificSearch])
   const MessageItem = ({item, index}) => (
+    console.log(item.lastMessage),
     <div className='cursor-pointer' style={styles.chatContainer} onClick={() => {deleteMessageNotifications(item); setFocusedItem(item)}}>
               {item.pfp ? <img src={item.pfp} style={{height: 45, width: 45, borderRadius: 8, borderWidth: 1.5}}/> :
              <UserCircleIcon className='userBtn' style={{height: 45, width: 45, borderRadius: 8, borderWidth: 1.5}}/>

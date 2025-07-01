@@ -444,7 +444,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       })}
       <div style={styles.commentInputContainer}>
         <div style={styles.commentInput}>
-        <div className='flex items-center' style={{width: '47.5%'}}>
+        <div className='flex items-center mt-3' style={{width: '47.5%'}}>
         {pfp != undefined ? <img src={pfp} style={styles.inputPfp}/> :
           <UserCircleIcon className='userBtn' style={styles.inputPfp}/>}
           {replyToReplyFocus ? 
@@ -457,13 +457,13 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           <textarea value={comment}
             onChange={handleNewComment} maxLength={200}
           className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
-          </div>
-          <div className='justify-end flex items-end mr-5'>
+          <div className='justify-end flex items-end mb-2'>
             {!singleCommentLoading ? 
-            <button style={styles.sendButton} onClick={() => addNewComment()}>
-              <p style={styles.sendText}>Send</p>
+            <button disabled={comment.length == 0 && reply.length == 0} style={styles.sendButton} onClick={() => addNewComment()}>
+              <p style={styles.sendText}>Comment</p>
             </button> : 
             <BeatLoader color='#9edaff'/>}
+          </div>
           </div>
         </div>
       </div>
