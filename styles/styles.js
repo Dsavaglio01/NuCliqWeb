@@ -170,7 +170,8 @@ postHeader: {
   },
   commentHeart: {
     alignSelf: 'center',
-    paddingRight: 3
+    paddingRight: 3,
+    height: 5
   },
   numberCommentText: {
     fontSize: 12.29, 
@@ -936,9 +937,7 @@ postHeader: {
   },
   usernameText: {
     fontSize: 15.36,
-    paddingTop: 0,
-    padding: 5,
-    paddingBottom: 0,
+    paddingRight: 5,
     color: "#fafafa"
   },
   sendButton: {
@@ -1065,9 +1064,10 @@ postHeader: {
     backgroundColor: "#121212"
   },
   commentsPfp: {
-    height: 35, 
-    width: 35, 
-    borderRadius: 17.5
+    height: 50, 
+    width: 50, 
+    borderRadius: 25,
+    alignSelf: 'center'
   },
   videoPfp: {
     height: typeof window !== 'undefined' ? window.innerHeight / 20 : 0, 

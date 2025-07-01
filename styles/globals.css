@@ -68,6 +68,11 @@ html, body {
   z-index: 10;
 }
 
+.comment-time {
+  color: #fafafa;
+  font-size: small;
+}
+
 .side-chat {
   margin-left: 100px; /* Account for sidebar width */
   width: 25vw;
