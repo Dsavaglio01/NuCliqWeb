@@ -181,7 +181,7 @@ function IndVidPost({item, user, dropdownRef, pfp, followers, following, usernam
         <Comments commentModal={commentModal} videoStyling={true} closeCommentModal={() => setCommentModal(false)} pfp={pfp} user={user}/>
         {/* <ViewLikes likesModal={likesModal} closeLikesModal={() => setLikesModal(false)} focusedLikedItem={focusedLikedItem} user={user}/> */}
         <ReportModal reportModal={reportModal} closeReportModal={() => setReportModal(false)} theme={false} post={true} video={false}/>
-        <SendingModal sendingModal={sendingModal} payload={item} closeSendingModal={() => setSendingModal(false)} video={false} theme={false} post={true} user={user} followers={followers} following={following}/>
+        <SendingModal sendingModal={sendingModal} payloadUsername={item.username} payload={item} closeSendingModal={() => setSendingModal(false)} video={false} theme={false} post={true} user={user} followers={followers} following={following}/>
     </div>
   );
 };
