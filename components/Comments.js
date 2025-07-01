@@ -444,7 +444,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       })}
       <div style={styles.commentInputContainer}>
         <div style={styles.commentInput}>
-        <div className='flex items-center'>
+        <div className='flex items-center' style={{width: '47.5%'}}>
         {pfp != undefined ? <img src={pfp} style={styles.inputPfp}/> :
           <UserCircleIcon className='userBtn' style={styles.inputPfp}/>}
           {replyToReplyFocus ? 

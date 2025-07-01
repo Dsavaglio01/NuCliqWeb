@@ -275,7 +275,7 @@ postHeader: {
     fontSize: 15.36, 
     paddingLeft: 5, 
     paddingTop: 20, 
-    width: '45%'
+    width: '100%',
   },
   reportSupplementText: {
       fontSize: 15.36,
