@@ -1,7 +1,7 @@
 import React, {useRef, useState, useEffect} from 'react'
 import ReactModal from 'react-modal'
 import { BeatLoader } from 'react-spinners';
-import { UserCircleIcon, ChevronDownIcon, XMarkIcon} from '@heroicons/react/24/solid';
+import { UserCircleIcon, ChevronDownIcon, XMarkIcon, HeartIcon} from '@heroicons/react/24/solid';
 import CarouselComponent from './Carousel';
 import { useRouter } from 'next/router';
 import { useSwipeable } from 'react-swipeable';
@@ -135,49 +135,6 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       loadComments();
     }
     }, [focusedItem])
-    /* const deleteReplyFunction = async(item, reply) => {
-      await deleteReply(item, reply, focusedItem, comments, setComments, tempPosts, setTempPosts);
-    } */
-    /* const deleteReplyFunction = useCallback(
-      async(currentItem, currentElement) => {
-        if (currentItem && currentElement) {
-          await deleteReply(item, element)
-        }
-        else {
-          console.error("Error: 'item' is undefined.");
-        }
-        
-      },
-      [deleteReply],
-    ) */
-    
-    
-    
-    /* const handleSwipe = (dir) => {
-      if (dir === 'left') {
-        const updatedData = comments.filter((e) => e.id == tempReplyId)
-        const newObject = {reply: reply,
-        commentId: tempReplyId,
-        loading: false,
-        pfp: pfp,
-        notificationToken: notificationToken,
-        username: username,
-        replyToComment: true,
-        timestamp: Timestamp.fromDate(new Date()),
-        likedBy: [],
-        postId: focusedItem.id,
-        user: user.uid}
-        // Add the new object to the array
-        updatedData[0].replies = [...updatedData[0].replies, newObject]
-        const objectInd = comments.findIndex(obj => obj.id === tempReplyId)
-        const dataUpdated = [...comments];
-        dataUpdated[objectInd] = updatedData[0];
-        setComments(dataUpdated)
-      } 
-      else if (dir === 'right') {
-        return;
-      }
-    }; */
     const swipeHandlers = useSwipeable({
       /* onSwipedLeft: handleSwipe('left'),
       onSwipedRight: handleSwipe('right'), */

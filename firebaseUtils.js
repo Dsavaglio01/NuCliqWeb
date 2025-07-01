@@ -6,6 +6,7 @@ import { schedulePushLikeNotification } from './notificationFunctions';
 import { getAuth, signOut } from 'firebase/auth';
 import { linkUsernameAlert, profanityUsernameAlert } from './lib/alert';
 import { schedulePushCommentNotification } from './notificationFunctions';
+const TEXT_MODERATION_URL='https://api.sightengine.com/1.0/text/check.json'
 const auth = getAuth();
 /**
  * Applies theme to a user's Posts, Profiles or Both
@@ -68,8 +69,8 @@ export const addNewCommentFunction = async(endpoint, username, comment, blockedU
     headers: {
       'Content-Type': 'application/json', // Set content type as needed
     },
-    body: JSON.stringify({ data: {newComment: comment, textModerationURL: process.env.TEXT_MODERATION_URL, blockedUsers: blockedUsers, pfp: pfp, 
-      notificationToken: notificationToken, user: userId, focusedPost: focusedPost, username: username}}), // Send data as needed
+    body: JSON.stringify({ data: {newComment: comment, textModerationURL: TEXT_MODERATION_URL, blockedUsers: blockedUsers, pfp: pfp, 
+      notificationToken: notificationToken, userId: userId, focusedPost: focusedPost, username: username}}), // Send data as needed
   })
   const data = await response.json();
   if (data.link) {
