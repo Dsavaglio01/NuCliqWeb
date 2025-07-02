@@ -8,8 +8,9 @@ import { useSwipeable } from 'react-swipeable';
 import getDateAndTime from '@/lib/getDateAndTime';
 import FollowButtons from './FollowButtons';
 import { styles } from '@/styles/styles';
-import { fetchComments, addNewCommentFunction} from '@/firebaseUtils';
+import { fetchComments, addNewCommentFunction, addNewReplyFunction} from '@/firebaseUtils';
 import Comment from './Comment';
+import { db } from '@/firebase';
 function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blockedUsers, ableToShare, videoStyling, username, notificationToken, actualData, 
     handleData }) {
     const router = useRouter();
@@ -19,6 +20,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     const [replyFocus, setReplyFocus] = useState(false);
     const [singleCommentLoading, setSingleCommentLoading] = useState(false);
     const [reportCommentModal, setReportCommentModal ] = useState(false);
+    const [tempReplyId, setTempReplyId] = useState(null);
     const [lastCommentVisible, setLastCommentVisible] = useState(null);
     const [comment, setComment] = useState('');
     const [reply, setReply] = useState('');
@@ -67,6 +69,82 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     const handleReply = (event) => {
       setReply(event.target.value)
     }
+    async function addNewReply() {
+      if (!ableToShare) {
+        window.alert('Unavailable to reply.')
+        setComment('')
+        setReply('')
+        setReplyFocus(false)
+      }
+      else {
+        setSingleCommentLoading(true)
+        if (!videoStyling) {
+          const commentSnap = await getDoc(doc(db, 'posts', focusedItem.id, 'comments', tempReplyId))
+          const newReply = {reply: reply,
+            pfp: pfp,
+            notificationToken: notificationToken,
+            username: username,
+            replyToComment: true,
+            timestamp: Timestamp.fromDate(new Date()),
+            likedBy: [],
+            postId: focusedItem.id,
+            user: user.uid
+          }
+          if (commentSnap.exists() && commentSnap.data().username !== username) {
+            try {
+              addNewReplyFunction('newReply', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+                pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+          else if (commentSnap.exists() && commentSnap.data().username == username) {
+            try {
+              addNewReplyFunction('newReplyUsername', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+                pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+        }
+        else {
+          const commentSnap = await getDoc(doc(db, 'videos', focusedItem.id, 'comments', tempReplyId))
+          const newReply = {reply: reply,
+            pfp: pfp,
+            notificationToken: notificationToken,
+            username: username,
+            replyToComment: true,
+            timestamp: Timestamp.fromDate(new Date()),
+            likedBy: [],
+            postId: focusedItem.id,
+            user: user.uid
+          }
+          if (commentSnap.exists() && commentSnap.data().username !== username) {
+            try {
+              addNewReplyFunction('newReplyVideo', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+                pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading
+              )
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+          else if (commentSnap.exists() && commentSnap.data().username == username) {
+            try {
+              addNewReplyFunction('newReplyVideoUsername', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+                pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading)
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+        }
+      }
+    }
     async function addNewComment(){
       if (!ableToShare) {
         window.alert('Unavailable to comment.')
@@ -75,7 +153,6 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
         setReplyFocus(false)
       }
       else {
-        console.log('at least here')
         setSingleCommentLoading(true)
         if (!videoStyling) {
           if (username == focusedItem.username) {
