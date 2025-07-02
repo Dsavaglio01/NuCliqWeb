@@ -978,6 +978,12 @@ postHeader: {
     height: 40, 
     borderRadius: 8, 
   },
+  replyText: {
+    color: "grey",
+    fontWeight: '400',
+    paddingLeft: 8,
+    fontSize: 12.29
+  },
   profileImage: {
     width: 40,
     height: 40,

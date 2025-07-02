@@ -65,7 +65,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       trackMouse: true, // Enables mouse tracking for desktop swipes
     })
     const handleReply = (event) => {
-      setReply(event.targe.value)
+      setReply(event.target.value)
     }
     async function addNewComment(){
       if (!ableToShare) {
@@ -248,17 +248,17 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           {replyToReplyFocus ? 
           <textarea value={reply} maxLength={200}
             onChange={handleReply}
-          className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : replyFocus ? 
+          className='bg-transparent text-white' style={styles.addComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : replyFocus ? 
           <textarea value={reply} maxLength={200}
             onChange={handleReply}
-          className='bg-transparent text-white w-full pt-5' style={styles.inputComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : 
+          className='bg-transparent text-white' style={styles.addComment} placeholder={tempReplyName != undefined ? `Reply To ${tempReplyName}` : 'Reply To'} color='#fafafa'/> : 
           <textarea value={comment}
             onChange={handleNewComment} maxLength={200}
           className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
           <div className='justify-end flex items-end mb-2'>
             {!singleCommentLoading ? 
-            <button disabled={comment.length == 0 && reply.length == 0} style={styles.sendButton} onClick={() => addNewComment()}>
-              <p style={styles.sendText}>Comment</p>
+            <button disabled={comment.length == 0 && reply.length == 0} style={styles.sendButton} onClick={replyFocus ? () => addNewReply() : () => addNewComment()}>
+              <p style={styles.sendText}>{replyFocus ? 'Reply' : 'Comment'}</p>
             </button> : 
             <BeatLoader color='#9edaff'/>}
           </div>
