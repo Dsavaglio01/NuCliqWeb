@@ -61,6 +61,67 @@ export const activePerson = async(personId) => {
   const docSnap = await getDoc(doc(db, 'profiles', personId))
   return docSnap.data()
 }
+export const addNewReplyToReplyFunction = async(endpoint, tempCommentId, newReply, commentSnap, reply, userId, focusedPost, username, setComment, setSingleCommentLoading, 
+  setReply, comments, setComments, actualData, handleData, tempReplyName, setReplyToReplyFocus) => {
+   const response = await fetch(`http://localhost:4000/api/${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', // Set content type as needed
+    },
+    body: JSON.stringify({ data:  {tempCommentId: tempCommentId, textModerationURL: TEXT_MODERATION_URL, newReply: newReply, commentSnap: commentSnap.data(), reply: reply, 
+      userId: userId, focusedPost: focusedPost, username: username}}), // Send data as needed
+  })
+  const data = await response.json();
+  if (data.link) {
+    linkUsernameAlert('Reply', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
+  }
+  else if (data.profanity) {
+    profanityUsernameAlert('Reply', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
+  }
+  else if (data.done) {
+
+    const updatedData = comments.filter((e) => e.id == tempCommentId)
+    const newObject = {
+      reply: reply,
+      commentId: tempCommentId,
+      loading: false,
+      pfp: pfp,
+      notificationToken: notificationToken,
+      username: username,
+      replyToComment: false,
+      replyTo: tempReplyName,
+      timestamp: Timestamp.fromDate(new Date()),
+      likedBy: [],
+      postId: focusedPost.id,
+      user: userId
+    }
+    // Add the new object to the array
+    updatedData[0].actualReplies = [...updatedData[0].actualReplies, newObject]
+    const objectInd = comments.findIndex(obj => obj.id === tempCommentId)
+    const dataUpdated = [...comments];
+    dataUpdated[objectInd] = updatedData[0];
+    setComments(dataUpdated)
+    
+    const updatedObject = { ...focusedPost };
+
+    // Update the array in the copied object
+    updatedObject.comments = updatedObject.comments + 1;
+    const objectIndex = actualData.findIndex(obj => obj.id === focusedPost.id);
+    if (objectIndex !== -1) {
+      const updatedData = [...actualData];
+      updatedData[objectIndex] = updatedObject;
+      // Set the new array as the state
+      handleData(updatedData);
+    }
+    setReply('')
+    setReplyToReplyFocus(false)
+    setSingleCommentLoading(false)
+  }
+  if (username != focusedPost.username) {
+    schedulePushCommentReplyNotification(commentSnap.data().user, username, commentSnap.data().notificationToken, reply)
+  }
+
+}
 export const addNewReplyFunction = async(endpoint, tempReplyId, username, userId, reply, newReply, focusedPost, commentSnap, comments, setComments, notificationToken, pfp,
   actualData, handleData, setComment, setReply, setSingleCommentLoading) => {
   const response = await fetch(`http://localhost:4000/api/${endpoint}`, {
@@ -74,10 +135,10 @@ export const addNewReplyFunction = async(endpoint, tempReplyId, username, userId
   })
   const data = await response.json();
   if (data.link) {
-    linkUsernameAlert('Comment', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
+    linkUsernameAlert('Reply', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
   }
   else if (data.profanity) {
-    profanityUsernameAlert('Comment', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
+    profanityUsernameAlert('Reply', () => {setComment(''); setSingleCommentLoading(false); setReply('')})
   }
   else if (data.done) {
     const updatedData = comments.filter((e) => e.id == tempReplyId)

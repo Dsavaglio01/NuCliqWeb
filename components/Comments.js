@@ -8,9 +8,10 @@ import { useSwipeable } from 'react-swipeable';
 import getDateAndTime from '@/lib/getDateAndTime';
 import FollowButtons from './FollowButtons';
 import { styles } from '@/styles/styles';
-import { fetchComments, addNewCommentFunction, addNewReplyFunction} from '@/firebaseUtils';
+import { fetchComments, addNewCommentFunction, addNewReplyFunction, addNewReplyToReplyFunction} from '@/firebaseUtils';
 import Comment from './Comment';
 import { db } from '@/firebase';
+import { getDoc, doc, Timestamp } from 'firebase/firestore';
 function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blockedUsers, ableToShare, videoStyling, username, notificationToken, actualData, 
     handleData }) {
     const router = useRouter();
@@ -21,6 +22,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     const [singleCommentLoading, setSingleCommentLoading] = useState(false);
     const [reportCommentModal, setReportCommentModal ] = useState(false);
     const [tempReplyId, setTempReplyId] = useState(null);
+    const [tempCommentId, setTempCommentId] = useState(null);
     const [lastCommentVisible, setLastCommentVisible] = useState(null);
     const [comment, setComment] = useState('');
     const [reply, setReply] = useState('');
@@ -68,6 +70,84 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     })
     const handleReply = (event) => {
       setReply(event.target.value)
+    }
+    async function addNewReplyToReply() {
+      if (!ableToShare) {
+        window.alert('Unavailable to reply.')
+        setComment('')
+        setReply('')
+        setReplyFocus(false)
+      }
+      else {
+        setSingleCommentLoading(true)
+        if (!videoStyling) {
+          const commentSnap = await getDoc(doc(db, 'posts', focusedItem.id, 'comments', tempCommentId))
+          const newReply = {
+            reply: reply,
+            pfp: pfp,
+            notificationToken: notificationToken,
+            username: username,
+            replyToComment: false,
+            replyTo: tempReplyName,
+            timestamp: Timestamp.fromDate(new Date()),
+            likedBy: [],
+            postId: focusedItem.id,
+            user: user.uid
+          }
+          if (commentSnap.exists() && commentSnap.data().username !== username) {
+            try {
+              addNewReplyToReplyFunction('newReplyToReply', tempCommentId, newReply, commentSnap, reply, user.uid, focusedItem, username, setComment, setSingleCommentLoading, 
+                setReply, comments, setComments, actualData, handleData, tempReplyName, setReplyToReplyFocus)
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+          else if (commentSnap.exists() && commentSnap.data().username == username) {
+            try {
+              addNewReplyToReplyFunction('newReplyToReplyUsername', tempCommentId, newReply, commentSnap, reply, user.uid, focusedItem, username, setComment, setSingleCommentLoading, 
+                setReply, comments, setComments, actualData, handleData, tempReplyName, setReplyToReplyFocus)
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+        }
+        else {
+          const commentSnap = await getDoc(doc(db, 'videos', focusedItem.id, 'comments', tempCommentId))
+          const newReply = {
+            reply: reply,
+            pfp: pfp,
+            notificationToken: notificationToken,
+            username: username,
+            replyToComment: false,
+            replyTo: tempReplyName,
+            timestamp: Timestamp.fromDate(new Date()),
+            likedBy: [],
+            postId: focusedItem.id,
+            user: user.uid
+          }
+          if (commentSnap.exists() && commentSnap.data().username !== username) {
+            try {
+              addNewReplyToReplyFunction('newReplyToReplyVideo', tempCommentId, newReply, commentSnap, reply, user.uid, focusedItem, username, setComment, setSingleCommentLoading, 
+                setReply, comments, setComments, actualData, handleData, tempReplyName, setReplyToReplyFocus)
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+          else if (commentSnap.exists() && commentSnap.data().username == username) {
+            try {
+              addNewReplyToReplyFunction('newReplyToReplyVideoUsername', tempCommentId, newReply, commentSnap, reply, user.uid, focusedItem, username, setComment, setSingleCommentLoading, 
+                setReply, comments, setComments, actualData, handleData, tempReplyName, setReplyToReplyFocus)
+            }
+            catch (e) {
+              console.error(e);
+            }
+          }
+        }
+
+      }
     }
     async function addNewReply() {
       if (!ableToShare) {
