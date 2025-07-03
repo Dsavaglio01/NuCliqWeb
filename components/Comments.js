@@ -108,7 +108,6 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
             postId: focusedItem.id,
             user: user.uid
           }
-          console.log(`Comment snap: ${commentSnap.data()}`)
           if (commentSnap.exists() && commentSnap.data().username !== username) {
             try {
               addNewReplyToReplyFunction('newReplyToReply', tempCommentId, newReply, commentSnap, reply, user.uid, focusedItem, username, setComment, setSingleCommentLoading, 
@@ -174,7 +173,6 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       else {
         setSingleCommentLoading(true)
         if (!videoStyling) {
-          console.log(focusedItem.id, tempReplyId)
           const commentSnap = await getDoc(doc(db, 'posts', focusedItem.id, 'comments', tempReplyId))
           const newReply = {
             reply: reply,
@@ -189,7 +187,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           }
           if (commentSnap.exists() && commentSnap.data().username !== username) {
             try {
-              addNewReplyFunction('newReply', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+              addNewReplyFunction('newReply', tempReplyId, username, user.uid, reply, newReply, focusedItem, commentSnap, comments, setComments, notificationToken, 
                 pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading
               )
             }
@@ -199,7 +197,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           }
           else if (commentSnap.exists() && commentSnap.data().username == username) {
             try {
-              addNewReplyFunction('newReplyUsername', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+              addNewReplyFunction('newReplyUsername', tempReplyId, username, user.uid, reply, newReply, focusedItem, commentSnap, comments, setComments, notificationToken, 
                 pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading
               )
             }
@@ -222,7 +220,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           }
           if (commentSnap.exists() && commentSnap.data().username !== username) {
             try {
-              addNewReplyFunction('newReplyVideo', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+              addNewReplyFunction('newReplyVideo', tempReplyId, username, user.uid, reply, newReply, focusedItem, commentSnap, comments, setComments, notificationToken, 
                 pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading
               )
             }
@@ -232,7 +230,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           }
           else if (commentSnap.exists() && commentSnap.data().username == username) {
             try {
-              addNewReplyFunction('newReplyVideoUsername', tempReplyId, username, user.uid, reply, newReply, user.uid, focusedItem, commentSnap, comments, setComments, notificationToken, 
+              addNewReplyFunction('newReplyVideoUsername', tempReplyId, username, user.uid, reply, newReply, focusedItem, commentSnap, comments, setComments, notificationToken, 
                 pfp, actualData, handleData, setComment, setReply, setSingleCommentLoading)
             }
             catch (e) {
@@ -412,7 +410,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       comments.slice().sort((a, b) => b.timestamp - a.timestamp).map((item) => {
         return (
           <Comment item={item} user={user} handleClose={handleClose} setComments={setComments} setTempReplyName={setTempReplyName} setReplyFocus={setReplyFocus} 
-          replyFunction={replyFunction} replySecondFunction={replySecondFunction}/>
+          replyFunction={replyFunction} replySecondFunction={replySecondFunction} comments={comments}/>
         )
       })}
       <div style={styles.commentInputContainer}>

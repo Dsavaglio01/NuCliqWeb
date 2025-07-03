@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react'
+import React, {useState} from 'react'
 import { UserCircleIcon, HeartIcon, ChevronDownIcon } from '@heroicons/react/24/solid';
 import { styles } from '@/styles/styles';
 import { db } from '@/firebase';
@@ -6,12 +6,10 @@ import { useRouter } from 'next/router';
 import getDateAndTime from '@/lib/getDateAndTime';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { addCommentLike, removeCommentLike, } from '@/firebaseUtils';
-function Comment({item, user, handleClose, setComments, setTempReplyName, setReplyFocus, replyFunction, replySecondFunction}) {
-    const [tempReplyId, setTempReplyId] = useState('');
+function Comment({item, user, handleClose, setComments,  replyFunction, replySecondFunction, comments}) {
     const [usernames, setUsernames] = useState([]);
     //const [reportComment, setReportComment] = useState('');
     const [replyLastVisible, setReplyLastVisible] = useState(0);
-    const textInputRef = useRef();
     const router = useRouter();
     async function removeLike(item) {
         await removeCommentLike(item, user, setComments, comments, focusedItem)
@@ -113,10 +111,10 @@ function Comment({item, user, handleClose, setComments, setTempReplyName, setRep
             </div>
             {item.replies.length == 1 && item.showReply == false ? <div style={{display: 'flex'}} onClick={() => toggleShowReply(item)}>
                 <p style={styles.viewRepliesText}>View {item.replies.length} Reply</p>
-                <ChevronDownIcon className='btn' style={{alignSelf: 'center'}}/>
+                <ChevronDownIcon className='downBtn' color='#808080' style={{alignSelf: 'center'}}/>
             </div> : item.replies.length > 1 && item.showReply == false ? <div style={{display: 'flex'}} onClick={() => toggleShowReply(item)}>
                 <p style={styles.viewRepliesText}>View {item.replies.length} Replies</p>
-                <ChevronDownIcon className='btn' style={{alignSelf: 'center'}}/>
+                <ChevronDownIcon className='downBtn' color='#808080' style={{alignSelf: 'center'}}/>
             </div> : <></>}
             {item.showReply ? 
                 <div>

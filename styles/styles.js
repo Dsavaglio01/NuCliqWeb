@@ -984,6 +984,11 @@ postHeader: {
     paddingLeft: 8,
     fontSize: 12.29
   },
+  viewRepliesText: {
+    color: "#808080",
+    fontSize: 12.29,
+    padding: 5
+  },
   profileImage: {
     width: 40,
     height: 40,

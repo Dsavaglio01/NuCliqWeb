@@ -153,7 +153,7 @@ export const addNewReplyFunction = async(endpoint, tempReplyId, username, userId
       replyToComment: true,
       timestamp: Timestamp.fromDate(new Date()),
       likedBy: [],
-      postId: focusedItem.id,
+      postId: focusedPost.id,
       user: userId
     }
     // Add the new object to the array
@@ -162,7 +162,7 @@ export const addNewReplyFunction = async(endpoint, tempReplyId, username, userId
     const dataUpdated = [...comments];
     dataUpdated[objectInd] = updatedData[0];
     setComments(dataUpdated)
-    const updatedObject = { ...focusedItem };
+    const updatedObject = { ...focusedPost };
 
     // Update the array in the copied object
     updatedObject.comments = updatedObject.comments + 1;

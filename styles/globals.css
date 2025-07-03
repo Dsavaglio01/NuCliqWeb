@@ -109,6 +109,9 @@ html, body {
 .btn {
   @apply h-7 hover:scale-125 cursor-pointer transition-all duration-150 ease-out text-white;
 }
+.downBtn {
+  @apply h-5 hover:scale-125 cursor-pointer transition-all duration-150 ease-out text-gray-500;
+}
 .userBtn {
   @apply h-7 text-white;
 }
