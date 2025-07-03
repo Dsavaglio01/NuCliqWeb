@@ -6,11 +6,10 @@ import { useRouter } from 'next/router';
 import getDateAndTime from '@/lib/getDateAndTime';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { addCommentLike, removeCommentLike, } from '@/firebaseUtils';
-function Comment({item, user, handleClose, setComments, setTempReplyName, setReplyFocus }) {
+function Comment({item, user, handleClose, setComments, setTempReplyName, setReplyFocus, replyFunction, replySecondFunction}) {
     const [tempReplyId, setTempReplyId] = useState('');
     const [usernames, setUsernames] = useState([]);
     //const [reportComment, setReportComment] = useState('');
-    const [tempCommentId, setTempCommentId] = useState(null);
     const [replyLastVisible, setReplyLastVisible] = useState(0);
     const textInputRef = useRef();
     const router = useRouter();
@@ -101,9 +100,7 @@ function Comment({item, user, handleClose, setComments, setTempReplyName, setRep
             <div style={styles.commentFooterContainer}>
                 <div style={{display: 'flex'}}>
                     <p className='comment-time'>{getDateAndTime(item.timestamp)}</p>
-                    <div className='cursor-pointer' style={styles.replyStyle} onClick={() => {setReplyFocus(true); if (textInputRef.current) {
-                        textInputRef.current.focus();
-                    } setTempReplyName(item.username); setTempReplyId(item.id)}}>
+                    <div className='cursor-pointer' style={styles.replyStyle} onClick={() => replySecondFunction(item)}>
                         <p style={styles.replyText}>Reply</p>
                     </div>
                 </div>
@@ -140,7 +137,7 @@ function Comment({item, user, handleClose, setComments, setTempReplyName, setRep
                                 <div style={styles.commentFooterContainer}>
                                     <div style={{display: 'flex'}}>
                                         <p className='comment-time'>{element.timestamp ? getDateAndTime(element.timestamp) : null}</p>
-                                        <div style={styles.replyStyle} className='cursor-pointer' onClick={() => {setReplyToReplyFocus(true); setTempReplyName(element.username); setTempCommentId(item.id); setTempReplyId(element.id)}}>
+                                        <div style={styles.replyStyle} className='cursor-pointer' onClick={() => replyFunction(item, element)}>
                                             <p style={styles.replyText}>Reply</p>
                                         </div>
                                     </div>

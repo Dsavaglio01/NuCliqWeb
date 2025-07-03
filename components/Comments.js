@@ -71,6 +71,20 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     const handleReply = (event) => {
       setReply(event.target.value)
     }
+    async function replySecondFunction(item) {
+      setReplyFocus(true); 
+      setTempReplyName(item.username); 
+      setTempReplyId(item.id);
+    }
+    async function replyFunction(item, element) {
+      
+      setReplyToReplyFocus(true); 
+      
+      setTempReplyName(element.username); 
+      setTempCommentId(item.id); 
+      setTempReplyId(element.id);
+      //await addNewReply()
+    }
     async function addNewReplyToReply() {
       if (!ableToShare) {
         window.alert('Unavailable to reply.')
@@ -94,6 +108,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
             postId: focusedItem.id,
             user: user.uid
           }
+          console.log(`Comment snap: ${commentSnap.data()}`)
           if (commentSnap.exists() && commentSnap.data().username !== username) {
             try {
               addNewReplyToReplyFunction('newReplyToReply', tempCommentId, newReply, commentSnap, reply, user.uid, focusedItem, username, setComment, setSingleCommentLoading, 
@@ -159,8 +174,10 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       else {
         setSingleCommentLoading(true)
         if (!videoStyling) {
+          console.log(focusedItem.id, tempReplyId)
           const commentSnap = await getDoc(doc(db, 'posts', focusedItem.id, 'comments', tempReplyId))
-          const newReply = {reply: reply,
+          const newReply = {
+            reply: reply,
             pfp: pfp,
             notificationToken: notificationToken,
             username: username,
@@ -394,7 +411,8 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       
       comments.slice().sort((a, b) => b.timestamp - a.timestamp).map((item) => {
         return (
-          <Comment item={item} user={user} handleClose={handleClose} setComments={setComments} setTempReplyName={setTempReplyName} setReplyFocus={setReplyFocus} />
+          <Comment item={item} user={user} handleClose={handleClose} setComments={setComments} setTempReplyName={setTempReplyName} setReplyFocus={setReplyFocus} 
+          replyFunction={replyFunction} replySecondFunction={replySecondFunction}/>
         )
       })}
       <div style={styles.commentInputContainer}>
@@ -416,7 +434,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
             {!singleCommentLoading ? 
             <button disabled={comment.length == 0 && reply.length == 0} style={styles.sendButton} onClick={replyToReplyFocus ? () => addNewReplyToReply() :
               replyFocus ? () => addNewReply() : () => addNewComment()}>
-              <p style={styles.sendText}>{replyFocus ? 'Reply' : 'Comment'}</p>
+              <p style={styles.sendText}>{replyFocus || replyToReplyFocus ? 'Reply' : 'Comment'}</p>
             </button> : 
             <BeatLoader color='#9edaff'/>}
           </div>

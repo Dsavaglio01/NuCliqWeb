@@ -68,7 +68,7 @@ export const addNewReplyToReplyFunction = async(endpoint, tempCommentId, newRepl
     headers: {
       'Content-Type': 'application/json', // Set content type as needed
     },
-    body: JSON.stringify({ data:  {tempCommentId: tempCommentId, textModerationURL: TEXT_MODERATION_URL, newReply: newReply, commentSnap: commentSnap.data(), reply: reply, 
+    body: JSON.stringify({ data:  {tempCommentId: tempCommentId, textModerationURL: TEXT_MODERATION_URL, newReply: newReply, commentSnap: commentSnap, reply: reply, 
       userId: userId, focusedPost: focusedPost, username: username}}), // Send data as needed
   })
   const data = await response.json();
@@ -118,19 +118,20 @@ export const addNewReplyToReplyFunction = async(endpoint, tempCommentId, newRepl
     setSingleCommentLoading(false)
   }
   if (username != focusedPost.username) {
-    schedulePushCommentReplyNotification(commentSnap.data().user, username, commentSnap.data().notificationToken, reply)
+    schedulePushCommentReplyNotification(commentSnap.user, username, commentSnap.notificationToken, reply)
   }
 
 }
 export const addNewReplyFunction = async(endpoint, tempReplyId, username, userId, reply, newReply, focusedPost, commentSnap, comments, setComments, notificationToken, pfp,
   actualData, handleData, setComment, setReply, setSingleCommentLoading) => {
+    console.log(commentSnap)
   const response = await fetch(`http://localhost:4000/api/${endpoint}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json', // Set content type as needed
     },
     body: JSON.stringify({ data: {tempReplyId: tempReplyId, textModerationURL: TEXT_MODERATION_URL, newReply: newReply, 
-      commentSnap: commentSnap.data(), reply: reply, userId: userId, 
+      commentSnap: commentSnap, reply: reply, userId: userId, 
       focusedPost: focusedPost, username: username}}), // Send data as needed
   })
   const data = await response.json();
@@ -175,7 +176,7 @@ export const addNewReplyFunction = async(endpoint, tempReplyId, username, userId
     setReply('')
     setSingleCommentLoading(false)
     if (username != focusedPost.username) {
-      schedulePushCommentReplyNotification(commentSnap.data().user, username, commentSnap.data().notificationToken, reply)
+      schedulePushCommentReplyNotification(commentSnap.user, username, commentSnap.notificationToken, reply)
     }
   }
 
