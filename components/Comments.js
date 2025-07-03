@@ -414,7 +414,8 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
           className='bg-transparent text-white' style={styles.addComment} placeholder='Add Comment...' color='#fafafa'/>}
           <div className='justify-end flex items-end mb-2'>
             {!singleCommentLoading ? 
-            <button disabled={comment.length == 0 && reply.length == 0} style={styles.sendButton} onClick={replyFocus ? () => addNewReply() : () => addNewComment()}>
+            <button disabled={comment.length == 0 && reply.length == 0} style={styles.sendButton} onClick={replyToReplyFocus ? () => addNewReplyToReply() :
+              replyFocus ? () => addNewReply() : () => addNewComment()}>
               <p style={styles.sendText}>{replyFocus ? 'Reply' : 'Comment'}</p>
             </button> : 
             <BeatLoader color='#9edaff'/>}
