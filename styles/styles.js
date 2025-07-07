@@ -1078,7 +1078,7 @@ postHeader: {
     height: 50, 
     width: 50, 
     borderRadius: 25,
-    alignSelf: 'center'
+    //alignSelf: 'center'
   },
   videoPfp: {
     height: typeof window !== 'undefined' ? window.innerHeight / 20 : 0, 

@@ -49,7 +49,7 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
     }
     
     useEffect(() => {
-      if (focusedItem) {
+      if (focusedItem && comments.length == 0) {
       const loadComments = async() => {
         /* if (videoStyling) {
           const { comments, lastVisible } = await fetchComments(focusedItem, blockedUsers, 'videos')
@@ -62,7 +62,8 @@ function Comments({ commentModal, closeCommentModal, pfp, focusedItem, user, blo
       }
       loadComments();
     }
-    }, [focusedItem])
+    }, [focusedItem, comments])
+    console.log(`Comments: ${comments.length}`)
     const swipeHandlers = useSwipeable({
       /* onSwipedLeft: handleSwipe('left'),
       onSwipedRight: handleSwipe('right'), */

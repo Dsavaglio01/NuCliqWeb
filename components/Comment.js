@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import getDateAndTime from '@/lib/getDateAndTime';
 import { query, collection, where, getDocs } from 'firebase/firestore';
 import { addCommentLike, removeCommentLike, } from '@/firebaseUtils';
-function Comment({item, user, handleClose, setComments,  replyFunction, replySecondFunction, comments}) {
+function Comment({item, user, handleClose, setComments, username, focusedItem,  replyFunction, replySecondFunction, comments}) {
     const [usernames, setUsernames] = useState([]);
     //const [reportComment, setReportComment] = useState('');
     const [replyLastVisible, setReplyLastVisible] = useState(0);
@@ -144,9 +144,9 @@ function Comment({item, user, handleClose, setComments,  replyFunction, replySec
                                 
                                 </div>
                             </div>
-                            {replyLastVisible < item.replies.length && item.actualReplies.indexOf(element) == replyLastVisible - 1 ? <div style={styles.replyContainer} onClick={() => toggleShowReply(item)}>
+                            {replyLastVisible < item.replies.length && item.actualReplies.indexOf(element) == replyLastVisible - 1 ? <button style={styles.replyContainer} onClick={() => toggleShowReply(item)}>
                                 <p style={styles.moreRepliesText}>Show more replies</p>
-                            </div> : null}
+                            </button> : null}
                     </> : <div style={{margin: '2.5%'}}>
         <BeatLoader color="#9edaff" />
         </div>
