@@ -255,29 +255,40 @@ export const sendReport = (userId, bugChecked, uxChecked, securityChecked, messa
     feedback: report
   }).then(() => setSentReport(true))
 }
-export const fetchSettingsContent = async(userId, collectionName) => {
+export const fetchSettingsContent = async (userId, collectionName) => {
   if (!userId) {
-    throw new Error("Error: 'userId' or 'collectionName' is undefined.")
+    throw new Error("Error: 'userId' or 'collectionName' is undefined.");
   }
-  const first = query(collection(db, "profiles", userId, collectionName), orderBy('timestamp', 'desc'), limit(10));
+  console.log(collectionName);
+
+  const first = query(
+    collection(db, "profiles", userId, collectionName),
+    orderBy('timestamp', 'desc'),
+    limit(10)
+  );
   const querySnapshot = await getDocs(first);
-  const posts = []
-  querySnapshot.forEach(async(document) => {
-    if (document.data().video) {
-      const secondSnap = await getDoc(doc(db, 'videos', document.id));
-      if (secondSnap.exists()) {
-        posts.push({id: secondSnap.id, ...secondSnap.data()})
-      }
+  console.log(`querySnapshot: ${querySnapshot.docs.length}`);
+
+  const postPromises = querySnapshot.docs.map(async (document) => {
+    const data = document.data();
+    const secondSnap = data.video
+      ? await getDoc(doc(db, 'videos', document.id))
+      : await getDoc(doc(db, 'posts', document.id));
+
+    if (secondSnap.exists()) {
+      return { id: secondSnap.id, ...secondSnap.data() };
     }
-    else {
-      const secondSnap = await getDoc(doc(db, 'posts', document.id));
-      if (secondSnap.exists()) {
-        posts.push({id: secondSnap.id, ...secondSnap.data()})
-      }
-    }
+    return null;
   });
-  return {posts: posts, lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1]}
-}
+
+  const posts = (await Promise.all(postPromises)).filter(Boolean);
+
+  return {
+    posts,
+    lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1],
+  };
+};
+
 export const unBlock = async(itemId, userId, posts, setPosts) => {
   if (!itemId || !userId) {
     throw new Error("Error: 'userId' or 'itemId' is undefined.")
@@ -1043,7 +1054,6 @@ export const fetchPublicPostsExcludingBlockedUsersVideo = async (blockedUsers) =
         posts.push({ id: doc.id, loading: false, ...doc.data() });
       });
     }
-    console.log(`Posts: ${posts}`)
     return { posts, lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1] };
   }
   catch (e) {

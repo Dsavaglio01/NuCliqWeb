@@ -2,7 +2,6 @@ import React from 'react'
 import { styles } from '@/styles/styles'
 import { FaPlay } from "react-icons/fa6";
 function MiniPost({item, index, repost, onClick}) {
-  console.log(item)
 
   return (
     <div key={index} style={{height: 300}} onClick={onClick}>

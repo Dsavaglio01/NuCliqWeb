@@ -18,7 +18,7 @@ function Settings() {
     const [lastVisible, setLastVisible] = useState(null);
     const [completePosts, setCompletePosts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [contentState, setContentState] = useState('saves');
+    const [contentState, setContentState] = useState('My Likes');
     const [postDone, setPostDone] = useState(false);
     const [sentReport, setSentReport] = useState(false);
     const [posts, setPosts] = useState([]);
@@ -38,6 +38,7 @@ function Settings() {
       if (contentState == 'My Likes') {
         const getLikes = async() => {
           const {posts, lastVisible} = await fetchSettingsContent(user.uid, 'likes')
+          console.log(posts.length)
           setPosts(posts)
           setLastVisible(lastVisible)
         }
@@ -54,6 +55,7 @@ function Settings() {
       else if (contentState == 'saves') {
         const getSaves = async() => {
           const {posts, lastVisible} = await fetchSettingsContent(user.uid, 'saves')
+          console.log(posts.length)
           setPosts(posts)
           setLastVisible(lastVisible)
         }
