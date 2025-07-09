@@ -30,13 +30,13 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
     }
     useEffect(() => {
         if (response) {
+            console.log(`Responseee: ${response.length}`)
             setNewPostArray(response)
         }
     }, [response])
-    console.log(response)
-    console.log(newPostArray)
     useEffect(() => {
         if (newPostArray.length > 0 && profile) {
+            console.log(newPostArray.length, newPostArray)
             if ((newPostArray.filter((item) => item.image == true).every(obj => obj['post'].includes('https://firebasestorage.googleapis.com')) && newPostArray.length == data.length) || (newPostArray.filter((item) => item.text).every(obj => obj['visible'] == true) && newPostArray.length == data.length)) {
             const doFunction = async() => {
                 try {
