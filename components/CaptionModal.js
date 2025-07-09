@@ -86,7 +86,7 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
         </div>
         <div style={{position: 'absolute', left: '85%'}}>   
             <div style={styles.postContainerButton}>
-                {(data.length > 0 && !uploading) ? 
+                {(data.length > 0 && !uploading && !finished) ? 
                     <div className='mr-3 mt-3'>
                     <MainButton text={"POST"} onClick={() => handleCaption()} />
                 </div> :
