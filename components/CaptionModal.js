@@ -10,7 +10,7 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
     const [uploading, setUploading] = useState(false);
     const [finished, setFinished] = useState(false);
     const [newPostArray, setNewPostArray] = useState([]);
-    const {addImage, addVideo} = useMultiDownloadImage({user: user, mood: '', caption: caption ?? '', actualPostArray: data, setNewPostArray: setNewPostArray});
+    const {addImage, addVideo, response} = useMultiDownloadImage({user: user, mood: '', caption: caption ?? '', actualPostArray: data, setNewPostArray: setNewPostArray});
     const handleCaption = () => {
         setUploading(true)
         if (data.length > 1 || (data.length == 1 && !data[0].text)) {
@@ -28,7 +28,13 @@ function CaptionModal({ data, profile, closeCaptionModal, user}) {
             }
         })
     }
-    console.log(`Newpostarray: ${newPostArray}`)
+    useEffect(() => {
+        if (response) {
+            setNewPostArray(response)
+        }
+    }, [response])
+    console.log(response)
+    console.log(newPostArray)
     useEffect(() => {
         if (newPostArray.length > 0 && profile) {
             if ((newPostArray.filter((item) => item.image == true).every(obj => obj['post'].includes('https://firebasestorage.googleapis.com')) && newPostArray.length == data.length) || (newPostArray.filter((item) => item.text).every(obj => obj['visible'] == true) && newPostArray.length == data.length)) {

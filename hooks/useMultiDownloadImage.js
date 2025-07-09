@@ -6,6 +6,7 @@ import handleVideoContentModeration from "../lib/handleVideoModeration";
 export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, setNewPostArray}) => {
   //console.log(caption)
   const [downloadLoading, setDownloadLoading] = useState(false);
+  const [response, setResponse] = useState(null);
   const storage = getStorage();
   // Upload Image to Firebase Storage
   const addImage = async (data) => {
@@ -50,7 +51,9 @@ export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, set
     try {
       const starsRef = ref(storage, post);
       const url = await getDownloadURL(starsRef);
-      await handleImageModeration({url: url, caption: caption, mood: mood, actualPostArray: actualPostArray, setNewPostArray: setNewPostArray, reference: starsRef, item: item})
+      const response = await handleImageModeration({url: url, caption: caption, mood: mood, actualPostArray: actualPostArray, setNewPostArray: setNewPostArray, reference: starsRef, item: item})
+      console.log(`Response: ${response}`)
+      setResponse(response)
     } catch (error) {
       console.error("Error getting download URL:", error);
       setDownloadLoading(false);
@@ -88,5 +91,5 @@ export const useMultiDownloadImage = ({mood, user, caption, actualPostArray, set
     return values;
   };
 
-  return { addImage, addVideo, downloadLoading };
+  return { addImage, addVideo, downloadLoading, response };
 };
