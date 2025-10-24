@@ -31,5 +31,6 @@ NuCliqWeb is in beta, supporting NuCliq’s 100+ beta downloads. Active developm
 4. Run: `npm start`
 
 ## Screenshots
-![Dashboard](docs/dashboard.png)
-![Theme Marketplace](docs/marketplace.png)
+![Registration](docs/Registration.png)
+![Dashboard](docs/Dashboard.png)
+![Theme Marketplace](docs/Theme_Marketplace.png)
