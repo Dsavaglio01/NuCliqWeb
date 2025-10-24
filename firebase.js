@@ -18,11 +18,12 @@ const firebaseConfig = {
 
   appId: process.env.NEXT_PUBLIC_APP_ID,
 
-  measurementId: process.env.MEASUREMENT_ID
+  measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 
 };
 
 const app = initializeApp(firebaseConfig);
+console.log(firebaseConfig)
 const db = getFirestore('qadb'); // For your second database
 const auth = getAuth(app)
 export {db, auth, app}
