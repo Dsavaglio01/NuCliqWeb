@@ -269,7 +269,7 @@ function NewPostModal({newPostModal, closePostModal}) {
             {!captionModal ? 
             <div style={{position: 'absolute', left: '85%'}}>   
                 <div style={styles.postContainerButton}>
-                    {(text.length > 0 && !uploading) ? 
+                    {(text.length > 0 && !uploading && !textDone) ? 
                         <div className='mr-3 mt-3'>
                             <MainButton text={"POST"} onClick={() => postText()} />
                         </div> 

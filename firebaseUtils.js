@@ -4,10 +4,10 @@ import { getDoc, doc, collection, where, onSnapshot, setDoc, getDocs, startAfter
   writeBatch} from 'firebase/firestore';
 import { schedulePushLikeNotification } from './notificationFunctions';
 import { getAuth, signOut } from 'firebase/auth';
+import { auth } from '@/firebase';
 import { linkUsernameAlert, profanityUsernameAlert } from './lib/alert';
 import { schedulePushCommentNotification, schedulePushCommentReplyNotification} from './notificationFunctions';
 const TEXT_MODERATION_URL='https://api.sightengine.com/1.0/text/check.json'
-const auth = getAuth();
 /**
  * Applies theme to a user's Posts, Profiles or Both
  * @param {string} posts - If Posts is true, apply to Posts.
